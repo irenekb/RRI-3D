@@ -2,7 +2,7 @@
 '''
 python3 expandinteraction.py -b 2 -x Interaction_Script/test4.bp -n Interaction_Script/test4.seq -i Interaction_Script/test4.in
 
-python expandinteraction.py -b 2 -x Interaction_Script/test4.bp -n Interaction_Script/test4.seq -i Interaction_Script/test4.in
+python expandinteraction.py -b 2 -x test4.bp -n test4.seq -i test4.in
 '''
 
 import logging
@@ -10,13 +10,10 @@ import argparse
 from copy import deepcopy
 #import csv
 from collections import defaultdict
-#import pandas
 import json
 from operator import itemgetter
-#from itertools import chain
 
 log = logging.getLogger(__name__)
-
 
 def is_crossing(dotbracket,basepair):
     """
@@ -60,6 +57,7 @@ def is_taken(dotbracket, basepair):
     log.debug('Is taken: {} ({} {}, {} {})'.format(taken, open, dotbracket[open],close,dotbracket[close]))
     return taken
 
+
 def create_db(basepairs, sequencelength,chainbreak):
     """
     Create a dotbracket string from the basepairlist
@@ -67,37 +65,30 @@ def create_db(basepairs, sequencelength,chainbreak):
     :param basepairs: List of basepairs
     :param sequencelength: length of the DB
     """
-
     dotbracket = [['.']*sequencelength]
     dotbracket[0][chainbreak] = ' '
     dotbracketline = 0
 
-    print (basepairs)
     while len(basepairs) > 0:
-        if dotbracketline == 0:
-            for position, basepair in enumerate(basepairs):
-                print(position, basepair)
-                taken = is_taken(dotbracket[dotbracketline],basepair)
-                crossing = is_crossing(dotbracket[dotbracketline],basepair)
-                if (crossing == False) and (taken == False):
-                    dotbracket[dotbracketline][basepair[0]] = '('
-                    dotbracket[dotbracketline][basepair[1]] = ')'
-                    basepairs.pop(position)
-            print(dotbracketline)
-            dotbracket.append(['.']*sequencelength)
-            dotbracketline += 1
-            print(dotbracketline)
-        else:
-            for position, basepair in enumerate(basepairs):
-                taken = is_taken(dotbracket[dotbracketline],basepair)
-                crossing = is_crossing(dotbracket[dotbracketline],basepair)
-                if (crossing == False) and (taken == False):
-                    dotbracket[dotbracketline][basepair[0]] = '('
-                    dotbracket[dotbracketline][basepair[1]] = ')'
-                    basepairs.pop(position)
-            dotbracket.append(['.']*sequencelength)
-            dotbracketline += 1
+        remaining_basepairs = []
+        for position, basepair in enumerate(basepairs):
+            log.debug(position, basepair)
+            taken = is_taken(dotbracket[dotbracketline],basepair)
+            crossing = is_crossing(dotbracket[dotbracketline],basepair)
+            if (crossing == False) and (taken == False):
+                log.debug('checkpoint passed {}'.format(basepair))
+                dotbracket[dotbracketline][basepair[0]] = '('
+                dotbracket[dotbracketline][basepair[1]] = ')'
+            else:
+                remaining_basepairs.append(basepair)
+        basepairs = remaining_basepairs
+        if len(basepairs) <= 0: break
+        dotbracket.append(['.']*sequencelength)
+        dotbracketline += 1
+        dotbracket[dotbracketline][chainbreak] = ' '
+
     return dotbracket
+
 
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
@@ -143,11 +134,13 @@ def main():
     basepairs.sort(key=itemgetter(0),reverse=False)
     print('ultimate bp list: {}'.format(basepairs))
 
-    '''#Starting Dotbracket structure
+
+    #Starting Dotbracket structure
     dotbracket_old = create_db(basepairs,sequencelength,chainbreak)
     print('old dotbracket')
     for line in dotbracket_old:
-        print(''.join(line))'''
+        print(''.join(line))
+
 
     #INTERACTION BASEPAIRS
     interaction = list()
@@ -155,6 +148,7 @@ def main():
         interaction=json.load(INFile)
     interaction.sort(key=itemgetter(0), reverse=False)
 
+    #new interaction + bufferzone
     start_left, end_left = list(), list()
     start_right, end_right = list(), list()
     for i in range(buffer+1):
@@ -203,7 +197,7 @@ def main():
                 if i in v:
                     basepairs.pop(k)
 
-    print('actual basepairlists: {}'.format(basepairs))
+    print('cleaned basepairlists: {}'.format(basepairs))
 
     #new interaction
     if args.left:
@@ -226,8 +220,7 @@ def main():
         print(sorted(list2, key=lambda l: (len(l), l)))
         [[2, 4, 5], [2, 5, 4], [4, 5, 2]]
     '''
-    print('new basepairlists')
-    print (basepairs)
+    print('new basepairlists: {}'.format(basepairs))
 
     #WRITE THE NEW DOTBRACKET STRUCTURE
     dotbracket_new = create_db(basepairs,sequencelength,chainbreak)
