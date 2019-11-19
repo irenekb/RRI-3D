@@ -215,6 +215,7 @@ def main():
         newbps=[start_left[-1],end_left[0]]
         ncl = [nucleotides[start_left[-1]],nucleotides[end_left[0]]]
         print('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+        #chainbraketest: chainbrake != in pairs
         if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
             basepairs.append(newbps)
     if right:
@@ -223,7 +224,6 @@ def main():
         print('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
         if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
             basepairs.append(newbps)
-    #ToDo: action if chainbreak
 
     basepairs = sorted(basepairs, key=lambda l: (len(l), l))
     '''
