@@ -72,7 +72,7 @@ def create_db(basepairs, sequencelength,chainbreak):
     while len(basepairs) > 0:
         remaining_basepairs = []
         for position, basepair in enumerate(basepairs):
-            log.debug(position, basepair)
+            log.debug('position {} basepair {}'.format(position, basepair))
             taken = is_taken(dotbracket[dotbracketline],basepair)
             crossing = is_crossing(dotbracket[dotbracketline],basepair)
             if (crossing == False) and (taken == False):
@@ -99,8 +99,8 @@ def main():
     parser.add_argument ('-n', '--nucleotides', help='related nucleotides')
     parser.add_argument ('-i', '--interaction', help='interacting basepairs')
     parser.add_argument ('-s', '--stepsize', type=int, help='e.g expanding of onlzy 1/2 bps', default=1 )
-    parser.add_argument ('-r', '--right', action='store_true', help='expand right',default=True)
-    parser.add_argument ('-l', '--left', action='store_true', help='expand_left',default=True)
+    parser.add_argument ('-r', '--right', action='store_true', help='expand right')
+    parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
 
     args = parser.parse_args()
 
@@ -109,6 +109,15 @@ def main():
         print('DEBUGGING MODE')
     else:
         logging.basicConfig(level = logging.WARNING)
+
+    if not args.right and not args.left:
+        right = True
+        left = True
+    else:
+        right = args.right
+        left = args.left
+
+    print('right {} left {}'.format(right, left))
 
     buffer = args.buffer
     Pairs = {"A":"U","U":"A","G":"C","C":"G"}
@@ -148,71 +157,73 @@ def main():
         interaction=json.load(INFile)
     interaction.sort(key=itemgetter(0), reverse=False)
 
+    print('Interaction list, with interaction: {}'.format(interaction))
+
     #new interaction + bufferzone
     start_left, end_left = list(), list()
     start_right, end_right = list(), list()
     for i in range(buffer+1):
         i += 1 #one for zero and one for bracket + buffer
-        if args.right and args.left:
+        if right and left:
             start_left.append(interaction[0][0]-i)
             end_left.append(interaction[0][1]+i)
             start_right.append(interaction[-1][0]+i)
             end_right.append(interaction[-1][1]-i)
-        if args.right and not args.left:
+        if right and not left:
             start_right.append(interaction[-1][0]+i)
             end_right.append(interaction[-1][1]-i)
-        if args.left and not args.right:
+        if left and not right:
             start_left.append(interaction[0][0]-i)
             end_left.append(interaction[0][1]+i)
-
-    if args.right:
-        start_right.sort()
-        end_right.sort()
-    if args.left:
-        start_left.sort()
-        end_left.sort()
-
-    print('Interaction list, with interaction: {}'.format(interaction))
-
-    print('New interaction positions left: start {} end {}; right: start {} end {}'.format(start_left, end_left, start_right, end_right))
 
     #Remove all brackets left
-    if args.left:
-        for i in start_left:
-            for k, v in enumerate(basepairs):
-                if i in v:
-                    basepairs.pop(k)
-        for i in end_left:
-            for k, v in enumerate(basepairs):
-                if i in v:
-                    basepairs.pop(k)
-    #Remove all brackets right
-    if args.right:
-        for i in start_right:
-            for k, v in enumerate(basepairs):
-                if i in v:
-                    basepairs.pop(k)
-        for i in end_right:
-            for k, v in enumerate(basepairs):
-                if i in v:
-                    basepairs.pop(k)
+    if left:
+        removing_basepairs = []
+        start_left.sort()
+        end_left.sort()
+        for base in start_left:
+            for pair in basepairs:
+                if base in pair:
+                    removing_basepairs.append(pair)
+        for base in end_left:
+            for pair in basepairs:
+                if base in pair:
+                    removing_basepairs.append(pair)
+        for pair in removing_basepairs:
+            basepairs.remove(pair)
+        print('New interaction positions left: start {} end {}, need to remove '.format(start_left, end_left,removing_basepairs))
 
-    print('cleaned basepairlists: {}'.format(basepairs))
+    if right:
+        removing_basepairs = []
+        start_right.sort()
+        end_right.sort()
+        for base in start_right:
+            for pair in basepairs:
+                if base in pair:
+                    removing_basepairs.append(pair)
+        for base in end_right:
+            for pair in basepairs:
+                if base in pair:
+                    removing_basepairs.append(pair)
+        for pair in removing_basepairs:
+            basepairs.remove(pair)
+        print('New interaction positions right: start {} end {}'.format(start_right, end_right,removing_basepairs))
+
 
     #new interaction
-    if args.left:
+    if left:
         newbps=[start_left[-1],end_left[0]]
         ncl = [nucleotides[start_left[-1]],nucleotides[end_left[0]]]
         print('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
         if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
             basepairs.append(newbps)
-    if args.right:
+    if right:
         newbps=[start_right[0],end_right[-1]]
         ncl = [nucleotides[start_right[0]],nucleotides[end_right[-1]]]
         print('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
         if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
             basepairs.append(newbps)
-    #ToDo: action if chainbreak or it is not complementary
+    #ToDo: action if chainbreak
 
     basepairs = sorted(basepairs, key=lambda l: (len(l), l))
     '''
