@@ -7,11 +7,14 @@ python expandinteraction.py -b 2 -x test4.bp -n test4.seq -i test4.in
 
 import logging
 import argparse
-from copy import deepcopy
 #import csv
 from collections import defaultdict
 import json
 from operator import itemgetter
+import sys #for nussinov
+import numpy as np
+np.set_printoptions(threshold=sys.maxsize,linewidth =900)
+
 
 log = logging.getLogger(__name__)
 
@@ -150,12 +153,49 @@ def main():
     for line in dotbracket_old:
         print(''.join(line))
 
-
     #INTERACTION BASEPAIRS
     interaction = list()
     with open(args.interaction, 'r') as INFile:
         interaction=json.load(INFile)
     interaction.sort(key=itemgetter(0), reverse=False)
+
+    #GET INTERACTION BASEPAIRS WITH NUSSINOV
+    preinteractionlist = list()
+    for pair in basepairs:
+        if pair[0] < chainbreak and pair[1] > chainbreak:
+            preinteractionlist.append(pair)
+    preinteractionlist = sorted(preinteractionlist, key=lambda l: (len(l), l))
+
+    print('Accept basepairs for interaction: {}'.format(preinteractionlist))
+
+    inter_1 = [min(map(lambda x: x[0],preinteractionlist)),max(map(lambda x: x[0],preinteractionlist))]
+    inter_2 = [min(map(lambda x: x[-1],preinteractionlist)),max(map(lambda x: x[-1],preinteractionlist))]
+    print (inter_1, inter_2)
+    #inter_start, inter_end = preinteractionlist[0][0], preinteractionlist[-1][-1]
+    #IM  = np.zeros([sequencelength,sequencelength],dtype=int)
+    IM  = np.empty([sequencelength,sequencelength])
+    IM[:] = np.NAN
+    for j in range(inter_1[0],inter_2[0]+1):
+        for i in reversed(range(inter_1[0],inter_2[0]+1)):
+            IM[i,j]=0
+            IM[j,i]=0
+            '''
+    for j in range(inter_2[0],inter_2[1]+1):
+        for i in reversed(range(inter_2[0],inter_2[1]+1)):
+            IM[i,j]=0
+            IM[j,i]=0
+            '''
+            '''
+        for i in range(sequencelength-k):
+            j = i+k
+            print (i,j)
+            IM[i,j]=0
+            IM[j,i]=0'''
+    for pair in preinteractionlist:
+        IM[pair[0],pair[1]]=1
+        IM[pair[1],pair[0]]=1
+    print(IM)
+
 
     print('Interaction list, with interaction: {}'.format(interaction))
 
@@ -227,9 +267,8 @@ def main():
 
     basepairs = sorted(basepairs, key=lambda l: (len(l), l))
     '''
-        list2 = [[4, 5, 2], [2, 5, 4], [2, 4, 5]]
-        print(sorted(list2, key=lambda l: (len(l), l)))
-        [[2, 4, 5], [2, 5, 4], [4, 5, 2]]
+        list = sort( [[4, 5, 2], [2, 5, 4], [2, 4, 5]])
+        list = [[2, 4, 5], [2, 5, 4], [4, 5, 2]]
     '''
     print('new basepairlists: {}'.format(basepairs))
 
