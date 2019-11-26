@@ -11,7 +11,7 @@ import argparse
 from collections import defaultdict
 import json
 from operator import itemgetter
-import sys #for nussinov
+import sys
 import numpy as np
 np.set_printoptions(threshold=sys.maxsize,linewidth =900)
 
@@ -93,6 +93,38 @@ def create_db(basepairs, sequencelength,chainbreak):
     return dotbracket
 
 
+def db2bps(db):
+    """
+    Get base pair list from db string.
+
+    :param db: String of dotbracket
+    """
+    opening_bps = []
+    bps = []
+
+    for i in range(len(db)):
+        if db[i] in ['(','[','{','<']:
+            opening_bps.append(i)
+        elif db[i] in [')',']','}','>']:
+            bps.append([opening_bps.pop(),i]) # list of lists
+    return bps
+
+
+'''
+def optimal_interaction(y,x,nucleotides):
+    if y == 'nan' or x == 'nan':
+        return 0
+    else:
+        inter_false =  opitmal_interaction(y,x-1,nucleotides) # if not within the interaction the score is IM(i,j-1)
+        inter_true = [1 +  optimal_interaction(y, t-1, sequence) + optimal_interaction(t+1, x-1, sequence) for t in range(y, x)\
+                    if nucleotides[t] in Pairs and nucleotides[x] == Pairs[nucleotides[0]]]
+
+        if not inter_true:
+            inter_true = [0]
+        inter_true = max(inter_true)
+
+    return max(inter_false, inter_true)
+'''
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
     parser.add_argument ('-b', '--buffer', type= int, help='Buffer length',default=0)
@@ -124,6 +156,7 @@ def main():
 
     buffer = args.buffer
     Pairs = {"A":"U","U":"A","G":"C","C":"G"}
+    #Pairs = [('A', 'U'), ('U', 'A'), ('C', 'G'), ('G', 'C')]
 
     #NUCLEOTIDES from file, SEQUENCELENGTH, CHAINBREAK
     nucleotides =  list()
@@ -153,13 +186,31 @@ def main():
     for line in dotbracket_old:
         print(''.join(line))
 
+
+    #Find the interaction (within DB)
+    findinteractionline = dict()
+    for nr, db_line in enumerate(dotbracket_old):
+        bp_count = 0
+        interim_interaction_bps = db2bps(db_line)
+        for pair in interim_interaction_bps:
+                if pair[0] < chainbreak and pair[1] > chainbreak:
+                    bp_count += 1
+        findinteractionline[nr] = [bp_count,interim_interaction_bps]
+
+    interaction = max(findinteractionline.values()[1])
+    interaction.sort(key=itemgetter(0), reverse=False)
+
+    print(findinteractionline)
+
+    '''
     #INTERACTION BASEPAIRS
     interaction = list()
     with open(args.interaction, 'r') as INFile:
         interaction=json.load(INFile)
     interaction.sort(key=itemgetter(0), reverse=False)
-
-    #GET INTERACTION BASEPAIRS WITH NUSSINOV
+    '''
+    '''
+    #GET INTERACTION BASEPAIRS
     preinteractionlist = list()
     for pair in basepairs:
         if pair[0] < chainbreak and pair[1] > chainbreak:
@@ -167,35 +218,36 @@ def main():
     preinteractionlist = sorted(preinteractionlist, key=lambda l: (len(l), l))
 
     print('Accept basepairs for interaction: {}'.format(preinteractionlist))
-
+    '''
+    '''
     inter_1 = [min(map(lambda x: x[0],preinteractionlist)),max(map(lambda x: x[0],preinteractionlist))]
     inter_2 = [min(map(lambda x: x[-1],preinteractionlist)),max(map(lambda x: x[-1],preinteractionlist))]
-    print (inter_1, inter_2)
+    print ('Interaction between the bases: y axis {} x axis {}'.format(inter_1, inter_2))
     #inter_start, inter_end = preinteractionlist[0][0], preinteractionlist[-1][-1]
     #IM  = np.zeros([sequencelength,sequencelength],dtype=int)
     IM  = np.empty([sequencelength,sequencelength])
     IM[:] = np.NAN
-    for j in range(inter_1[0],inter_2[0]+1):
-        for i in reversed(range(inter_1[0],inter_2[0]+1)):
-            IM[i,j]=0
-            IM[j,i]=0
-            '''
-    for j in range(inter_2[0],inter_2[1]+1):
-        for i in reversed(range(inter_2[0],inter_2[1]+1)):
-            IM[i,j]=0
-            IM[j,i]=0
-            '''
-            '''
-        for i in range(sequencelength-k):
-            j = i+k
-            print (i,j)
-            IM[i,j]=0
-            IM[j,i]=0'''
+    for y in (range(inter_1[0],inter_1[1]+1)):
+        for x in reversed(range(inter_2[0],inter_2[1]+1)):
+            IM[y,x]=int(0)
+            IM[x,y]=int(0)
+
     for pair in preinteractionlist:
-        IM[pair[0],pair[1]]=1
-        IM[pair[1],pair[0]]=1
+        IM[pair[0],pair[1]]=int(1)
+        IM[pair[1],pair[0]]=int(1)
     print(IM)
 
+    for y in range(0,sequencelength+1):
+        for x in reverse(range(0,sequencelength+1)):
+            if IM.item(y,x) == nan:
+                pass
+            else:
+
+
+            IM[y][x] = optimal_interaction(y,x,nucleotides)
+
+    print(IM)
+    '''
 
     print('Interaction list, with interaction: {}'.format(interaction))
 
@@ -216,6 +268,7 @@ def main():
             start_left.append(interaction[0][0]-i)
             end_left.append(interaction[0][1]+i)
 
+    print(start_left,end_left, start_right, end_right)
     #Remove all brackets left
     if left:
         removing_basepairs = []
@@ -231,7 +284,7 @@ def main():
                     removing_basepairs.append(pair)
         for pair in removing_basepairs:
             basepairs.remove(pair)
-        print('New interaction positions left: start {} end {}, need to remove '.format(start_left, end_left,removing_basepairs))
+        print('New interaction positions left: start {} end {}'.format(start_left, end_left,removing_basepairs))
 
     if right:
         removing_basepairs = []
@@ -263,6 +316,7 @@ def main():
         ncl = [nucleotides[start_right[0]],nucleotides[end_right[-1]]]
         print('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
         if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
+        #if ncl in Pairs:
             basepairs.append(newbps)
 
     basepairs = sorted(basepairs, key=lambda l: (len(l), l))
