@@ -74,6 +74,7 @@ def create_db(basepairs, sequencelength,chainbreak):
 
     while len(basepairs) > 0:
         remaining_basepairs = []
+        log.debug('NEW ROUND IN DB-CREATION')
         for position, basepair in enumerate(basepairs):
             log.debug('position {} basepair {}'.format(position, basepair))
             taken = is_taken(dotbracket[dotbracketline],basepair)
@@ -110,21 +111,6 @@ def db2bps(db):
     return bps
 
 
-'''
-def optimal_interaction(y,x,nucleotides):
-    if y == 'nan' or x == 'nan':
-        return 0
-    else:
-        inter_false =  opitmal_interaction(y,x-1,nucleotides) # if not within the interaction the score is IM(i,j-1)
-        inter_true = [1 +  optimal_interaction(y, t-1, sequence) + optimal_interaction(t+1, x-1, sequence) for t in range(y, x)\
-                    if nucleotides[t] in Pairs and nucleotides[x] == Pairs[nucleotides[0]]]
-
-        if not inter_true:
-            inter_true = [0]
-        inter_true = max(inter_true)
-
-    return max(inter_false, inter_true)
-'''
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
     parser.add_argument ('-b', '--buffer', type= int, help='Buffer length',default=0)
@@ -176,7 +162,8 @@ def main():
     basepairs = list()
     with open(args.basepairlist, 'r') as BPFile:
         basepairs=json.load(BPFile)
-    basepairs.sort(key=itemgetter(0),reverse=False)
+    #basepairs.sort(key=itemgetter(0),reverse=False)
+    basepairs.sort(key = lambda k: (k[0], -k[1]))
     print('ultimate bp list: {}'.format(basepairs))
 
 
@@ -187,7 +174,7 @@ def main():
         print(''.join(line))
 
 
-    #Find the interaction (within DB)
+    #Find the interaction (use DBold)
     findinteractionline = dict()
     for nr, db_line in enumerate(dotbracket_old):
         bp_count = 0
@@ -196,58 +183,11 @@ def main():
                 if pair[0] < chainbreak and pair[1] > chainbreak:
                     bp_count += 1
         findinteractionline[nr] = [bp_count,interim_interaction_bps]
+        print (findinteractionline)
 
     interaction = max(findinteractionline.values()[1])
-    interaction.sort(key=itemgetter(0), reverse=False)
-
-    print(findinteractionline)
-
-    '''
-    #INTERACTION BASEPAIRS
-    interaction = list()
-    with open(args.interaction, 'r') as INFile:
-        interaction=json.load(INFile)
-    interaction.sort(key=itemgetter(0), reverse=False)
-    '''
-    '''
-    #GET INTERACTION BASEPAIRS
-    preinteractionlist = list()
-    for pair in basepairs:
-        if pair[0] < chainbreak and pair[1] > chainbreak:
-            preinteractionlist.append(pair)
-    preinteractionlist = sorted(preinteractionlist, key=lambda l: (len(l), l))
-
-    print('Accept basepairs for interaction: {}'.format(preinteractionlist))
-    '''
-    '''
-    inter_1 = [min(map(lambda x: x[0],preinteractionlist)),max(map(lambda x: x[0],preinteractionlist))]
-    inter_2 = [min(map(lambda x: x[-1],preinteractionlist)),max(map(lambda x: x[-1],preinteractionlist))]
-    print ('Interaction between the bases: y axis {} x axis {}'.format(inter_1, inter_2))
-    #inter_start, inter_end = preinteractionlist[0][0], preinteractionlist[-1][-1]
-    #IM  = np.zeros([sequencelength,sequencelength],dtype=int)
-    IM  = np.empty([sequencelength,sequencelength])
-    IM[:] = np.NAN
-    for y in (range(inter_1[0],inter_1[1]+1)):
-        for x in reversed(range(inter_2[0],inter_2[1]+1)):
-            IM[y,x]=int(0)
-            IM[x,y]=int(0)
-
-    for pair in preinteractionlist:
-        IM[pair[0],pair[1]]=int(1)
-        IM[pair[1],pair[0]]=int(1)
-    print(IM)
-
-    for y in range(0,sequencelength+1):
-        for x in reverse(range(0,sequencelength+1)):
-            if IM.item(y,x) == nan:
-                pass
-            else:
-
-
-            IM[y][x] = optimal_interaction(y,x,nucleotides)
-
-    print(IM)
-    '''
+    #interaction.sort(key=itemgetter(0), reverse=False)
+    interaction.sort(key = lambda k: (k[0], -k[1]))
 
     print('Interaction list, with interaction: {}'.format(interaction))
 
@@ -319,10 +259,11 @@ def main():
         #if ncl in Pairs:
             basepairs.append(newbps)
 
-    basepairs = sorted(basepairs, key=lambda l: (len(l), l))
+    #basepairs = sorted(basepairs, key=lambda l: (len(l), l))
+    basepairs.sort(key = lambda k: (k[0], -k[1]))
     '''
-        list = sort( [[4, 5, 2], [2, 5, 4], [2, 4, 5]])
-        list = [[2, 4, 5], [2, 5, 4], [4, 5, 2]]
+        list = sort( [[5, 2], [2, 4], [4, 5]])
+        list = [[2, 5], [2, 4], [4, 5]]
     '''
     print('new basepairlists: {}'.format(basepairs))
 
