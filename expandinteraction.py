@@ -115,10 +115,8 @@ def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
     parser.add_argument ('-b', '--buffer', type= int, help='Buffer length',default=0)
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
-
     parser.add_argument ('-x', '--basepairlist', help='basepair list')
     parser.add_argument ('-n', '--nucleotides', help='related nucleotides')
-    parser.add_argument ('-i', '--interaction', help='interacting basepairs')
     parser.add_argument ('-s', '--stepsize', type=int, help='e.g expanding of onlzy 1/2 bps', default=1 )
     parser.add_argument ('-r', '--right', action='store_true', help='expand right')
     parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
