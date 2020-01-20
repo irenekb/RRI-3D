@@ -7,7 +7,7 @@ python expandinteraction.py -b 2 -x test4.bp -n test4.seq -i test4.in
 
 import logging
 import argparse
-#import csv
+import csv
 from collections import defaultdict
 import json
 from operator import itemgetter
@@ -117,9 +117,10 @@ def main():
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
     parser.add_argument ('-x', '--basepairlist', help='basepair list')
     parser.add_argument ('-n', '--nucleotides', help='related nucleotides')
-    parser.add_argument ('-s', '--stepsize', type=int, help='e.g expanding of onlzy 1/2 bps', default=1 )
+    parser.add_argument ('-s', '--stepsize', type=int, help='e.g expanding of only 1/2 bps', default=1 )
     parser.add_argument ('-r', '--right', action='store_true', help='expand right')
     parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
+    parser.add_argument ('-o', '--output', help='name of the outputfile')
 
     args = parser.parse_args()
 
@@ -152,7 +153,8 @@ def main():
                 nucleotides.append(element)
                 if not element.strip():
                     chainbreak = int(index)
-        sequencelength = int(len(nucleotides))
+        sequencelength = int(len(nucleotides))+1
+
     print('ultimate ncl list with length {}, with chainbrake at {}'.format(sequencelength,chainbreak))
     print(nucleotides)
 
@@ -164,7 +166,6 @@ def main():
     basepairs.sort(key = lambda k: (k[0], -k[1]))
     print('ultimate bp list: {}'.format(basepairs))
 
-
     #Starting Dotbracket structure
     dotbracket_old = create_db(basepairs,sequencelength,chainbreak)
     print('old dotbracket')
@@ -174,17 +175,19 @@ def main():
 
     #Find the interaction (use DBold)
     findinteractionline = dict()
-    for nr, db_line in enumerate(dotbracket_old):
+
+    for nr, db_line in enumerate(dotbracket_old): #line includes only noncrossing bps
+        print (nr, db_line)
         bp_count = 0
         interim_interaction_bps = db2bps(db_line)
-        for pair in interim_interaction_bps:
+        for pair in interim_interaction_bps: #counting interaction pairs
                 if pair[0] < chainbreak and pair[1] > chainbreak:
                     bp_count += 1
         findinteractionline[nr] = [bp_count,interim_interaction_bps]
         print (findinteractionline)
 
-    interaction = max(findinteractionline.values()[1])
-    #interaction.sort(key=itemgetter(0), reverse=False)
+    interaction_list = list(sorted(findinteractionline.values()))[-1]
+    interaction = interaction_list[0]= interaction_list[1]
     interaction.sort(key = lambda k: (k[0], -k[1]))
 
     print('Interaction list, with interaction: {}'.format(interaction))
@@ -268,8 +271,16 @@ def main():
     #WRITE THE NEW DOTBRACKET STRUCTURE
     dotbracket_new = create_db(basepairs,sequencelength,chainbreak)
     print('new dotbracket')
+    forprinting = list()
     for line in dotbracket_new:
         print(''.join(line))
+        fp = (''.join(line))
+        forprinting.append(fp)
+
+    with open(args.output, mode='w',newline='\n') as OUTPUTFILE:
+        writer = csv.writer(OUTPUTFILE, delimiter='\n' )
+        writer.writerow(forprinting)
+
 
 if __name__ == "__main__":
     main()
