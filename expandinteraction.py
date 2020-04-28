@@ -153,7 +153,7 @@ def main():
                 nucleotides.append(element)
                 if not element.strip():
                     chainbreak = int(index)
-        sequencelength = int(len(nucleotides))+1
+        sequencelength = int(len(nucleotides))
 
     print('ultimate ncl list with length {}, with chainbrake at {}'.format(sequencelength,chainbreak))
     print(nucleotides)
@@ -277,9 +277,10 @@ def main():
         fp = (''.join(line))
         forprinting.append(fp)
 
-    with open(args.output, mode='w',newline='\n') as OUTPUTFILE:
-        writer = csv.writer(OUTPUTFILE, delimiter='\n' )
+    with open(args.output, mode='w') as OUTPUTFILE:
+        writer = csv.writer(OUTPUTFILE, delimiter='\n')
         writer.writerow(forprinting)
+        #OUTPUTFILE.write('\n')
 
 
 if __name__ == "__main__":
