@@ -89,7 +89,9 @@ general options:
 > python3 continoussearch.py -p path/to/inputfiles --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f
 
 
+
 - To get the pdb for the next run:
+
 SimRNA_trafl2pdbsstructure.pdb trajectory.trafl {list} AA
 AA   ... all atom reconstruction
 list ... frame in the list
