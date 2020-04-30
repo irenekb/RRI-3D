@@ -81,10 +81,10 @@ instead of the most common secondary structure:
 --interaction: Find the secondary structure with an interaction most similar to the contrained one
 
 general options:
-- p       ... path to input files
--– print  ... print a csv-file with all minEnergy relevant files
-–- first  ... verify the first line
-–- second ... verify the second line
+-p       ... path to input files
+--print  ... print a csv-file with all minEnergy relevant files
+--first  ... verify the first line
+--second ... verify the second line
 
 > python3 continoussearch.py -p path/to/inputfiles --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f
 
