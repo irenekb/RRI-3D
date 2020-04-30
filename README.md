@@ -13,7 +13,7 @@ e.g.:
 UUCGUACUCGCCAAAGUUGAA UCUUCUUCAACUUUGGCGAGUACGAAAAGA  --> RNA Sequence
 ((((.............)))) ((((.(((...............)))))))  --> Dotbracket structur (intra)
 .....(((((((((((..... ..........))))))))))).........  --> Dotbracket structur (inter)
-    RNA-CHAIN 1                RNA-CHAIN 2
+     RNA-CHAIN 1                RNA-CHAIN 2
 
 
 Dotbracket Structure: Point   = free nucleotide
@@ -76,7 +76,6 @@ The structure with the best energy (3D) is the one for the next constrained run.
 
 
 instead of the most common secondary structure: 
-
 --force: Find the secondary structure that fits the given constrain best
 --interaction: Find the secondary structure with an interaction most similar to the contrained one
 
