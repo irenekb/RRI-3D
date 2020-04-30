@@ -2,6 +2,7 @@ Several RNA-RNA-interaction skripts
 
 
 - expandinteraciton.py
+
 Prepare DB-files with expanding interaction (python3 preferred)
 
 Expand an interaction site between two RNA chains. 
@@ -49,7 +50,8 @@ e.g -b 2
 
 
 
-- Ssalignment.py
+- SSalignment.py
+
 Compare all secondary structures files (calculated via SimRNA – SimRNA-style) with the start ss-sequence, the constrained ss-sequence and with each other.
 For comparing the energy the SimRNA trafl file is used. 
 
@@ -87,7 +89,7 @@ general options:
 > python3 continoussearch.py -p path/to/inputfiles --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f
 
 
-To get the pdb for the next run:
+- To get the pdb for the next run:
 SimRNA_trafl2pdbsstructure.pdb trajectory.trafl {list} AA
 AA   ... all atom reconstruction
 list ... frame in the list
