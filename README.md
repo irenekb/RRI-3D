@@ -76,8 +76,8 @@ The structure with the best energy (3D) is the one for the next constrained run.
 
 
 instead of the most common secondary structure: 
---force: Find the secondary structure that fits the given constrain best
 
+--force: Find the secondary structure that fits the given constrain best
 --interaction: Find the secondary structure with an interaction most similar to the contrained one
 
 general options:
@@ -90,9 +90,7 @@ general options:
 
 
 
-- To get the pdb for the next run:
-
+To get the pdb for the next run:
 SimRNA_trafl2pdbsstructure.pdb trajectory.trafl {list} AA
 AA   ... all atom reconstruction
 list ... frame in the list
-
