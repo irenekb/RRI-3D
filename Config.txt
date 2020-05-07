@@ -1,0 +1,64 @@
+RUN-SETTINGS
+
+First-Run
+Steps 		16000000
+Saving-Steps	   16000
+Input		sequence, secondary structure constrain
+
+Surface
+Steps 		10000
+Saving-Steps	    1
+Input		pdb from previous run (First-Run)
+
+Expand (also for buffer-, left-, right-runs)
+Steps 		10000
+Saving-Steps	    1
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 01
+Steps 		20000
+Saving-Steps	    1
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 01
+Steps 		20000
+Saving-Steps	    1
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 02
+Steps 		30000
+Saving-Steps	    1
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 03
+Steps 		100000
+Saving-Steps	   100
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 04
+Steps 		300000
+Saving-Steps	   100
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 05
+Steps 		600000
+Saving-Steps	   100
+Input		pdb from previous run, secondary structure constrain
+
+Expand-long 06
+Steps 		1000000
+Saving-Steps	    100
+Input		pdb from previous run, secondary structure constrain
+
+
+OTHER SETTING
+INIT_TEMP			0.95
+FINAL_TEMP			0.90
+BONDS_WEIGHT			 1.0
+ANGLES_WEIGHT			 1.0
+TORS_ANGLES_WEIGHT		 0.0
+ETA_THETA_WEIGHT		 0.4
+SECONDS_STRC_RESTRAINTS_WEIGHT	 1
+
+without replica exchange
+random number seed 1-10
