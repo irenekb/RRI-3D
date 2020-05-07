@@ -1,0 +1,77 @@
+#Sample for a constraint run + analysis of the structures
+
+./job_simrna_start_expand.sh $OUTPUTDIR $PDB $SECONDARY-STRUCTURE
+#OUTDIR: CopStems_Kolb/03/
+
+#create structure for the analysis
+mkdir CopStems_Kolb/03/analyse
+mkdir CopStems_Kolb/03/analyse/01
+mkdir CopStems_Kolb/03/analyse/02
+mkdir CopStems_Kolb/03/analyse/03
+mkdir CopStems_Kolb/03/analyse/04
+mkdir CopStems_Kolb/03/analyse/05
+mkdir CopStems_Kolb/03/analyse/06
+mkdir CopStems_Kolb/03/analyse/07
+mkdir CopStems_Kolb/03/analyse/08
+mkdir CopStems_Kolb/03/analyse/09
+mkdir CopStems_Kolb/03/analyse/10
+
+cp CopStems_Kolb/03/CopStems_03_01.trafl CopStems_Kolb/03/analyse/01
+cp CopStems_Kolb/03/CopStems_03_02.trafl CopStems_Kolb/03/analyse/02
+cp CopStems_Kolb/03/CopStems_03_03.trafl CopStems_Kolb/03/analyse/03
+cp CopStems_Kolb/03/CopStems_03_04.trafl CopStems_Kolb/03/analyse/04
+cp CopStems_Kolb/03/CopStems_03_05.trafl CopStems_Kolb/03/analyse/05
+cp CopStems_Kolb/03/CopStems_03_06.trafl CopStems_Kolb/03/analyse/06
+cp CopStems_Kolb/03/CopStems_03_07.trafl CopStems_Kolb/03/analyse/07
+cp CopStems_Kolb/03/CopStems_03_08.trafl CopStems_Kolb/03/analyse/08
+cp CopStems_Kolb/03/CopStems_03_09.trafl CopStems_Kolb/03/analyse/09
+cp CopStems_Kolb/03/CopStems_03_10.trafl CopStems_Kolb/03/analyse/10
+
+cp CopStems_Kolb/03/CopStems_03_01-000001.pdb CopStems_Kolb/03/analyse/01
+cp CopStems_Kolb/03/CopStems_03_02-000001.pdb CopStems_Kolb/03/analyse/02
+cp CopStems_Kolb/03/CopStems_03_03-000001.pdb CopStems_Kolb/03/analyse/03
+cp CopStems_Kolb/03/CopStems_03_04-000001.pdb CopStems_Kolb/03/analyse/04
+cp CopStems_Kolb/03/CopStems_03_05-000001.pdb CopStems_Kolb/03/analyse/05
+cp CopStems_Kolb/03/CopStems_03_06-000001.pdb CopStems_Kolb/03/analyse/06
+cp CopStems_Kolb/03/CopStems_03_07-000001.pdb CopStems_Kolb/03/analyse/07
+cp CopStems_Kolb/03/CopStems_03_08-000001.pdb CopStems_Kolb/03/analyse/08
+cp CopStems_Kolb/03/CopStems_03_09-000001.pdb CopStems_Kolb/03/analyse/09
+cp CopStems_Kolb/03/CopStems_03_10-000001.pdb CopStems_Kolb/03/analyse/10
+
+#translate every structure in the trafl file to coarse-grained pdb structure + the secondary structure
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/01/CopStems_03_01-000001.pdb CopStems_Kolb/03/analyse/01/CopStems_03_01.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/02/CopStems_03_02-000001.pdb CopStems_Kolb/03/analyse/02/CopStems_03_02.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/03/CopStems_03_03-000001.pdb CopStems_Kolb/03/analyse/03/CopStems_03_03.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/04/CopStems_03_04-000001.pdb CopStems_Kolb/03/analyse/04/CopStems_03_04.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/05/CopStems_03_05-000001.pdb CopStems_Kolb/03/analyse/05/CopStems_03_05.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/06/CopStems_03_06-000001.pdb CopStems_Kolb/03/analyse/06/CopStems_03_06.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/07/CopStems_03_07-000001.pdb CopStems_Kolb/03/analyse/07/CopStems_03_07.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/08/CopStems_03_08-000001.pdb CopStems_Kolb/03/analyse/08/CopStems_03_08.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/09/CopStems_03_09-000001.pdb CopStems_Kolb/03/analyse/09/CopStems_03_09.trafl :
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/10/CopStems_03_10-000001.pdb CopStems_Kolb/03/analyse/10/CopStems_03_10.trafl :
+
+#Compare all secondary structures 
+# use all ss-structures + trafl-files + starting ss-structure + constrained ss-structure
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/01/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_01.csv -u CopStems_2rl_03.csv -m 'w' -t CopStems_Kolb/03/analyse/01/CopStems_03_01.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/02/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_02.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/02/CopStems_03_02.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/03/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_03.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/03/CopStems_03_03.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/04/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_04.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/04/CopStems_03_04.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/05/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_05.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/05/CopStems_03_05.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/06/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_06.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/06/CopStems_03_06.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/07/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_07.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/07/CopStems_03_07.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/08/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_08.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/08/CopStems_03_08.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/09/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_09.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/09/CopStems_03_09.trafl
+python3 SSalignment.py -p CopStems_Kolb/03/analyse/10/ -i CopStems_Kolb/03/CopStems_03.ss_cc -c CopStems_Kolb/03/CopStems_03.ss -o CopStems_2rl_03_10.csv -u CopStems_2rl_03.csv -m 'a' -t CopStems_Kolb/03/analyse/10/CopStems_03_10.trafl
+
+mv CopStems_2rl_03* CopStems_Kolb/03/analyse/
+
+# Find the best fitting secondary structure (--interaction) and extract the one with the best 3D-energy (--print)
+python3 continoussearch.py -p /scr/coridan/irene/Data_interaction/CopStems_Kolb/03/analyse/ --print --first 'CopStems_03.ss' --second 'CopStems_03.ss_cc' --interaction -i CopStems_2rl_03
+
+mv CopStems_03_* CopStems_Kolb/03/analyse/
+
+# Translate the best Structure to a full-atom pdb structure --> used for the next run
+SimRNA_trafl2pdbs CopStems_Kolb/03/analyse/02/CopStems_03_02-000003.pdb  CopStems_Kolb/03/analyse/02/CopStems_03_02.trafl 3 AA 
+
+cp CopStems_Kolb/03/analyse/02/CopStems_03_02-000003* CopStems_Kolb/03/analyse/
+
