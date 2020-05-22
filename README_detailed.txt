@@ -1,6 +1,37 @@
 Several RNA-RNA-interaction skripts
 
+BASH
+- initial
+start a 16,000,000 million step run (stepsize 16,000) with a secondary structure and the sequence
 
+- surface
+10,000 step run (stepsize 1) only with the pdb-file
+
+- expand
+pdb-file and the new secondary structure constraint
+expand           > iterations    10,000 stepsize   1
+expand_long01    > iterations    20,000 stepsize   1
+expand_long02    > iterations    30,000 stepsize   1
+expand_long03    > iterations   100,000 stepsize 100
+expand_long04    > iterations   300,000 stepsize 100
+expand_long05    > iterations   600,000 stepsize 100
+expand_long06    > iterations 1,000,000 stepsize 100
+
+e.g.
+Startfile-script                  In/Output directory               Name Round SimRNA place                    config_name
+SimRNA_scripts/job_simrna_start_initial.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ initial
+SimRNA_scripts/job_simrna_start_surface.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ surface 
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 
+SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 
+
+
+
+PYTHON
 - expandinteraciton.py
 
 Prepare DB-files with expanding interaction (python3 preferred)

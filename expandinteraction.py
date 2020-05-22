@@ -1,8 +1,10 @@
-#!usr/bin/env python
+#!usr/bin/env python3
 '''
-python3 expandinteraction.py -b 2 -x Interaction_Script/test4.bp -n Interaction_Script/test4.seq -i Interaction_Script/test4.in
+python3 expandinteraction.py  -b 2 -n test5.seq -x test5.bp -o test5_01.ss
+python3 expandinteraction.py  -b 2 -n test5.seq -d test5.ss -o test5_02.ss
 
-python expandinteraction.py -b 2 -x test4.bp -n test4.seq -i test4.in
+python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -x SimRNA_interaction/1zci_00.bp -o 1zci_01.ss
+python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -d SimRNA_interaction/1zci_00.ss -o 1zci_02.ss
 '''
 
 import logging
@@ -110,12 +112,12 @@ def db2bps(db):
             bps.append([opening_bps.pop(),i]) # list of lists
     return bps
 
-
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
     parser.add_argument ('-b', '--buffer', type= int, help='Buffer length',default=0)
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
     parser.add_argument ('-x', '--basepairlist', help='basepair list')
+    parser.add_argument ('-d', '--dotbracket', help='dotbracket in SimRNA styles')
     parser.add_argument ('-n', '--nucleotides', help='related nucleotides')
     parser.add_argument ('-s', '--stepsize', type=int, help='e.g expanding of only 1/2 bps', default=1 )
     parser.add_argument ('-r', '--right', action='store_true', help='expand right')
@@ -160,18 +162,33 @@ def main():
 
     #BASEPAIRS
     basepairs = list()
-    with open(args.basepairlist, 'r') as BPFile:
-        basepairs=json.load(BPFile)
-    #basepairs.sort(key=itemgetter(0),reverse=False)
-    basepairs.sort(key = lambda k: (k[0], -k[1]))
-    print('ultimate bp list: {}'.format(basepairs))
+    if args.basepairlist is not None:
+        with open(args.basepairlist, 'r') as BPFile:
+            basepairs=json.load(BPFile)
+        #basepairs.sort(key=itemgetter(0),reverse=False)
+        basepairs.sort(key = lambda k: (k[0], -k[1]))
+        print('ultimate bp list: {}'.format(basepairs))
 
-    #Starting Dotbracket structure
-    dotbracket_old = create_db(basepairs,sequencelength,chainbreak)
-    print('old dotbracket')
-    for line in dotbracket_old:
-        print(''.join(line))
+        #Starting Dotbracket structure
+        dotbracket_old = create_db(basepairs,sequencelength,chainbreak)
+        print('old dotbracket')
+        for line in dotbracket_old:
+            print(''.join(line))
+    else:
+        dotbracket_old=[]
+        with open (args.dotbracket, 'r') as DBFile:
+            for line in DBFile:
+                dotbracket_old.append(line.rstrip('\n'))
 
+        for db_line in dotbracket_old: #line includes only noncrossing bps
+            interim_bp = (db2bps(db_line))
+            for bp in interim_bp:
+                basepairs.append(bp)
+        basepairs.sort(key = lambda k: (k[0], -k[1]))
+        print('ultimate bp list: {}'.format(basepairs))
+        print('old dotbracket')
+        for line in dotbracket_old:
+            print(''.join(line))
 
     #Find the interaction (use DBold)
     findinteractionline = dict()
