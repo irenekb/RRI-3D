@@ -1,0 +1,1 @@
+SimRNA -s /scr/coridan/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_interaction/1zci/1zci.seq -S /scr/coridan/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_interaction/1zci/1zci_00.ss -c /home/mescalin/irene/Programs/SimRNA_64bitIntel_Linux/config_initial.dat -R 10 -o 1zci_initial_00
