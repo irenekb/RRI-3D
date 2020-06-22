@@ -109,7 +109,7 @@ if [ "$WHERE" = "local" ]; then
 	fi
 	rm -r data
 elif [ "$WHERE" = "cluster" ]; then
-	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$SEQFILE" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7" &
+	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$PDB" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7" &
 fi
 wait
 
