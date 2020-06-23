@@ -16,7 +16,7 @@ SSFILE="${INOUTDIR}/${INITNAME}_${ROUND}.ss"
 SIMRNACONFIG=${SIMRNA}/"config_"${CONFIG}".dat"
 SIMRNADATA=${SIMRNA}/data/
 
-START="SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
+START="RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
 
 #Check if directories/files exist and all filenames/directories are correct
 errors=()
@@ -69,23 +69,29 @@ fi
 
 # start the job  localy or on the cluster:
 if [ "$WHERE" = "local" ]; then
-	cp -r "$SIMRNADATA" .
+	#ln -s "$SIMRNADATA" .
 	if [ "$7" = "random" ]; then
 		for step in {1..10}; do
 			random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
 			# Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1	
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${random}"
-			"SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$random" -o "$NEWNAME" >& "$NEWNAME".log" 
+			SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$random" -o "$NEWNAME" >& "$NEWNAME".log & 
 		done
 	else
 		for step in {1..10}; do
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${step}"
-			"SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log" 
+			SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log & 
 		done
 	fi
-	rm -r data
+	wait
+	#rm -r data
+	ls "$NAME"*
+	mv "$NAME"* "$INOUTDIR"
+
 elif [ "$WHERE" = "cluster" ]; then
-	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$SEQFILE" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7" &
+	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$SEQFILE" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7"
+else
+	echo "No calculation location given local|cluster"
 fi
 wait
 

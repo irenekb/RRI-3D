@@ -12,7 +12,7 @@
 #CSV5: OUTDIR, CSV6: NAME
 PDB="$1"
 SSFILE="$2"
-CSV3="$3"
+DATA="$3"
 CONFIG="$4"
 OUTPUT_DIRECTORY="$5"
 SEEDTYPE="$7"
@@ -23,7 +23,7 @@ cd "$TMPDIR"
 
 
 #Create link/copy file to file (SimRNA needs it!!!)
-cp -r "$CSV3" .
+cp -r "$DATA" .
 
 
 #Run SimRNA
@@ -32,12 +32,13 @@ if [ "$SEEDTYPE" = "random" ]; then
 		random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
                 # Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
 		NAME="$6_${step}_${random}"
-		SimRNA -p "$PDB" -S "$SSFILE" -c "$CONFIG" -R "$random" -o "$NAME" >& "$NAME".log 
+		SimRNA -p "$PDB" -S "$SSFILE" -c "$CONFIG" -R "$random" -o "$NAME" >& "$NAME".log & 
 	done
 else
 	for step in {1..10}; do	
 		NAME="$6_${step}_${step}"
-		SimRNA -p "$PDB" -S "$SSFILE" -c "$CONFIG" -R ${step} -o "$NAME" >& "$NAME".log
+		SimRNA -p "$PDB" -S "$SSFILE" -c "$CONFIG" -R "$step" -o "$NAME" >& "$NAME".log &
+	done
 fi
 
 

@@ -37,7 +37,7 @@ else
 	for step in {1..10}; do	
 		NAME="$6_${step}_${step}"
 		SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$CONFIG" -R ${step} -o "$NAME" >& "$NAME".log
-
+	done
 fi
 
 #Copy files to output directory

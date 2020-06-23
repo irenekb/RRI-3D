@@ -37,6 +37,7 @@ else
 	for step in {1..10}; do	
 		NAME="$5_${step}_${step}"
 		SimRNA -p "$PDB" -c "$CONFIG" -R ${step} -o "$NAME" >& "$NAME".log 
+	done
 fi
 
 
