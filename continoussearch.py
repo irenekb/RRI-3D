@@ -36,7 +36,7 @@ def main():
     parser.add_argument ('-f','--force',action='store_true', help='Find the sec-structures most similar to the contrained one')
     parser.add_argument ('--interaction',action='store_true', help='Find the interaction-structure most similar to the contrained one')
     parser.add_argument ('--first', help='First line in the dataframe') # CopStems_00.ss
-    parser.add_argument ('--second', help='Second line in the dataframe') # CopStems_00_00_000000.ss
+    parser.add_argument ('--second', help='Second line in the dataframe') # CopStems_00.ss_cc
     parser.add_argument ('-i', '--initialname', help='CopStems_2rl_01, CopStems_2rl_02, ...')
     args = parser.parse_args()
 
@@ -49,14 +49,15 @@ def main():
     path = args.path
     sumofruns = pd.DataFrame() #e.g CopStems_long-surface_10000.csv
     individual = pd.DataFrame() #e.g CopStems_long-surface_10000_01.csv
+    initialname =args.initialname
 
-    individualpath = glob.glob(os.path.join(path, str(args.initialname+'_**.csv'))) #list of directory files
+    ##filenames: CopStems_expand_long_00_001.csv -u CopStems_03_10000_0.csv
+    individualpath = glob.glob(os.path.join(path, str(initialname+'_***.csv'))) #list of directory files
     individualpath.sort(key=lambda x: int(os.path.basename(x).split('.')[-2].split('_')[-1])) #nr of the file
-    path_sumofruns = glob.glob(os.path.join(path, str(args.initialname+'.csv')))
+    path_sumofruns = glob.glob(os.path.join(path, str(initialname+'.csv')))
 
-    print(individualpath)
-    print(path_sumofruns)
-
+    print (individualpath)
+    print (path_sumofruns)
     #transfer to dataframe
     sumofruns = pd.read_csv(path_sumofruns[0],sep="\t",encoding='utf-8')
 
@@ -83,11 +84,13 @@ def main():
     individual.drop(index_constrain, inplace=True)
     individual.drop(index_start, inplace=True)
 
+    log.debug('SumOfRuns')
     log.debug(sumofruns)
+    log.debug('Individual runs')
     log.debug(individual)
 
     if args.force:
-        #get the most similar structure to the constraint
+        #get the most similar structure to the constraint in sumofruns
         count_constrain = sumofruns.min()['count_constraint'] #detect the min difference over all runs
         df_count_constrain = sumofruns[sumofruns['count_constraint']==sumofruns['count_constraint'].min()]
 
@@ -105,7 +108,7 @@ def main():
             log.debug('df_constrain_sequence')
             log.debug(df_constrain_sequence)
 
-        df_constrain_sequence.sort_values('energy_value',ascending=False) #sort energy
+        df_constrain_sequence.sort_values('energy_value',ascending=True, inplace=True) #sort energy
         log.debug('Full df_constrain_sequence')
         log.debug(df_constrain_sequence)
 
@@ -113,11 +116,12 @@ def main():
         print('Best 3D structure: {}'.format(best3d))
 
     if args.interaction:
-        #get the most similar structure to the interaction site
+        #get the most similar structure to the interaction site in sumofruns
         count_interaction = sumofruns.min()['count_interaction_constraint'] #detect the min difference over all runs
         df_count_interaction = sumofruns[sumofruns['count_interaction_constraint']==sumofruns['count_interaction_constraint'].min()]
 
         #from this df geht the most similar structure to the whole constraint
+        #insure that the ends are not open
         count_interaction_cc = df_count_interaction.min()['count_constraint'] #detect the min difference over all runs
         df_count_interaction_cc = df_count_interaction[df_count_interaction['count_constraint']==df_count_interaction['count_constraint'].min()]
 
@@ -135,18 +139,13 @@ def main():
         for index, row in df_count_interaction_cc.iterrows():
             interim_best3d[index] = row
             bp = interim_best3d[index][6]
-            #log.debug('bp {}'.format(bp))
 
-            #Find in all runs the one with these bps and the minE
+            #Find in all individual runs the one with these bps and the minE
             df_interaction_cc_sequence = (individual[individual['bp'] == bp]) #df with all these datasets from individual
-            #log.debug('df_interaction_cc_sequence')
-            #log.debug(df_interaction_cc_sequence)
 
-        df_interaction_cc_sequence.sort_values('energy_value',ascending=False) #sort energy
+        df_interaction_cc_sequence.sort_values('energy_value',ascending=True, inplace=True) #sort energy
         log.debug('Full df_constrain_sequence')
         log.debug(df_interaction_cc_sequence)
-
-
 
         best3d = (df_interaction_cc_sequence.head(1))
         print('Best 3D structure: {}'.format(best3d))
@@ -170,7 +169,7 @@ def main():
             log.debug('df_max_sequence')
             log.debug(df_max_sequence)
 
-        df_max_sequence.sort_values('energy_value',ascending=False)
+        df_max_sequence.sort_values('energy_value',ascending=True ,inplace=True)
         log.debug('Full df_max_sequence')
         log.debug(df_max_sequence)
 
@@ -178,13 +177,14 @@ def main():
         print('Best 3D structure: {}'.format(best3d))
 
     #Extract the trafl-name and the list number from the .ss_detected name
-    #CopStems_long-surface_10000_01-000109.ss_detected
-
     number = best3d.iloc[:,0].to_string(index=False).strip()
-    log.debug('secondary structure file: {}'.format(number))
-    filename = str((number.split('-')[0])+'-'+(number.split('-')[1])+'.trafl')
+    print('secondary structure file: {}'.format(number))
+    #filenames old CopStems_03_10-000008.trafl
+
+    filename = str((number.split('.')[0])+'.trafl')
     line = int(number.split('.')[0].split('-')[-1])
     print('ss_file: {}, trafl_filename: {}, line: {}'.format(number,filename,line))
+
     bp_string = str(bp)
 
     file = open( str((number.split('-')[0])+'-'+(number.split('-')[1])+'.bp'), 'w')
@@ -193,11 +193,14 @@ def main():
 
     if args.print:
         if args.force:
-            df_constrain_sequence.to_csv(os.path.join(path,r'CopStems_constrain.csv'), mode='w',index=False, header=True,sep="\t")
+            name = initialname+'.constraint-csv'
+            df_constrain_sequence.to_csv(os.path.join(path,name), mode='w',index=False, header=True,sep="\t")
         if args.interaction:
-            df_interaction_cc_sequence.to_csv(os.path.join(path,r'CopStems_interaction_cc.csv'), mode='w',index=False, header=True,sep="\t")
+            name = initialname+'.interaction-csv'
+            df_interaction_cc_sequence.to_csv(os.path.join(path,name), mode='w',index=False, header=True,sep="\t")
         if not args.force and not args.interaction:
-            df_max_sequence.to_csv(os.path.join(path,r'CopStems_common.csv'), mode='w',index=False, header=True,sep="\t")
+            name = initialname+'.common-csv'
+            df_max_sequence.to_csv(os.path.join(path,name), mode='w',index=False, header=True,sep="\t")
 
 
 if __name__ == "__main__":
