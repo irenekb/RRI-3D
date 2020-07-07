@@ -13,6 +13,7 @@ import re
 import copy
 from operator import itemgetter
 import itertools
+from itertools import groupby, count
 import sys
 import pandas
 from more_itertools import consecutive_groups
@@ -139,22 +140,16 @@ def consecutive_interaction_length(pairline):
     :param pairline: list of all bases that are involved in the interaction
     :return len_interaction: length of the longest consectuive interaction
     '''
+    pairset = list()
+    c = count()
 
-    pairset = set()
-    ans = 0
     for element in pairline: #Hash all array elements
-        pairset.add(element)
-    log.debug(pairset)
+        pairset.append(element)
+    pairset.sort()
+    log.debug('len pairline {}, pairline {}, pairset {}'.format(len(pairline),pairline,pairset))
 
-    # check each possible sequence from the start then update optimal length
-    for i in range(len(pairline)):
-        if (pairline[i]-1) not in pairset:
-            # Then check for next elements in the sequence
-            j = pairline[i]
-            while (j in pairset):
-                j+=1
-            # update  optimal length if this length is more
-            len_interaction = max(ans, j-pairline[i])
+    len_interaction = max((list(g) for _, g in groupby (pairset, lambda x : x-next(c))), key=len)
+    log.debug('interaction len {}'.format(len_interaction))
 
     return (len_interaction)
 
@@ -313,9 +308,9 @@ def main():
                 interim_interaction_db.append(line)
             bp = sorted(bp, key=itemgetter(0))
 
-            interaction,interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
-
             filename = str(os.path.basename(File)) #exctract filename
+            log.debug(filename)
+            interaction,interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
 
             #get the last entry from dict TODO: make it smarter
             last_key = str(list(dic.keys())[-1])
