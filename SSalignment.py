@@ -17,7 +17,6 @@ from itertools import groupby, count
 import sys
 import pandas
 from more_itertools import consecutive_groups
-#from more-itertools import consecutive_groups
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ def trafl(traflfile):
                     line_count += 1
     return rawdat
 
-def difference(bigset,smalset,bp_dic):
+def difference(bigset,smalset):
     '''
     :param bigset: dictionary of eg all basepairs from the constraint, startpoint,
                   initial interaction, bp before...
@@ -75,14 +74,8 @@ def difference(bigset,smalset,bp_dic):
 
     difference_bp= [x for x in smalset if x not in bigset] + [x for x in bigset if x not in smalset]
     count_difference = len(difference_bp)
-    for pair in difference_bp:
-        pair = str(pair)
-        if pair in bp_dic.keys():
-            bp_dic[pair] += 1
-        else:
-            bp_dic[pair] = 1
 
-    return difference_bp, count_difference,bp_dic
+    return difference_bp, count_difference
 
 
 def find_interaction(interim_interaction_db,chainbreak):
@@ -124,9 +117,6 @@ def find_interaction(interim_interaction_db,chainbreak):
 
     len_interaction = consecutive_interaction_length(pairline)
 
-    #test_consecutive = [list(group)for group in consecutive_groups(pairline)]
-    #log.debug('Consecutive Interaction')
-    #log.debug(test_consecutive)
     log.debug('Interaction Length')
     log.debug(len_interaction)
 
@@ -158,17 +148,11 @@ def main():
     parser.add_argument ('-p', '--path', help='Path to Inputfiles')
     parser.add_argument ('-i', '--input', help='Input ss-sequence')
     parser.add_argument ('-c', '--constraint', help='Constrained ss-sequence')
-
     parser.add_argument ('-o', '--output', help='Name of the outputfile')
     parser.add_argument ('-m','--outputmode', choices=['w','a'], default='w', help="Overwrite ('w') or append ('a')")
     parser.add_argument ('-u', '--uniqueoutput', help='Name of the unique outputfile/or the already existing one')
-    #parser.add_argument ('-b', '--bplist', help='Name of the bp-list (unique)/or the already existing one')
-
     parser.add_argument ('-t', '--trafl', help='Traflfile')
-
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
-
-    #ToDo:
     parser.add_argument ('-r', '--right', action='store_true', help='expand right')
     parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
 
@@ -185,12 +169,10 @@ def main():
     unique_outputfile = args.uniqueoutput
     unique_start_bp = args.uniqueoutput+'_bp'
 
-
     path = args.path
     start_ss = args.input
     constraint_ss = args.constraint
     start_fn = os.path.basename(args.input)
-
 
     dic = OrderedDict()
     dic_unique = OrderedDict() #dictionary for all already collected unique sequences with all the other data
@@ -203,6 +185,8 @@ def main():
     bp_dict_constraint = {} #collect the bps and how often do they change compared to the constrained structure
     bp_dict_interaction_cc = {} #collect the bps and how often do they change compared to the interaction itselfe
 
+    bp_dict_currentrun = {}
+    bp_dict_unique = {}
 
     #CONSTRAINED SECONDARY STRUCTURE
     with open(constraint_ss , 'r') as CSSFile:
@@ -255,9 +239,9 @@ def main():
         start_ssf = str(os.path.basename(start_ss))
         print('start {}'.format(start_ssf))
 
-        dif_constraint,count_constraint,bp_dict_constraint = difference(bp_constraint,bp_start,bp_dict_constraint)
+        dif_constraint,count_constraint = difference(bp_constraint,bp_start)
 
-        dif_interaction_cc,count_interaction_constraint,bp_dict_interaction = difference(interaction_cc,interaction,bp_dict_interaction_cc)
+        dif_interaction_cc,count_interaction_constraint = difference(interaction_cc,interaction)
 
         dic[start_ssf] = start_sequence, count_constraint,0,0,0,dif_constraint,0,0,bp_start,0,0,0,0,interaction, interaction_countbp, len_interaction, count_interaction_constraint,dif_interaction_cc
         # [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]      [8] [9]
@@ -265,7 +249,7 @@ def main():
 
     #APPENDMODE: if already values available - use mode append and take the values from their (unique)
     if args.outputmode == 'a':
-        bp_dict_start = {}
+        bp_dict_unique = {}
         with open(args.uniqueoutput,'r') as Uniquefile:
             next(Uniquefile)
             for line in Uniquefile:
@@ -278,17 +262,14 @@ def main():
             next(Bplist)
             for line in Bplist:
                 nr, bp1,bp2, count = line.strip('\n').split('\t')
-                bp_dict_start[bp1,bp2] = int(count)
+                bp_dict_unique[bp1,bp2] = int(count)
 
     print(path)
     print(start_ss)
 
     Files = glob.glob(os.path.join(path, '*.ss_detected')) #list of directory files
     Files.sort(key=lambda x: int(os.path.basename(x).split('.')[-2].split('-')[-1])) #nr of the file (for old and new)
-
     trafls = trafl(args.trafl)
-
-
     constancy = 0
 
     #START
@@ -320,13 +301,10 @@ def main():
             #If the current sequence differ to the one before safe it
             bpstr = ''.join(str(s) for s in bp)
 
-            dif_constraint,count_constraint,bp_dict_interaction = difference(bp_constraint,bp,bp_dict_constraint)
-
-            dif_interaction_cc, count_interaction_constraint,bp_dict_constraint = difference(interaction_cc,interaction,bp_dict_interaction_cc)
-
-            dif_before, count_before, bp_dict_before = difference(bp_before,bp, bp_dict_before)
-
-            dif_start, count_start, bp_dict_start = difference(bp_start,bp,bp_dict_start)
+            dif_constraint,count_constraint = difference(bp_constraint,bp)
+            dif_interaction_cc, count_interaction_constraint = difference(interaction_cc,interaction)
+            dif_before, count_before = difference(bp_before,bp)
+            dif_start, count_start = difference(bp_start,bp)
 
 
             if bp_start_str == bpstr: #check if we ever reach the constraint
@@ -362,6 +340,23 @@ def main():
             dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc
             #                  [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]   [8]    [9]         [10]                                [11]           [12]     [13]            [14]                  [15]                       [16]
 
+            bps.sorted(key=itemgetter(0))
+            for pair in bp:
+                if pair in bp_dict_currentrun:
+                    bp_dict_currentrun[pair] +=1
+                else:
+                    bp_dict_currentrun[pair] = 1
+                if pair
+
+            for k, v in bp_currentrun.items():
+                if k in bp_dict_unique.keys():
+                    bp_dict_unique[k] += v
+                else:
+                    bp_dict_unique[k] = v
+
+            bp_dict_currentrun.sorted(key_value.keys())
+            bp_dict_unique.sorted(key.value.keys())
+
             log.debug('Difference to the constrained sequence, the start sequence {} and the one before {}'.format(count_constraint,count_start, count_before))
 
             #If the current sequence is an unique one safe it
@@ -369,7 +364,6 @@ def main():
                 count_unique[bpstr] = 1
                 dic_unique[sequence] = 1,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc
                 #                       [0]                 [1]         [2]          [3]            [4]  [5] [6]   [7]              [8]              [9]                [10]                          [11]
-
             else: #increase the count for how often the structure appears
                 for k,v in count_unique.items():
                     if k == bpstr:
@@ -380,6 +374,8 @@ def main():
         for key, value in count_unique.items(): #[k]bpstr [v]count_how_often
             if key == v[6]:
                 unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11]
+
+
 
     #save the work
     with open(output, 'w') as csvfile:
@@ -417,17 +413,18 @@ def main():
                              'interaction_countbp':v[8],'len_interaction':v[9],\
                              'count_interaction_constraint':v[10],'dif_interaction_cc':v[11]})
 
+
     header = ['nr','bp1','bp2', 'count']
     with open(output_bp, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
         writer.writeheader()
-        for k,v in enumerate(bp_dict_before.items()):
+        for k,v in enumerate(bp_dict_currentrun.items()):
             writer.writerow({'nr':k,'bp1':v[0][1],'bp2':v[0][5],'count':v[1]})
 
     with open(unique_start_bp, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
         writer.writeheader()
-        for k,v in enumerate(bp_dict_before.items()):
+        for k,v in enumerate(bp_dict_unique.items()):
             writer.writerow({'nr':k,'bp1':v[0][1],'bp2':v[0][5],'count':v[1]})
 
     print("We reach the constraint {} times.".format(goal_constraint))
