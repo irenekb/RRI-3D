@@ -138,7 +138,8 @@ def consecutive_interaction_length(pairline):
     pairset.sort()
     log.debug('len pairline {}, pairline {}, pairset {}'.format(len(pairline),pairline,pairset))
 
-    len_interaction = max((list(g) for _, g in groupby (pairset, lambda x : x-next(c))), key=len)
+    longest_interaction = max((list(g) for _, g in groupby (pairset, lambda x : x-next(c))), key=len)
+    len_interaction = len(longest_interaction)
     log.debug('interaction len {}'.format(len_interaction))
 
     return (len_interaction)
