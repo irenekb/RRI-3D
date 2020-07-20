@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH --job-name=SimRNAinitial
-#SBATCH --time=15:0:0
+#SBATCH --time=24:0:0
 #SBATCH --mem-per-cpu=32G
 #SBATCH --cpus-per-task=10
-##SBATCH --array=1-10
+#SBATCH --array=1-10
 
 ## script started from job_simrna_start_initial.sh for a cluster calculation
 
@@ -27,17 +27,13 @@ cp -r "$CSV3" .
 
 #Run SimRNA
 if [ "$SEEDTYPE" = "random" ]; then
-        for step in {1..10}; do
-		random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
-                # Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
-		NAME="$6_${step}_${random}"
-		SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$CONFIG" -R "$random" -o "$NAME" >& "$NAME".log 
-	done
+	random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
+        # Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
+	NAME="$6_${SLURM_ARRAY_TASK_ID}_${random}"
+	SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$CONFIG" -R "$random" -o "$NAME" >& "$NAME".log 
 else
-	for step in {1..10}; do	
-		NAME="$6_${step}_${step}"
-		SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$CONFIG" -R ${step} -o "$NAME" >& "$NAME".log
-	done
+	NAME="$6_${SLURM_ARRAY_TASK_ID}_${SLURM_ARRAY_TASK_ID}"
+	SimRNA -s "$SEQFILE" -S "$SSFILE" -c "$CONFIG" -R ${SLURM_ARRAY_TASK_ID} -o "$NAME" >& "$NAME".log
 fi
 
 #Copy files to output directory
