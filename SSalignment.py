@@ -263,7 +263,8 @@ def main():
             next(Bplist)
             for line in Bplist:
                 nr, bp1,bp2, count = line.strip('\n').split('\t')
-                bp_dict_unique[bp1,bp2] = int(count)
+                pairstr = str(bp1+', '+bp2)
+                bp_dict_unique[pairstr] = int(count)
 
     print(path)
     print(start_ss)
@@ -341,22 +342,17 @@ def main():
             dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc
             #                  [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]   [8]    [9]         [10]                                [11]           [12]     [13]            [14]                  [15]                       [16]
 
-            bps.sorted(key=itemgetter(0))
+            bp = sorted(bp, key=itemgetter(0))
             for pair in bp:
-                if pair in bp_dict_currentrun:
-                    bp_dict_currentrun[pair] +=1
-                else:
-                    bp_dict_currentrun[pair] = 1
-                if pair
+                pairstr=(', '.join(str(x) for x in pair))
+                bp_dict_currentrun[pairstr] = bp_dict_currentrun.get(pairstr, 0) + 1
 
-            for k, v in bp_currentrun.items():
-                if k in bp_dict_unique.keys():
+            for k, v in bp_dict_currentrun.items():
+                if k in bp_dict_unique:
                     bp_dict_unique[k] += v
                 else:
                     bp_dict_unique[k] = v
 
-            bp_dict_currentrun.sorted(key_value.keys())
-            bp_dict_unique.sorted(key.value.keys())
 
             log.debug('Difference to the constrained sequence, the start sequence {} and the one before {}'.format(count_constraint,count_start, count_before))
 
@@ -420,13 +416,15 @@ def main():
         writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
         writer.writeheader()
         for k,v in enumerate(bp_dict_currentrun.items()):
-            writer.writerow({'nr':k,'bp1':v[0][1],'bp2':v[0][5],'count':v[1]})
+            currentpair=[x.strip() for x in v[0].split(', ')]
+            writer.writerow({'nr':k,'bp1':currentpair[0],'bp2':currentpair[1],'count':v[1]})
 
     with open(unique_start_bp, 'w') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
         writer.writeheader()
         for k,v in enumerate(bp_dict_unique.items()):
-            writer.writerow({'nr':k,'bp1':v[0][1],'bp2':v[0][5],'count':v[1]})
+            currentpair= currentpair=[x.strip() for x in v[0].split(', ')]
+            writer.writerow({'nr':k,'bp1':currentpair[0],'bp2':currentpair[1],'count':v[1]})
 
     print("We reach the constraint {} times.".format(goal_constraint))
     print("We reach the start {} times.".format(goal_start))
