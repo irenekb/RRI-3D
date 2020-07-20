@@ -32,7 +32,7 @@ def main():
     parser = argparse.ArgumentParser(description='Find the best 3D structure after a SimRNA surface run and the SSAllignment analysis')
     parser.add_argument ('-p', '--path', help='Path to Inputfiles')
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
-    parser.add_argument ('--print', action='store_true',help='Print a csv-file with all minEnergy relevant files')
+    parser.add_argument ('--printout', action='store_true',help='Print a csv-file with all minEnergy relevant files')
     parser.add_argument ('-f','--force',action='store_true', help='Find the sec-structures most similar to the contrained one')
     parser.add_argument ('--interaction',action='store_true', help='Find the interaction-structure most similar to the contrained one')
     parser.add_argument ('--first', help='First line in the dataframe') # CopStems_00.ss
@@ -191,7 +191,7 @@ def main():
     file.write(bp)
     file.close()
 
-    if args.print:
+    if args.printout:
         if args.force:
             name = initialname+'.constraint-csv'
             df_constrain_sequence.to_csv(os.path.join(path,name), mode='w',index=False, header=True,sep="\t")
