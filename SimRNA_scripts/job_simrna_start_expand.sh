@@ -40,7 +40,7 @@ NAME="${INITNAME}_${CONFIG}_${ROUND}"
 
 # checkout the right config file
 IFS='_' read -r -a pos <<< "$CONFIG"
-START="RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
+START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
 
 
 #Check if directories/files exist and all filenames/directories are correct
@@ -115,7 +115,7 @@ if [ "$WHERE" = "local" ]; then
 
 elif [ "$WHERE" = "cluster" ]; then
 	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$PDB" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7"
-
+	wait
 else
 	echo "No calculation location given local|cluster"
 fi

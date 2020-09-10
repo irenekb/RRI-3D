@@ -15,7 +15,7 @@ PDB="${INOUTDIR}/${INITNAME}_${ROUND}.pdb"
 SIMRNACONFIG=${SIMRNA}/"config_"${CONFIG}".dat"
 SIMRNADATA=${SIMRNA}/data/
 
-START="RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
+START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
 
 #Check if directories/files exist and all filenames/directories are correct
 errors=()
@@ -82,7 +82,7 @@ if [ "$WHERE" = "local" ]; then
 
 elif [ "$WHERE" = "cluster" ]; then
 	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$PDB" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$7" &
-
+	wait
 else
 	echo"No calculation location given local|cluster"
 fi
