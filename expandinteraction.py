@@ -297,7 +297,7 @@ def main():
     with open(args.output, mode='w') as OUTPUTFILE:
         writer = csv.writer(OUTPUTFILE, delimiter='\n')
         writer.writerow(forprinting)
-        #OUTPUTFILE.write('\n')
+        OUTPUTFILE.write('\n')
 
 
 if __name__ == "__main__":
