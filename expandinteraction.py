@@ -133,8 +133,8 @@ def main():
         logging.basicConfig(level = logging.WARNING)
 
     if not args.right and not args.left:
-        right = True
-        left = True
+        right = False
+        left = False
     else:
         right = args.right
         left = args.left
@@ -294,11 +294,9 @@ def main():
         fp = (''.join(line))
         forprinting.append(fp)
 
-    with open(args.output, mode='w') as OUTPUTFILE:
-        writer = csv.writer(OUTPUTFILE, delimiter='\n')
-        writer.writerow(forprinting)
-        OUTPUTFILE.write('\n')
-
+    with open(args.output, 'w') as out:
+        out.write('\n'.join(forprinting))
+        out.write('\n')
 
 if __name__ == "__main__":
     main()
