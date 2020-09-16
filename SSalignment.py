@@ -198,13 +198,14 @@ def main():
 
         interim_interaction_db =[]
         for line in content:
+            print(line)
             bp_constraint.extend(db2bps(line))
             constraint_sequence = constraint_sequence +' '+ line
             interim_interaction_db.append(line)
             for nr, element in enumerate(line):
                 if element == ' ':
-                    log.debug('chainbreak: {}'.format(nr))
                     chainbreak = nr
+                    log.debug('chainbreak: {}'.format(nr))
 
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
