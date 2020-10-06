@@ -132,9 +132,9 @@ def main():
     else:
         logging.basicConfig(level = logging.WARNING)
 
-    if not args.right and not args.left:
-        right = False
-        left = False
+    if (not args.right) and (not args.left): #default: both true
+        right = True
+        left = True
     else:
         right = args.right
         left = args.left
