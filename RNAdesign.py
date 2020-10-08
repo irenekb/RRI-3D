@@ -22,11 +22,6 @@ python RNAdesign.py -i SimRNA_interaction/RNAdesign.test -o RNA
 -s --selection  number of selected designs
 '''
 
-
-# without these two lines "import RNAblueprint" will fail
-from ctypes import *
-lib1 = cdll.LoadLibrary('/usr/local/lib/libRNAblueprint.so')
-
 import RNAblueprint as rbp
 import RNA
 import math
