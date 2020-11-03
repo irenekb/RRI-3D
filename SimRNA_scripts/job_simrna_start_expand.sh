@@ -35,7 +35,7 @@ PDB="${INOUTDIR}/${INITNAME}_${ROUND}.pdb"
 echo "$PDB" "$INITNAME" "$ROUND"
 SSFILE="${INOUTDIR}/${INITNAME}_${ROUND}.ss"
 SIMRNACONFIG=${SIMRNA}/"config_"${CONFIG}".dat"
-SIMRNADATA=${SIMRNA}/data/
+SIMRNADATA="${SIMRNA}/data"
 NAME="${INITNAME}_${CONFIG}_${ROUND}"
 
 # checkout the right config file
@@ -94,7 +94,7 @@ fi
 
 # start the job  localy or on the cluster:
 if [ "$WHERE" = "local" ]; then
-	#ln -s "$SIMRNADATA" . 
+	ln -s "$SIMRNADATA" . 
 	if [ "$7" = "random" ]; then
 		for step in {1..10}; do
 			random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
@@ -109,7 +109,7 @@ if [ "$WHERE" = "local" ]; then
 		done
 	fi
 	wait
-	#rm -r data
+	rm -r data
 	ls "$NAME"*
 	mv "$NAME"* "$INOUTDIR"
 
