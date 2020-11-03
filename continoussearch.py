@@ -58,6 +58,7 @@ def main():
 
     print (individualpath)
     print (path_sumofruns)
+
     #transfer to dataframe
     sumofruns = pd.read_csv(path_sumofruns[0],sep="\t",encoding='utf-8')
 
@@ -71,18 +72,21 @@ def main():
 
     # Get names of indexes for which column Age has value 30
     constrained_line = args.first
-    start_line = args.second
     index_constrain = individual[individual['number'] == constrained_line].index
-    index_start = individual[ individual['number'] == start_line].index
+    if args.second:
+        start_line = args.second
+        index_start = individual[ individual['number'] == start_line].index
 
     #get the start and constrained ss and remove them from the df
     constrain_bp = individual.loc[individual['number'] == constrained_line].loc[0,'bp'].values[0]
     log.debug('constrain: {}'.format(constrain_bp))
-    start_bp = individual.loc[individual['number'] == start_line].loc[1,'bp'].values[0]
-    log.debug('start:  {}'.format(start_bp))
+    if args.second:
+        start_bp = individual.loc[individual['number'] == start_line].loc[1,'bp'].values[0]
+        log.debug('start:  {}'.format(start_bp))
     # Delete these row indexes from dataFrame
     individual.drop(index_constrain, inplace=True)
-    individual.drop(index_start, inplace=True)
+    if args.second:
+        individual.drop(index_start, inplace=True)
 
     log.debug('SumOfRuns')
     log.debug(sumofruns)

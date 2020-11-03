@@ -1,0 +1,107 @@
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin7400 01 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2200 02 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin5200 03 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin1900 04 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin900 05 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin4800 06 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin2300 07 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin800 08 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin8000 09 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long00 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05 local step
+./RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_start_expand.sh /scr/coridan/irene/Data_interaction/SimRNA/CopStems/CopStemsErnwin/best/ CopStemsErnwin200 10 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06 local step
+
+
+
+
+
+
