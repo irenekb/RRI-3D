@@ -59,6 +59,7 @@ def main():
     print (individualpath)
     print (path_sumofruns)
 
+    print(path_sumofruns[0])
     #transfer to dataframe
     sumofruns = pd.read_csv(path_sumofruns[0],sep="\t",encoding='utf-8')
 

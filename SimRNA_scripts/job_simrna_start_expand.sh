@@ -8,10 +8,10 @@
 
 #iterations 20,000 stepsize 1
 ##SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01 local|cluster |random
- 
+
 #iterations 30,000 stepsize 1
 ##SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02 local|cluster |random
- 
+
 #iterations 100,000 stepsize 100
 ##SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03 local|cluster |random
 
@@ -40,8 +40,9 @@ NAME="${INITNAME}_${CONFIG}_${ROUND}"
 
 # checkout the right config file
 IFS='_' read -r -a pos <<< "$CONFIG"
-START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
-
+#START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
+#Bartimaeus:
+START="/home/irene/Programs/GitHub/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
 
 #Check if directories/files exist and all filenames/directories are correct
 errors=()
@@ -94,22 +95,23 @@ fi
 
 # start the job  localy or on the cluster:
 if [ "$WHERE" = "local" ]; then
-	ln -s "$SIMRNADATA" . 
+	ln -s "$SIMRNADATA" .
 	if [ "$7" = "random" ]; then
 		for step in {1..10}; do
 			random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
-			# Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1	
+			# Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${random}"
 			SimRNA -p "$PDB" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$random" -o "$NEWNAME" >& "$NEWNAME".log &
 		done
 	else
 		for step in {1..10}; do
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${step}"
+			#echo SimRNA -p "$PDB" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log &
 			SimRNA -p "$PDB" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log &
 		done
 	fi
 	wait
-	rm -r data
+	#rm -r data
 	ls "$NAME"*
 	mv "$NAME"* "$INOUTDIR"
 
@@ -120,4 +122,3 @@ else
 	echo "No calculation location given local|cluster"
 fi
 wait
-

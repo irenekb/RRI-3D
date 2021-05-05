@@ -15,8 +15,11 @@ PDB="${INOUTDIR}/${INITNAME}_${ROUND}.pdb"
 SIMRNACONFIG=${SIMRNA}/"config_"${CONFIG}".dat"
 SIMRNADATA=${SIMRNA}/data/
 
-START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
-
+#START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"${CONFIG}".sh"
+#Bartimaeus:
+# checkout the right config file
+IFS='_' read -r -a pos <<< "$CONFIG"
+START="/home/irene/Programs/GitHub/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
 #Check if directories/files exist and all filenames/directories are correct
 errors=()
 
@@ -65,9 +68,9 @@ if [ "$WHERE" = "local" ]; then
 	if [ "$7" = "random" ]; then
 		for step in {1..10}; do
 			random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
-			# Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1	
+			# Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${random}"
-			SimRNA -p "$PDB" -c "$SIMRNACONFIG" -R "$random" -o "$NEWNAME" >& "$NEWNAME".log & 
+			SimRNA -p "$PDB" -c "$SIMRNACONFIG" -R "$random" -o "$NEWNAME" >& "$NEWNAME".log &
 		done
 	else
 		for step in {1..10}; do
@@ -87,4 +90,3 @@ else
 	echo"No calculation location given local|cluster"
 fi
 wait
-

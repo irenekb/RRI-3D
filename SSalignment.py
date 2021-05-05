@@ -202,10 +202,16 @@ def main():
             bp_constraint.extend(db2bps(line))
             constraint_sequence = constraint_sequence +' '+ line
             interim_interaction_db.append(line)
+            severalchains=False #only for non-interaction calculations
             for nr, element in enumerate(line):
                 if element == ' ':
                     chainbreak = nr
+                    severalchains=True
                     log.debug('chainbreak: {}'.format(nr))
+
+            if severalchains == False:
+                chainbreak = len(line)+1
+                print('Only one chain available!')
 
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
