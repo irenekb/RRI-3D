@@ -112,13 +112,18 @@ def find_interaction(interim_interaction_db,chainbreak):
     for pair in interaction:
         pairline.append(int(pair[0]))
         pairline.append(int(pair[1]))
+
     log.debug('pairline')
     log.debug(pairline)
 
-    len_interaction = consecutive_interaction_length(pairline)
+    if interaction_countbp > 0:
+        len_interaction = consecutive_interaction_length(pairline)
+    else:
+        len_interaction = 0
 
-    log.debug('Interaction Length')
-    log.debug(len_interaction)
+    log.debug('interaction {}'.format(interaction))
+    log.debug('Interaction_countbp {}'.format(interaction_countbp))
+    log.debug('Interaction Length {}'.format(len_interaction))
 
     return interaction, interaction_countbp, len_interaction
 
@@ -202,16 +207,16 @@ def main():
             bp_constraint.extend(db2bps(line))
             constraint_sequence = constraint_sequence +' '+ line
             interim_interaction_db.append(line)
-            severalchains=False #only for non-interaction calculations
+            #severalchains=False #only for non-interaction calculations
             for nr, element in enumerate(line):
                 if element == ' ':
                     chainbreak = nr
                     severalchains=True
                     log.debug('chainbreak: {}'.format(nr))
-
-            if severalchains == False:
-                chainbreak = len(line)+1
-                print('Only one chain available!')
+            #TODO:debug
+            #if severalchains == False:
+                #chainbreak = len(line)+1
+                #print('Only one chain available!')
 
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
@@ -355,9 +360,12 @@ def main():
                 bp_dict_currentrun[pairstr] = bp_dict_currentrun.get(pairstr, 0) + 1
 
             for k, v in bp_dict_currentrun.items():
+                log.debug('bp_dict_currentrun: k {}, v {}'.format(k,v))
                 if k in bp_dict_unique:
-                    bp_dict_unique[k] += v
+                    log.debug('adding: k {} : +v {}'.format(k,v))
+                    bp_dict_unique[k] = v+1
                 else:
+                    log.debug('new: k {} : +v {}'.format(k,v))
                     bp_dict_unique[k] = v
 
 
