@@ -196,6 +196,13 @@ def main():
     file.write(bp)
     file.close()
 
+    consecutive_interaction_length= str(best3d['len_interaction'].values[0])
+    print("consecutive interaction length: {}".format(consecutive_interaction_length))
+
+    file = open( str((number.split('-')[0])+'-'+(number.split('-')[1])+'.il'), 'w')
+    file.write(consecutive_interaction_length)
+    file.close()
+
     if args.printout:
         if args.force:
             name = initialname+'.constraint-csv'
