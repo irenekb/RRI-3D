@@ -105,6 +105,7 @@ if [ "$WHERE" = "local" ]; then
 		done
 	else
 		for step in {1..10}; do
+		#for step in {1..2}; do #Scenario testing
 			NEWNAME="${INITNAME}_${CONFIG}_${ROUND}_${step}_${step}"
 			#echo SimRNA -p "$PDB" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log &
 			SimRNA -p "$PDB" -S "$SSFILE" -c "$SIMRNACONFIG" -R "$step" -o "$NEWNAME" >& "$NEWNAME".log &
