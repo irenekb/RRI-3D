@@ -16,9 +16,9 @@ A selection of - default 5 - designs will be saved with the following filename:
 SAMPLE COMMAND:
 python RNAdesign.py -i SimRNA_interaction/RNAdesign.test -o RNA
 
--i --input      secondary structure file in SimRNA Format
+-i --input      secondary structure file in SimRNA format
 -o --ouput      Ouputname
--n --number     number of Designs
+-n --number     number of designs
 -s --selection  number of selected designs
 '''
 
@@ -36,16 +36,14 @@ def testinput():
     '''
     Testinput if there is no input given.
 
-    :return STRUCTURES: secondary structure
-    :return SEQUENCE_CONSTRAINTS: sequence constraints, no constraint = N
+    :return DOTBRACKET: secondary structure
     '''
 
     ################ TEST-INPUT ####################
-    STRUCTURES =          ['(((((((.........)))))))..........(((((((.........)))))))',
-                           '(((((((((((((((((((((((..........)))))))))))))))))))))))']
-    SEQUENCE_CONSTRAINTS = 'NNNNNNNNNNNNNNNNNNNNNNNAAAAAAAAAANNNNNNNNNNNNNNNNNNNNNNN'
+    DOTBRACKET = ['(((((((.........))))))) (((((((.........)))))))',
+                  '((((((((((((((((((((((( )))))))))))))))))))))))']
 
-    return(STRUCTURES,SEQUENCE_CONSTRAINTS)
+    return(DOTBRACKET)
 
 def objective(sequence):
     '''
@@ -67,7 +65,7 @@ def objective(sequence):
     return (eos1 - pf) + (eos0 - pf);
 
 
-def objective2(sequence,STRUCTURES):
+def objective2(sequence,STRUCTURES,index):
     '''
     variant for 'interaction' between first and second half
     allows to spicify the stability in more detail between the two hairpins
@@ -79,11 +77,18 @@ def objective2(sequence,STRUCTURES):
     :return: objective funtion
     '''
     # split the sequence/structure in the middle
-    chainbreak=int(len(sequence)/2)
-    sequence1 = sequence[0:chainbreak]
-    sequence2 = sequence[chainbreak:]
-    structure1 = STRUCTURES[0][0:chainbreak]
-    structure2 = STRUCTURES[0][chainbreak:]
+    #chainbreak=int(len(sequence)/2)
+    sequence1 = sequence[0:(index+5)]
+    sequence2 = sequence[(index+5):]
+    structure1 = STRUCTURES[0][0:(index+5)]
+    structure2 = STRUCTURES[0][(index+5):]
+    log.debug(STRUCTURES[0])
+    log.debug(STRUCTURES[1])
+    log.debug(sequence)
+    log.debug(sequence1)
+    log.debug(structure1)
+    log.debug(sequence2)
+    log.debug(structure2)
 
     # create the fold compounds of each part of the sequence
     fc1 = RNA.fold_compound(sequence1)
@@ -117,38 +122,42 @@ def main():
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
     args = parser.parse_args()
 
-    NUBMER_DESIGNS = args.number
+    if args.verbose:
+        logging.basicConfig(level =  logging.DEBUG)
+        print('DEBUGGING MODE')
+    else:
+        logging.basicConfig(level = logging.WARNING)
 
-    selection = args.selection
-
+    NUBMER_DESIGNS = int(args.number)
+    selection = int(args.selection)
     COOL_FACTOR = 0.98 #default
+    STRUCTURES=[]
 
     if args.input:
-        STRUCTURES=[]
+
         dotbracket = []
         with open (args.input, 'r') as INPUTFILE:
             for line in INPUTFILE:
                 dotbracket.append(line.rstrip('\n'))
         log.debug(dotbracket)
 
-        #if there is a chainbreak connect the two chains
-        index= dotbracket[0].index(" ")
-        log.debug('chainbreak: {}'.format(index))
-
-        for line in dotbracket:
-            line = line[:index] + '..........' + line[index+1:]
-            log.debug(line)
-            STRUCTURES.append(line)
-
-        #creat a sequence incl. the "chainbreaking-sequence"
-        SEQUENCE_CONSTRAINTS= "N"* (len(dotbracket[0])-1) #-1 for the empty space
-        SEQUENCE_CONSTRAINTS= SEQUENCE_CONSTRAINTS[:index] + 'AAAAAAAAAA' + SEQUENCE_CONSTRAINTS[index:]
-        log.debug(SEQUENCE_CONSTRAINTS)
     #if there is no input given, take the default one
     else:
-        STRUCTURES,SEQUENCE_CONSTRAINTS = testinput()
-        log.debug(STRUCTURES)
-        log.debug(SEQUENCE_CONSTRAINTS)
+        dotbracket = testinput()
+        log.debug(dotbracket)
+
+    #if there is a chainbreak connect the two chains
+    index= dotbracket[0].index(" ")
+    log.debug('chainbreak: {}'.format(index))
+    for line in dotbracket:
+        line = line[:index] + '..........' + line[index+1:]
+        log.debug(line)
+        STRUCTURES.append(line)
+
+    #creat a sequence incl. the "chainbreaking-sequence"
+    SEQUENCE_CONSTRAINTS= "N"* (len(dotbracket[0])-1) #-1 for the empty space
+    SEQUENCE_CONSTRAINTS= SEQUENCE_CONSTRAINTS[:index] + 'AAAAAAAAAA' + SEQUENCE_CONSTRAINTS[index:]
+    log.debug(SEQUENCE_CONSTRAINTS)
     erase_line = '\r\033[K'
 
     # print input
@@ -162,7 +171,7 @@ def main():
         # reset and resample complete sequence
         dg.sample()
         # initialize best score,
-        score = objective2(dg.get_sequence(),STRUCTURES);
+        score = objective2(dg.get_sequence(),STRUCTURES,index);
         # initial temperature for cooling during simulated annealing
         temperature = 20
 
@@ -175,7 +184,7 @@ def main():
             # sample a new sequence
             dg.sample_clocal()
             # calculate new score
-            this_score = objective2(dg.get_sequence(),STRUCTURES)
+            this_score = objective2(dg.get_sequence(),STRUCTURES,index)
             # evaluate probability with scores
             rand = random.uniform(0, 1)
             if (this_score-score) < 0:
