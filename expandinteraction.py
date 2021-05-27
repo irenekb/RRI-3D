@@ -182,11 +182,11 @@ def main():
         for line in content:
             for index,element in enumerate(line):
                 nucleotides.append(element)
-                if not element.strip():
+                if not element.strip() or element == "&":
                     chainbreak = int(index)
         sequencelength = int(len(nucleotides))
 
-    print('ultimate ncl list with length {}, with chainbrake at {}'.format(sequencelength,chainbreak))
+    print('ultimate ncl list with length {}, with chainbreak at {}'.format(sequencelength,chainbreak))
     print(nucleotides)
 
     #BASEPAIRS
