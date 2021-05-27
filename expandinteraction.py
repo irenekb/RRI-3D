@@ -1,10 +1,11 @@
 #!usr/bin/env python3
 '''
+TESTINPUT
 python3 expandinteraction.py  -b 2 -n test5.seq -x test5.bp -o test5_01.ss
 python3 expandinteraction.py  -b 2 -n test5.seq -d test5.ss -o test5_02.ss
 
-python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -x SimRNA_interaction/1zci_00.bp -o 1zci_01.ss
-python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -d SimRNA_interaction/1zci_00.ss -o 1zci_02.ss
+python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -x SimRNA_interaction/1zci.bp -o 1zci_01.ss
+python3 expandinteraction.py  -b 2 -n SimRNA_interaction/1zci.seq -d SimRNA_interaction/1zci.ss -o 1zci_02.ss
 '''
 
 import logging
@@ -112,6 +113,34 @@ def db2bps(db):
             bps.append([opening_bps.pop(),i]) # list of lists
     return bps
 
+def interfunction(db,chainbreak):
+    """
+    Isolate the interaction basepairs and measure the interaction length
+
+    :param db: String of dotbracket
+    :param chainbreak: (int) positon of the chainbreak between the two RNAs
+    """
+    #Find the interaction (use DBold)
+    findinteractionline = dict()
+
+    for nr, db_line in enumerate(db): #line includes only noncrossing bps
+        print (nr, db_line)
+        bp_count = 0
+        interim_interaction_bps = db2bps(db_line)
+        for pair in interim_interaction_bps: #counting interaction pairs
+                if pair[0] < chainbreak and pair[1] > chainbreak:
+                    bp_count += 1
+        findinteractionline[nr] = [bp_count,interim_interaction_bps]
+        print (findinteractionline)
+
+    interaction_list = list(sorted(findinteractionline.values()))[-1]
+    interaction = interaction_list[0]= interaction_list[1]
+    interaction.sort(key = lambda k: (k[0], -k[1]))
+
+    print('Interaction list, with interaction: {}'.format(interaction))
+
+    return (interaction)
+
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
     parser.add_argument ('-b', '--buffer', type= int, help='Buffer length',default=0)
@@ -190,24 +219,8 @@ def main():
         for line in dotbracket_old:
             print(''.join(line))
 
-    #Find the interaction (use DBold)
-    findinteractionline = dict()
-
-    for nr, db_line in enumerate(dotbracket_old): #line includes only noncrossing bps
-        print (nr, db_line)
-        bp_count = 0
-        interim_interaction_bps = db2bps(db_line)
-        for pair in interim_interaction_bps: #counting interaction pairs
-                if pair[0] < chainbreak and pair[1] > chainbreak:
-                    bp_count += 1
-        findinteractionline[nr] = [bp_count,interim_interaction_bps]
-        print (findinteractionline)
-
-    interaction_list = list(sorted(findinteractionline.values()))[-1]
-    interaction = interaction_list[0]= interaction_list[1]
-    interaction.sort(key = lambda k: (k[0], -k[1]))
-
-    print('Interaction list, with interaction: {}'.format(interaction))
+    interaction = interfunction(dotbracket_old,chainbreak)
+    print('INTERACTIONLENGTH: {}'.format(len(interaction)))
 
     #new interaction + bufferzone
     start_left, end_left = list(), list()
@@ -294,9 +307,15 @@ def main():
         fp = (''.join(line))
         forprinting.append(fp)
 
+    #WRITE OUTPUT
     with open(args.output, 'w') as out:
         out.write('\n'.join(forprinting))
         out.write('\n')
+
+    #INTERACTION length
+    interactionnew = interfunction(dotbracket_new,chainbreak)
+    print('INTERACTIONLENGTH NEW: {}'.format(len(interactionnew)))
+
 
 if __name__ == "__main__":
     main()
