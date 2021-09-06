@@ -14,7 +14,7 @@ A selection of - default 5 - designs will be saved with the following filename:
 
 
 SAMPLE COMMAND:
-python RNAdesign.py -i SimRNA_interaction/RNAdesign.test -o RNA
+python RNAdesign.py -i SimRNA_interaction/RNAdesign.test -o RNA -n 10 -s 10
 
 -i --input      secondary structure file in SimRNA format
 -o --ouput      Ouputname
@@ -31,6 +31,7 @@ import pandas as pd
 import argparse
 import logging
 log = logging.getLogger(__name__)
+pd.options.display.max_colwidth = 500000000000 #otherwise it cut the strings
 
 def testinput():
     '''
@@ -45,7 +46,7 @@ def testinput():
 
     return(DOTBRACKET)
 
-def objective(sequence):
+def objective(sequence,STRUCTURES):
     '''
     Design bi-stable switches, ie.e sequences that will form either of the two
     structures with close to 50% probability. It uses RNAblueprint to sample
@@ -172,6 +173,7 @@ def main():
         dg.sample()
         # initialize best score,
         score = objective2(dg.get_sequence(),STRUCTURES,index);
+        ##score = objective(dg.get_sequence(),STRUCTURES);
         # initial temperature for cooling during simulated annealing
         temperature = 20
 
@@ -185,6 +187,7 @@ def main():
             dg.sample_clocal()
             # calculate new score
             this_score = objective2(dg.get_sequence(),STRUCTURES,index)
+            ##this_score = objective(dg.get_sequence(),STRUCTURES)
             # evaluate probability with scores
             rand = random.uniform(0, 1)
             if (this_score-score) < 0:
@@ -213,11 +216,14 @@ def main():
     output = str(args.output)
     for n in range(0,selection):
         nstr= str(n+1)
+        log.debug(nstr)
         outputname = output + "design" + nstr + ".seq"
 
         #remove the "chainbreaking-sequence"
         sequence = str(sequence_df.iloc[n]['Sequence'])
+        log.debug(sequence)
         sequence= sequence[:index] +' '+ sequence[index+10:]
+        log.debug(sequence)
         with open(outputname, 'w') as out:
             out.write(sequence)
 
