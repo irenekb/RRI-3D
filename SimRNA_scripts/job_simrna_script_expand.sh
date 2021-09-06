@@ -7,7 +7,7 @@
 
 ## script started from job_simrna_start_expand.sh for a cluster calculation
 #Get commandline arguments:
-#CSV1:pdb, CSV2: secondary-structure file 
+#CSV1:pdb, CSV2: secondary-structure file
 #CSV3: SimRNA Data conection, CSV4: SimRNA configfile
 #CSV5: OUTDIR, CSV6: NAME
 PDB="$1"
@@ -15,7 +15,8 @@ SSFILE="$2"
 DATA="$3"
 CONFIG="$4"
 OUTPUT_DIRECTORY="$5"
-SEEDTYPE="$7"
+SEED="$7"
+SIMROUND="$8"
 
 echo $PDB
 echo $SSFILE
@@ -31,15 +32,17 @@ cd $TMPDIR
 cp -r $DATA .
 
 #Run SimRNA
-if [ "$SEEDTYPE" = "random" ]; then
-        for step in {1..10}; do
+if [ $SEED = "random" ]; then
+  #for step in {1..10}; do
+  for step in $(seq 1 ${SIMROUND}); do
 		random=$(od -N 4 -t uL -An < /dev/urandom | tr -d " ")
-                # Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
+    # Reads 4 bytes from the random device and formats them as unsigned integer between 0 and 2^32-1
 		NAME="$6_${step}_${random}"
-		SimRNA -p $PDB -S $SSFILE -c $CONFIG -R $random -o $NAME >& $NAME.log & 
-	done
+	  SimRNA -p $PDB -S $SSFILE -c $CONFIG -R $random -o $NAME >& $NAME.log &
+  done
 else
-	for step in {1..10}; do	
+  #for step in {1..10}; do
+  for step in $(seq 1 ${SIMROUND}); do
 		NAME="$6_${step}_${step}"
 		SimRNA -p $PDB -S $SSFILE -c $CONFIG -R $step -o $NAME >& $NAME.log &
 	done
