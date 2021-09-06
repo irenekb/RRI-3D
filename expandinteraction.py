@@ -100,6 +100,7 @@ def create_db(basepairs, sequencelength,chainbreak):
 def db2bps(db):
     """
     Get base pair list from db string.
+    Possible as per DB-line there is no crosssing brackets allowed
 
     :param db: String of dotbracket
     """
@@ -124,22 +125,23 @@ def interfunction(db,chainbreak):
     findinteractionline = dict()
 
     for nr, db_line in enumerate(db): #line includes only noncrossing bps
-        print (nr, db_line)
+        log.debug("line: {}, db {}".format(nr, db_line))
         bp_count = 0
         interim_interaction_bps = db2bps(db_line)
         for pair in interim_interaction_bps: #counting interaction pairs
                 if pair[0] < chainbreak and pair[1] > chainbreak:
                     bp_count += 1
         findinteractionline[nr] = [bp_count,interim_interaction_bps]
-        print (findinteractionline)
+        log.debug(findinteractionline)
 
     interaction_list = list(sorted(findinteractionline.values()))[-1]
     interaction = interaction_list[0]= interaction_list[1]
     interaction.sort(key = lambda k: (k[0], -k[1]))
 
-    print('Interaction list, with interaction: {}'.format(interaction))
+    log.debug('Interaction list, with interaction: {}'.format(interaction))
 
     return (interaction)
+
 
 def main():
     parser = argparse.ArgumentParser(description='Prepare DB-files with expanding interaction')
@@ -168,11 +170,10 @@ def main():
         right = args.right
         left = args.left
 
-    print('right {} left {}'.format(right, left))
+    log.debug('right {} left {}'.format(right, left))
 
     buffer = args.buffer
-    Pairs = {"A":"U","U":"A","G":"C","C":"G"}
-    #Pairs = [('A', 'U'), ('U', 'A'), ('C', 'G'), ('G', 'C')]
+    Pairs = [['A', 'U'], ['C', 'G'], ['G', 'U'],['U', 'A'], ['G', 'C'], ['U', 'G']]
 
     #NUCLEOTIDES from file, SEQUENCELENGTH, CHAINBREAK
     nucleotides =  list()
@@ -186,8 +187,8 @@ def main():
                     chainbreak = int(index)
         sequencelength = int(len(nucleotides))
 
-    print('ultimate ncl list with length {}, with chainbreak at {}'.format(sequencelength,chainbreak))
-    print(nucleotides)
+    log.debug('ultimate ncl list with length {}, with chainbreak at {}'.format(sequencelength,chainbreak))
+    log.debug(nucleotides)
 
     #BASEPAIRS
     basepairs = list()
@@ -196,13 +197,13 @@ def main():
             basepairs=json.load(BPFile)
         #basepairs.sort(key=itemgetter(0),reverse=False)
         basepairs.sort(key = lambda k: (k[0], -k[1]))
-        print('ultimate bp list: {}'.format(basepairs))
+        log.debug('ultimate bp list: {}'.format(basepairs))
 
         #Starting Dotbracket structure
         dotbracket_old = create_db(basepairs,sequencelength,chainbreak)
-        print('old dotbracket')
+        log.debug('old dotbracket')
         for line in dotbracket_old:
-            print(''.join(line))
+            log.debug(''.join(line))
     else:
         dotbracket_old=[]
         with open (args.dotbracket, 'r') as DBFile:
@@ -214,13 +215,14 @@ def main():
             for bp in interim_bp:
                 basepairs.append(bp)
         basepairs.sort(key = lambda k: (k[0], -k[1]))
-        print('ultimate bp list: {}'.format(basepairs))
-        print('old dotbracket')
+        log.debug('ultimate bp list: {}'.format(basepairs))
+        log.debug('old dotbracket')
         for line in dotbracket_old:
-            print(''.join(line))
+            log.debug(''.join(line))
 
     interaction = interfunction(dotbracket_old,chainbreak)
-    print('INTERACTIONLENGTH: {}'.format(len(interaction)))
+    interactionlength= int(len(interaction))
+    print('INTERACTIONLENGTH: {}'.format(interactionlength))
 
     #new interaction + bufferzone
     start_left, end_left = list(), list()
@@ -239,7 +241,7 @@ def main():
             start_left.append(interaction[0][0]-i)
             end_left.append(interaction[0][1]+i)
 
-    print(start_left,end_left, start_right, end_right)
+    log.debug('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
     #Remove all brackets left
     if left:
         removing_basepairs = []
@@ -255,7 +257,7 @@ def main():
                     removing_basepairs.append(pair)
         for pair in removing_basepairs:
             basepairs.remove(pair)
-        print('New interaction positions left: start {} end {}'.format(start_left, end_left,removing_basepairs))
+        log.debug('New interaction positions left: start {} end {}'.format(start_left, end_left,removing_basepairs))
 
     if right:
         removing_basepairs = []
@@ -271,51 +273,53 @@ def main():
                     removing_basepairs.append(pair)
         for pair in removing_basepairs:
             basepairs.remove(pair)
-        print('New interaction positions right: start {} end {}'.format(start_right, end_right,removing_basepairs))
+        log.debug('New interaction positions right: start {} end {}'.format(start_right, end_right,removing_basepairs))
 
 
     #new interaction
     if left:
         newbps=[start_left[-1],end_left[0]]
         ncl = [nucleotides[start_left[-1]],nucleotides[end_left[0]]]
-        print('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+        log.debug('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
         #chainbraketest: chainbrake != in pairs
-        if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
+        if ncl in Pairs:
             basepairs.append(newbps)
+
     if right:
         newbps=[start_right[0],end_right[-1]]
         ncl = [nucleotides[start_right[0]],nucleotides[end_right[-1]]]
-        print('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
-        if ncl[0] in Pairs and ncl[1] == Pairs[ncl[0]]:
-        #if ncl in Pairs:
+        log.debug('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+        if ncl in Pairs:
             basepairs.append(newbps)
 
-    #basepairs = sorted(basepairs, key=lambda l: (len(l), l))
     basepairs.sort(key = lambda k: (k[0], -k[1]))
     '''
         list = sort( [[5, 2], [2, 4], [4, 5]])
         list = [[2, 5], [2, 4], [4, 5]]
     '''
-    print('new basepairlists: {}'.format(basepairs))
+    log.debug('new basepairlists: {}'.format(basepairs))
 
     #WRITE THE NEW DOTBRACKET STRUCTURE
     dotbracket_new = create_db(basepairs,sequencelength,chainbreak)
-    print('new dotbracket')
+    log.debug('new dotbracket')
     forprinting = list()
     for line in dotbracket_new:
-        print(''.join(line))
+        log.debug(''.join(line))
         fp = (''.join(line))
         forprinting.append(fp)
-
-    #WRITE OUTPUT
-    with open(args.output, 'w') as out:
-        out.write('\n'.join(forprinting))
-        out.write('\n')
 
     #INTERACTION length
     interactionnew = interfunction(dotbracket_new,chainbreak)
     print('INTERACTIONLENGTH NEW: {}'.format(len(interactionnew)))
 
+    #output only if there was an expansion
+    if int(len(interactionnew)) > int(interactionlength):
+        #WRITE OUTPUT
+        with open(args.output, 'w') as out:
+            out.write('\n'.join(forprinting))
+            out.write('\n')
+    else:
+        print("No expansion possible any more!")
 
 if __name__ == "__main__":
     main()
