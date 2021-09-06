@@ -3,7 +3,7 @@
 Parse over all SSalignment files (individual runs and the overview).
 Looking for the most common secondary  structure in the overview file.
 Look for this secondary structure in all individual runs and seperate them (max_file).
-The structure with the best energy (3D) is the one vor the next constrained run.
+The structure with the best energy (3D) is the one for the next constrained run.
 
 --force: instead of the most common secondary structure, the structure that fits
          the given constrain best
@@ -79,11 +79,11 @@ def main():
         index_start = individual[ individual['number'] == start_line].index
 
     #get the start and constrained ss and remove them from the df
-    constrain_bp = individual.loc[individual['number'] == constrained_line].loc[0,'bp'].values[0]
-    log.debug('constrain: {}'.format(constrain_bp))
-    if args.second:
-        start_bp = individual.loc[individual['number'] == start_line].loc[1,'bp'].values[0]
-        log.debug('start:  {}'.format(start_bp))
+    #constrain_bp = individual.loc[individual['number'] == constrained_line].loc[0,'bp'].values[0]
+    #log.debug('constrain: {}'.format(constrain_bp))
+    #if args.second:
+        #start_bp = individual.loc[individual['number'] == start_line].loc[1,'bp'].values[0]
+        #log.debug('start:  {}'.format(start_bp))
     # Delete these row indexes from dataFrame
     individual.drop(index_constrain, inplace=True)
     if args.second:
@@ -137,7 +137,6 @@ def main():
         print('count_interaction_constraint {}, shape {} (rows, columns)'.format(count_interaction_cc, df_count_interaction_cc.shape))
         log.debug('df_count_interaction_cc')
         log.debug(df_count_interaction_cc)
-
 
         interim_best3d = {}
         # seperate for the 3D structure in the individual runs with the certain 2D structure

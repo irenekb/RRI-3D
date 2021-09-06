@@ -159,8 +159,6 @@ def main():
     parser.add_argument ('-u', '--uniqueoutput', help='Name of the unique outputfile/or the already existing one')
     parser.add_argument ('-t', '--trafl', help='Traflfile')
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
-    parser.add_argument ('-r', '--right', action='store_true', help='expand right')
-    parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
 
     args = parser.parse_args()
 
