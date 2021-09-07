@@ -21,61 +21,137 @@ PDB="$COARSE/RESOURCES/PDB_DIR/"
 
 ######./ultimatescriptstart.sh "${START}/$DESIGN" "CopStemsdesign${DESIGN}" "/home/irene/Programs/GitHub/RNA-Interaction-Workflow/inputvalues.dat"
 
-python $PROGS/"RNAdesign.py" -i "$START/${BASENAME}_0.bb" -o ${BASENAME} -n $DESIGNS -s $DESIGNS #Scenario testing
-mv "${NAME}"* $START/.
+if [[ ${DESIGNS} == 0 ]]; then
+  if [ "$CLUSTER" -eq "0" ]; then
 
-python "$PROGS/formattranslation.py" -p $START -n $NAME -c $DESIGNS
-
-#calculation without clustering of the ernwin structures
-if [ "$CLUSTER" -eq "0" ]; then
-
-  for DESIGN in `seq 1 1 ${DESIGNS}`; do
-
-    mkdir "$START/${NAME}${DESIGN}"
-    cp "$START/${NAME}${DESIGN}.seq" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"
-    cp "$START/${NAME}_0.ss" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"
-    cp "$START/${NAME}_0.ss_cc" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"
-    cp "$START/${NAME}${DESIGN}.fa" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa"
-
-    python2 $ERNWIN "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
+    python2 $ERNWIN "$START/${NAME}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
     wait
-    mv ${NAME}${DESIGN} "$START/${NAME}${DESIGN}/"
-
+    mv ${NAME} "$START/"
     COUNTER=0
 
     while [  $COUNTER -lt $ERNROUND ]; do #Scenario testing
       echo "ernwin reconstruction $COUNTER"
 
-      python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$COUNTER.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+      python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/best$COUNTER.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
       wait
-      RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$COUNTER.coord.reconstr.pdb"
+      RECONSTRUCTIONFILE="$START/${NAME}/simulation_01/best$COUNTER.coord.reconstr.pdb"
 
       #check if file exist
       if [ ! -f "$RECONSTRUCTIONFILE" ]; then
         let COUNTER=$COUNTER+1
       else
         echo "possible ernwin reconstruction $COUNTER"
-        cp $RECONSTRUCTIONFILE  "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.pdb"
+        cp $RECONSTRUCTIONFILE  "$START/${NAME}_0.pdb"
         break 1
       fi
 
       echo "ERROR: No ernwin reconstruction possible"
+
+      ./ultimatescript.sh $FILE "${NAME}" "$START"
+
+      retVal=$?
+      TRY="0"
+      ERNWINCOUNT="1"
+
+      while [[ $retVal -ne 0 && "$TRY" -lt $ERNROUND ]]; do
+        echo "Error in PDB translation"
+
+        while [ $ERNWINCOUNT -lt $ERNROUND ]; do
+          #ERNWINCOUNT="$(($COUNTER+$RECONCOUNT))"
+          python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/best$ERNWINCOUNT.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+          wait
+          RECONSTRUCTIONFILE="$START/${NAME}/simulation_01/best$ERNWINCOUNT.coord.reconstr.pdb"
+
+          #check if file exist
+          if [ ! -f "$RECONSTRUCTIONFILE" ]; then
+            let COUNTER=$COUNTER+1
+          else
+            echo "possible ernwin reconstruction $COUNTER"
+            cp $RECONSTRUCTIONFILE  "$START/${NAME}_0.pdb"
+            break 1
+          fi
+
+          echo "ERROR: No ernwin reconstruction possible"
+        done
+
+        ./ultimatescript.sh $FILE "${NAME}" "$START"
+        retVal=$?
+
+        if [ $retVal -ne 0 ]; then
+            echo "Error in PDB translation"
+            let TRY=$TRY+1
+            let ERNWINCOUNT=$ERNWINCOUNT+1
+        fi
+
+      done
     done
 
-    ./ultimatescript.sh $FILE "${NAME}${DESIGN}" "$START/${NAME}${DESIGN}/"
+  #Calculation with ernwin clustering
+  else
+    #python2 $ERNWIN "$START/${NAME}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
+    #wait
+    #mv ${NAME} "$START/"
+    COUNTER=0
 
-    retVal=$?
-    TRY="0"
-    ERNWINCOUNT="1"
+    #python $PROGS/"ernwindiversity.py" -i "$START/${NAME}/simulation_01/" -n $ERNROUND -c $CLUSTER
 
-    while [[ $retVal -ne 0 && "$TRY" -lt $ERNROUND ]]; do
-      echo "Error in PDB translation"
+    for CST in `seq 0 1 ${CLUSTER}`; do
+      while IFS= read -r line; do
+        echo "From cluster $CST sample : $line"
 
-      while [ $ERNWINCOUNT -lt $ERNROUND ]; do
-        #ERNWINCOUNT="$(($COUNTER+$RECONCOUNT))"
-        python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$ERNWINCOUNT.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+        #python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/$line.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+        #mv ${NAME} "$START/"
         wait
-        RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$ERNWINCOUNT.coord.reconstr.pdb"
+        RECONSTRUCTIONFILE="$START/${NAME}/simulation_01/$line.coord.reconstr.pdb"
+
+        #check if file exist
+        if [ -f "$RECONSTRUCTIONFILE" ]; then
+          echo "possible ernwin reconstruction $line"
+          mkdir "$START/cluster${CST}"
+          cp $RECONSTRUCTIONFILE  "$START/cluster${CST}/${NAME}c${CST}_0.pdb"
+          cp "$START/${NAME}.seq"  "$START/cluster${CST}/${NAME}c${CST}.seq"
+          cp "$START/${NAME}_0.ss"  "$START/cluster${CST}/${NAME}c${CST}_0.ss"
+          cp "$START/${NAME}_0.ss_cc"  "$START/cluster${CST}/${NAME}c${CST}_0.ss_cc"
+          cp "$START/${NAME}_0.il"  "$START/cluster${CST}/${NAME}c${CST}_0.il"
+
+          ./ultimatescript.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
+          break 1
+        fi
+
+        echo "ERROR: No ernwin reconstruction possible"
+      done < "$START/${NAME}/simulation_01/cluster$CST.csv"
+    done
+  fi
+  
+else
+  python $PROGS/"RNAdesign.py" -i "$START/${BASENAME}_0.bb" -o ${BASENAME} -n $DESIGNS -s $DESIGNS #Scenario testing
+  mv "${NAME}"* $START/.
+
+  python "$PROGS/formattranslation.py" -p $START -n $NAME -c $DESIGNS
+
+  #calculation without clustering of the ernwin structures
+  if [ "$CLUSTER" -eq "0" ]; then
+
+    for DESIGN in `seq 1 1 ${DESIGNS}`; do
+
+      mkdir "$START/${NAME}${DESIGN}"
+      cp "$START/${NAME}${DESIGN}.seq" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"
+      cp "$START/${NAME}_0.ss" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"
+      cp "$START/${NAME}_0.ss_cc" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"
+      cp "$START/${NAME}${DESIGN}.fa" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa"
+
+      python2 $ERNWIN "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
+      wait
+      mv ${NAME}${DESIGN} "$START/${NAME}${DESIGN}/"
+
+      COUNTER=0
+
+      while [  $COUNTER -lt $ERNROUND ]; do #Scenario testing
+        echo "ernwin reconstruction $COUNTER"
+
+        python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$COUNTER.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+        wait
+        RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$COUNTER.coord.reconstr.pdb"
 
         #check if file exist
         if [ ! -f "$RECONSTRUCTIONFILE" ]; then
@@ -90,59 +166,87 @@ if [ "$CLUSTER" -eq "0" ]; then
       done
 
       ./ultimatescript.sh $FILE "${NAME}${DESIGN}" "$START/${NAME}${DESIGN}/"
+
       retVal=$?
+      TRY="0"
+      ERNWINCOUNT="1"
 
-      if [ $retVal -ne 0 ]; then
-          echo "Error in PDB translation"
-          let TRY=$TRY+1
-          let ERNWINCOUNT=$ERNWINCOUNT+1
-      fi
+      while [[ $retVal -ne 0 && "$TRY" -lt $ERNROUND ]]; do
+        echo "Error in PDB translation"
 
-    done
-  done
+        while [ $ERNWINCOUNT -lt $ERNROUND ]; do
+          #ERNWINCOUNT="$(($COUNTER+$RECONCOUNT))"
+          python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$ERNWINCOUNT.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+          wait
+          RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/best$ERNWINCOUNT.coord.reconstr.pdb"
 
-#Calculation with ernwin clustering
-else
-  for DESIGN in `seq 1 1 ${DESIGNS}`; do
+          #check if file exist
+          if [ ! -f "$RECONSTRUCTIONFILE" ]; then
+            let COUNTER=$COUNTER+1
+          else
+            echo "possible ernwin reconstruction $COUNTER"
+            cp $RECONSTRUCTIONFILE  "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.pdb"
+            break 1
+          fi
 
-    mkdir "$START/${NAME}${DESIGN}"
-    cp "$START/${NAME}${DESIGN}.seq" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"
-    cp "$START/${NAME}_0.ss" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"
-    cp "$START/${NAME}_0.ss_cc" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"
-    cp "$START/${NAME}${DESIGN}.fa" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa"
+          echo "ERROR: No ernwin reconstruction possible"
+        done
 
-    python2 $ERNWIN "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
-    wait
-    mv ${NAME}${DESIGN} "$START/${NAME}${DESIGN}/"
+        ./ultimatescript.sh $FILE "${NAME}${DESIGN}" "$START/${NAME}${DESIGN}/"
+        retVal=$?
 
-    COUNTER=0
-
-    python $PROGS/"ernwindiversity.py" -i "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/" -n $ERNROUND -c $CLUSTER
-
-
-    for CST in `seq 0 1 ${CLUSTER}`; do
-      while IFS= read -r line; do
-        echo "From cluster $CST sample : $line"
-
-        python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/$line.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
-        wait
-        RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/$line.coord.reconstr.pdb"
-
-        #check if file exist
-        if [ -f "$RECONSTRUCTIONFILE" ]; then
-          echo "possible ernwin reconstruction $line"
-          mkdir "$START/${NAME}${DESIGN}/cluster${CST}"
-          cp $RECONSTRUCTIONFILE  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.pdb"
-          cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}.seq"
-          cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.ss"
-          cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.ss_cc"
-
-          ./ultimatescript.sh $FILE "${NAME}${DESIGN}c${CST}" "$START/${NAME}${DESIGN}/cluster${CST}"
-          break 1
+        if [ $retVal -ne 0 ]; then
+            echo "Error in PDB translation"
+            let TRY=$TRY+1
+            let ERNWINCOUNT=$ERNWINCOUNT+1
         fi
 
-        echo "ERROR: No ernwin reconstruction possible"
-      done < "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/cluster$CST.csv"
+      done
     done
-  done
+
+  #Calculation with ernwin clustering
+  else
+    for DESIGN in `seq 1 1 ${DESIGNS}`; do
+
+      mkdir "$START/${NAME}${DESIGN}"
+      cp "$START/${NAME}${DESIGN}.seq" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"
+      cp "$START/${NAME}_0.ss" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"
+      cp "$START/${NAME}_0.ss_cc" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"
+      cp "$START/${NAME}${DESIGN}.fa" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa"
+
+      python2 $ERNWIN "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
+      wait
+      mv ${NAME}${DESIGN} "$START/${NAME}${DESIGN}/"
+
+      COUNTER=0
+
+      python $PROGS/"ernwindiversity.py" -i "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/" -n $ERNROUND -c $CLUSTER
+
+
+      for CST in `seq 0 1 ${CLUSTER}`; do
+        while IFS= read -r line; do
+          echo "From cluster $CST sample : $line"
+
+          python2 $RECONSTRUCTION "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/$line.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+          wait
+          RECONSTRUCTIONFILE="$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/$line.coord.reconstr.pdb"
+
+          #check if file exist
+          if [ -f "$RECONSTRUCTIONFILE" ]; then
+            echo "possible ernwin reconstruction $line"
+            mkdir "$START/${NAME}${DESIGN}/cluster${CST}"
+            cp $RECONSTRUCTIONFILE  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.pdb"
+            cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.seq"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}.seq"
+            cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.ss"
+            cp "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}${DESIGN}c${CST}_0.ss_cc"
+
+            ./ultimatescript.sh $FILE "${NAME}${DESIGN}c${CST}" "$START/${NAME}${DESIGN}/cluster${CST}"
+            break 1
+          fi
+
+          echo "ERROR: No ernwin reconstruction possible"
+        done < "$START/${NAME}${DESIGN}/${NAME}${DESIGN}/simulation_01/cluster$CST.csv"
+      done
+    done
+  fi
 fi

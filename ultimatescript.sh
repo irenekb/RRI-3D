@@ -33,8 +33,8 @@ RELAX=$(awk -F= '$1=="RELAX"{print $2;exit}' $FILE)
 SIMROUND=$(awk -F= '$1=="SIMROUND"{print $2;exit}' $FILE)
 SEED=$(awk -F= '$1=="SEED"{print $2;exit}' $FILE)
 TREESEARCH=$(awk -F= '$1=="TREESEARCH"{print $2;exit}' $FILE)
-CONTSEARCH=$(awk -F= '$1=="CONTSEARCH"{print $2;exit}' $FILE)
-
+CONTSEARCH1=$(awk -F= '$1=="CONTSEARCH1"{print $2;exit}' $FILE)
+CONTSEARCH2=$(awk -F= '$1=="CONTSEARCH2"{print $2;exit}' $FILE)
 SEQ="${START}/${NAME}.seq"
 
 echo $NAME
@@ -55,21 +55,21 @@ ln -s /home/irene/Programs/SimRNA_64bitIntel_Linux/data . #now simrna script doe
 #####EXPANSION PREPERATION
 #expansion to provide a bias through the SimRNA expansion
 echo "EXPANTION"
-#for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
+for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 
-	#ROLD="$(($CURRENTROUND-"1"))"
-	#NAMESS=$START/"${NAME}_${CURRENTROUND}.ss"
-	#NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
+	ROLD="$(($CURRENTROUND-"1"))"
+	NAMESS=$START/"${NAME}_${CURRENTROUND}.ss"
+	NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
 
-	#python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+	python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
 
-	#if [ ! -f $NAMESS ]; then
-		#echo "New number of rounds: $ROLD"
-		#ROUNDS="${ROLD}"
-		#break 1
-	#fi
+	if [ ! -f $NAMESS ]; then
+		echo "New number of rounds: $ROLD"
+		ROUNDS="${ROLD}"
+		break 1
+	fi
 
-#done
+done
 
 
 #####START from ernwin reconstructed pdb#####
@@ -80,49 +80,49 @@ wait
 
 #check if the SimRNA simulation runs without error
 #need only the first step for checking
-if grep -Fxq "error" "${NAME}_${RELAX}_${ROUND}_1_1.log"; then
+#if grep -Fxq "error" "${NAME}_${RELAX}_${ROUND}_1_1.log"; then
+#if [ ! -f "${NAME}_${RELAX}_${ROUND}_1_1.log" ]; then
   #if codeword error found
+	#echo "yThere is an error in the SimRNA start - see logfile: ${NAME}_${RELAX}_${ROUND}_1_1.log"
+
+while grep -Fxq "error" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; do
+#while [ ! -f "$START/${NAME}_${RELAX}_${ROUND}_1_1.log" ] ; do
 	echo "There is an error in the SimRNA start - see logfile: ${NAME}_${RELAX}_${ROUND}_1_1.log"
+  echo "1. Error is fixed - try again"
+  echo "2. Quit"
+  ##echo -n "Type 1 or 2 :"
+  read -n 1 -p "Type 1 or 2 :" VAR </dev/tty #ToDo -t timeout if necessary
+	wait
+  printf "\n"
+  case $VAR in
+  1* )     "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
+					 wait ;;
 
-	while :
-	do
-		echo "1. Error is fixed - try again"
-		echo "2. Quit"
-		echo -n "Type 1 or 2:"
-		read -n 1 -t 15 a
-		printf "\n"
-		case $a in
-		1* ) echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
-				 "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
-				 wait;;
+  2* )     exit 1;;
 
-		2* ) exit 1;;
+  * )     echo "Try again.";;
+  esac
+done
 
-		* ) echo "Try again.";;
-		esac
-	done
-fi
+	#fi
+
+#fi
 
 mkdir $START/$ROUND
+mv "${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
+mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
 ROUNDNEW="$(($ROUND+"1"))"
 mkdir $START/${ROUNDNEW}
-
-######can be deleted
-######if [ "$TREESEARCH" == false ] ; then
-######	NAMESS=$START/"${NAME}_${ROUND}.ss"
-######	NAMECC=$START/"${NAME}_${ROUND}.ss_cc"
-######	mkdir $START/$ROUND/analyse
-######fi
 
 for step in $(seq 1 ${SIMROUND}); do
 	TRAFL="${NAME}_${RELAX}_${ROUND}_${step}_${step}.trafl"
 	PDB="${NAME}_${RELAX}_${ROUND}_${step}_${step}-000001.pdb"
 
-	if [ ! -f ${START}/${PDB} ]; then
-		echo "File does not exist in Bash: "${START}""
-		mv "${NAME}_${RELAX}_${ROUND}_"* {START}/${ROUND}/.
-		#exit 1
-	fi
+	###if [ ! -f ${START}/${PDB} ]; then --> sollte davor schon abgefragt werden mit den kaputten pdb
+	###	echo "File does not exist in Bash: "${START}""
+	###	mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
+	###	exit 1
+	###fi
 
 	if [ "$TREESEARCH" == true ] ; then
 		#write and analyse from every simRNA run all paralell runs (SimRounds)
@@ -141,7 +141,7 @@ for step in $(seq 1 ${SIMROUND}); do
 
 		mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
 
-		python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH}
+		python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1}
 		#get the forced structure and search within the individual runs
 
 		#SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
@@ -199,7 +199,7 @@ done
 if [ "$TREESEARCH" == false ] ; then
 	mv ${NAME}_${RELAX}* ${START}/$ROUND
 
-	python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH}
+	python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1}
 	#get the forced structure and search within the individual runs
 
 	SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
@@ -290,7 +290,7 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 					mv ${NAME}_${EXTEND}* $START/${CURRENTROUND}/${simstep}/
 
 					#find the starting structure for the next round
-					python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
+					python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
 
 					SSCCBP=($START/${CURRENTROUND}/${simstep}/*.ss_detected.bp)
 					BASIS=(${SSCCBP##*/})
@@ -369,7 +369,7 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 		mv ${NAME}_${EXTEND}* ${START}/${CURRENTROUND}/
 
 		#find the starting structure for the next round
-		python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
+		python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
 
 		SSCCBP=(${START}/${CURRENTROUND}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
