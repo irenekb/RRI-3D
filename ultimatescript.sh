@@ -50,7 +50,7 @@ echo $EXTEND
 echo $RELAX
 echo $SIMROUND
 
-ln -s /home/irene/Programs/SimRNA_64bitIntel_Linux/data . #now simrna script does this
+#ln -s /home/irene/Programs/SimRNA_64bitIntel_Linux/data . #now simrna script does this
 
 #####EXPANSION PREPERATION
 #expansion to provide a bias through the SimRNA expansion
@@ -74,8 +74,8 @@ done
 
 #####START from ernwin reconstructed pdb#####
 ##extend_long03 = 100,000 steps save every 100th to relax the ernwin structure
-echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
-#"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
+echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
+"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 wait
 
 #check if the SimRNA simulation runs without error
@@ -95,7 +95,7 @@ while grep -Fxq "error" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; do
 	wait
   printf "\n"
   case $VAR in
-  1* )     "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND
+  1* )     "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 					 wait ;;
 
   2* )     exit 1;;
@@ -265,7 +265,7 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 					NAMESSOLD=$START/${ROLD}/"${NAME}_${ROLD}.ss"
 
 					#start the SimRNA expansion job
-					"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" ${START}/${CURRENTROUND}/${simstep}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND
+					"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" ${START}/${CURRENTROUND}/${simstep}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_scripts/"
 					wait
 
 					mkdir ${START}/${CURRENTROUND}/${simstep}/analyse
@@ -344,7 +344,7 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 		#+ checking algorithm - now both  before the SimRNA expantion
 
 		#start the SimRNA expansion job
-		"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START/${CURRENTROUND}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND
+		"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START/${CURRENTROUND}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_scripts/"
 		wait
 
 		#analyse of the SimRNA run

@@ -32,6 +32,7 @@ CONFIG=$5
 WHERE=$6
 SEED=$7
 SIMROUND=$8
+SIMSTART=$9
 
 PDB="${INOUTDIR}/${INITNAME}_${ROUND}.pdb"
 SSFILE="${INOUTDIR}/${INITNAME}_${ROUND}.ss"
@@ -42,17 +43,15 @@ echo "$PDB" "$INITNAME" "$ROUND" "$SSFILE" "$WHERE"
 
 # checkout the right config file
 IFS='_' read -r -a pos <<< "$CONFIG"
-#START="/scratch/irene/Data_interaction/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
-#Bartimaeus:
-START="/home/irene/Programs/GitHub/RNA-Interaction-Workflow/SimRNA_scripts/job_simrna_script_"$pos".sh"
+SIMSTART="${SIMSTART}/job_simrna_script_"$pos".sh"
 
 #Check if directories/files exist and all filenames/directories are correct
 errors=()
 
-if [ ! -f "$START" ]; then
-	errors+=('Starting script does not exist!' "$START")
+if [ ! -f "$SIMSTART" ]; then
+	errors+=('Starting script does not exist!' "$SIMSTART")
 else
-	echo "$START"
+	echo "$SIMSTART"
 fi
 
 if [ ! -d "$INOUTDIR" ]; then
@@ -123,7 +122,7 @@ if [ $WHERE = "local" ]; then
 	mv "$NAME"* "$INOUTDIR"
 
 elif [ $WHERE = "cluster" ]; then
-	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$START" "$PDB" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$SEED" "$SIMROUND"
+	sbatch --output "$INOUTDIR"/"$NAME"_%j.log "$SIMSTART" "$PDB" "$SSFILE" "$SIMRNADATA" "$SIMRNACONFIG" "$INOUTDIR" "$NAME" "$SEED" "$SIMROUND"
 	wait
 else
 	echo "No calculation location given local|cluster"
