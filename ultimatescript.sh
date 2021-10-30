@@ -109,10 +109,11 @@ done
 #fi
 
 mkdir $START/$ROUND
-mv "${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
-mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
+#mv "${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
+mv "${START}/${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
 ROUNDNEW="$(($ROUND+"1"))"
 mkdir $START/${ROUNDNEW}
+cp "$START/${NAME}_0"* ${START}/${ROUND}/
 
 for step in $(seq 1 ${SIMROUND}); do
 	TRAFL="${NAME}_${RELAX}_${ROUND}_${step}_${step}.trafl"
@@ -125,6 +126,7 @@ for step in $(seq 1 ${SIMROUND}); do
 	###fi
 
 	if [ "$TREESEARCH" == true ] ; then
+		ls $START/$ROUND/
 		#write and analyse from every simRNA run all paralell runs (SimRounds)
 		NAMESS=$START/$ROUND/"${NAME}_${ROUND}.ss"
 		NAMECC=$START/$ROUND/"${NAME}_${ROUND}.ss_cc"
@@ -158,17 +160,18 @@ for step in $(seq 1 ${SIMROUND}); do
 		SimRNA_trafl2pdbs "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
 		mkdir $START/${ROUNDNEW}/${step} #for each of the simRNA-rounds
 
-		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/${step}/"${NAME}_${ROUNDNEW}.pdb"
-		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/${step}/"${NAME}_${ROUNDNEW}.ss_cc"
+		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.pdb"
+		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.ss_cc"
 
 		# interaction lenght + bp
 		####cp "$START/$ROUND/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
 		cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
-		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUNDNEW}.il"
-		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUNDNEW}.bp"
+		cp $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
+		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}_ernwinrelax.il"
+		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.bp"
 
 		#clean up directory
-		cp "$START/${NAME}_0"* ${START}/${ROUND}/
+		#cp "$START/${NAME}_0"* ${START}/${ROUND}/
 		rm -r "${START}/${ROUND}/${step}/analyse"
 
 	elif [ "$TREESEARCH" == false ] ; then
@@ -214,12 +217,13 @@ if [ "$TREESEARCH" == false ] ; then
 
 	SimRNA_trafl2pdbs $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
 
-	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/"${NAME}_${ROUNDNEW}.pdb"
-	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/"${NAME}_${ROUNDNEW}.ss_cc"
+	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/"${NAME}_${ROUND}.pdb"
+	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/"${NAME}_${ROUND}.ss_cc"
 
 	# interaction lenght + bp
-	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/"${NAME}_${ROUNDNEW}.il"
-	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/"${NAME}_${ROUNDNEW}.bp"
+	mv $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
+	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}_ernwinrelax.il"
+	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}.bp"
 
 	#clean up directory
 	cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/
@@ -228,19 +232,28 @@ if [ "$TREESEARCH" == false ] ; then
 	rm -r "${START}/${ROUND}/analyse"
 fi #if no "treesearch" partII
 
+ls $START
+
+mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
+mv -T $START/$ROUNDNEW $START/${ROUND}
+
+ls $START
+
 #####EXPAND#####
-for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
+for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 	if [ "$TREESEARCH" == true ] ; then
-		ROLD="$(($CURRENTROUND-"1"))"
+		if [ "$CURRENTROUND" -ne 0 ]; then
+			ROLD="$(($CURRENTROUND-"1"))"
 
-		#if neither of the simsteps are expanded in the last round - stop simulation
-		if [[ ! -z "$(ls -A $START/$CURRENTROUND)" ]]; then
-    	echo "Directory is NOT empty - continue interction expansion!"
-		else
-    	echo "Directory is empty! - no SimRNA-simulation can be expanded, end simulation!"
-			rm $START/${CURRENTROUND}
-			break 1
+			#if neither of the simsteps are expanded in the last round - stop simulation
+			if [[ ! -z "$(ls -A $START/$CURRENTROUND)" ]]; then
+    				echo "Directory is NOT empty - continue interction expansion!"
+			else
+    				echo "Directory is empty! - no SimRNA-simulation can be expanded, end simulation!"
+				rm $START/${CURRENTROUND}
+				break 1
+			fi
 		fi
 
 		for simstep in $(seq 1 ${SIMROUND}); do #each of the starting SimRounds
@@ -254,7 +267,8 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 				declare -i ssold=$(cat "${START}/${ROLD}/${simstep}/${NAME}_${ROLD}.il")
 				echo "Interaction length old: $ssold; Interaction length new: $ssjet"
 
-				if [[ $ssjet -gt $ssold ]]; then #greater than -gt
+	
+				if ([ $CURRENTROUND -eq 0 ] && [ $ssjet -eq $ssold ]) || ([ $ssjet -gt $ssold ] && [ $CURRENTROUND -ne 0 ]) ; then #greater than -gt, equal -eq, not euqal -ne, || or, && and
 					echo "Not the same = continue"
 
 					cp "$START/${NAME}_${CURRENTROUND}.ss" "$START/${CURRENTROUND}/."
