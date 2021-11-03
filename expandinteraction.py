@@ -16,6 +16,7 @@ import json
 from operator import itemgetter
 import sys
 import numpy as np
+from sys import exit
 np.set_printoptions(threshold=sys.maxsize,linewidth =900)
 
 
@@ -154,6 +155,7 @@ def main():
     parser.add_argument ('-r', '--right', action='store_true', help='expand right')
     parser.add_argument ('-l', '--left', action='store_true', help='expand_left')
     parser.add_argument ('-o', '--output', help='name of the outputfile')
+    parser.add_argument ('-t', '--target', help='end/target structure')
 
     args = parser.parse_args()
 
@@ -192,6 +194,7 @@ def main():
 
     #BASEPAIRS
     basepairs = list()
+    target_basepairs = list()
     if args.basepairlist is not None:
         with open(args.basepairlist, 'r') as BPFile:
             basepairs=json.load(BPFile)
@@ -224,24 +227,79 @@ def main():
     interactionlength= int(len(interaction))
     print('INTERACTIONLENGTH: {}'.format(interactionlength))
 
+    #if there is a target structure given
+    if args.target is not None:
+        dotbracket_target=[]
+        with open (args.target, 'r') as TARGETFile:
+            for line in TARGETFile:
+                dotbracket_target.append(line.rstrip('\n'))
+
+        for target_line in dotbracket_target:
+            interimtarget_bp = (db2bps(target_line))
+            for bp in interimtarget_bp:
+                target_basepairs.append(bp)
+
+        target_basepairs.sort(key = lambda k: (k[0], -k[-1]))
+        print('target bp list: {}'.format(target_basepairs))
+        print('target dotbracket')
+        for line in dotbracket_target:
+            print(''.join(line))
+
+        if basepairs == target_basepairs:
+            print("Target structure reached")
+            exit()
+
+    target_interaction = interfunction(dotbracket_target,chainbreak)
+    print(target_interaction)
+
     #new interaction + bufferzone
     start_left, end_left = list(), list()
     start_right, end_right = list(), list()
-    for i in range(buffer+1):
-        i += 1 #one for zero and one for bracket + buffer
-        if right and left:
-            start_left.append(interaction[0][0]-i)
-            end_left.append(interaction[0][1]+i)
-            start_right.append(interaction[-1][0]+i)
-            end_right.append(interaction[-1][1]-i)
-        if right and not left:
-            start_right.append(interaction[-1][0]+i)
-            end_right.append(interaction[-1][1]-i)
-        if left and not right:
-            start_left.append(interaction[0][0]-i)
-            end_left.append(interaction[0][1]+i)
 
-    log.debug('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+    target_i_left = list()
+    target_i_right = list()
+
+    if args.target is not None: #if a target structure is given
+        interaction_firstpair = interaction[0][0]
+        interaction_lastpair = interaction[-1][0]
+        for nr, pair in enumerate(target_interaction):
+            if pair[0] < interaction_firstpair:
+                target_i_left.append(pair)
+            if pair[0] > interaction_lastpair:
+                target_i_right.append(pair)
+
+        print('target interaction: left {} right {}'.format(target_i_left,target_i_right))
+        if left and len(target_i_left) > 0:
+            for i in range(target_i_left[-1][0]-buffer,interaction[0][0]):
+                start_left.append(i)
+            for i in range(interaction[0][-1]+1,target_i_left[-1][1]+buffer+1):
+                end_left.append(i)
+
+        if right and len(target_i_right) > 0:
+            for i in range(interaction[-1][0]+1,target_i_right[0][0]+buffer+1):
+                start_right.append(i)
+            for i in range(target_i_right[0][1]-buffer,interaction[-1][1]):
+                end_right.append(i)
+
+        print('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+
+    else: #endless interaction expansion
+        for i in range(buffer+1):
+            i += 1 #one for zero and one for bracket + buffer
+            if right and left:
+                start_left.append(interaction[0][0]-i)
+                end_left.append(interaction[0][1]+i)
+                start_right.append(interaction[-1][0]+i)
+                end_right.append(interaction[-1][1]-i)
+            if right and not left:
+                start_right.append(interaction[-1][0]+i)
+                end_right.append(interaction[-1][1]-i)
+            if left and not right:
+                start_left.append(interaction[0][0]-i)
+                end_left.append(interaction[0][1]+i)
+
+            log.debug('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+
     #Remove all brackets left
     if left:
         removing_basepairs = []
@@ -257,7 +315,7 @@ def main():
                     removing_basepairs.append(pair)
         for pair in removing_basepairs:
             basepairs.remove(pair)
-        log.debug('New interaction positions left: start {} end {}'.format(start_left, end_left,removing_basepairs))
+        log.debug('New interaction positions left: start {} end {}'.format(start_left, end_left))
 
     if right:
         removing_basepairs = []
@@ -273,24 +331,42 @@ def main():
                     removing_basepairs.append(pair)
         for pair in removing_basepairs:
             basepairs.remove(pair)
-        log.debug('New interaction positions right: start {} end {}'.format(start_right, end_right,removing_basepairs))
+        log.debug('New interaction positions right: start {} end {}'.format(start_right, end_right))
 
 
-    #new interaction
-    if left:
-        newbps=[start_left[-1],end_left[0]]
-        ncl = [nucleotides[start_left[-1]],nucleotides[end_left[0]]]
-        log.debug('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
-        #chainbraketest: chainbrake != in pairs
-        if ncl in Pairs:
-            basepairs.append(newbps)
 
-    if right:
-        newbps=[start_right[0],end_right[-1]]
-        ncl = [nucleotides[start_right[0]],nucleotides[end_right[-1]]]
-        log.debug('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
-        if ncl in Pairs:
-            basepairs.append(newbps)
+    if args.target is not None: #if a target structure is given
+        if left and len(target_i_left) > 0:
+            newbps=[target_i_left[-1][0],target_i_left[-1][1]]
+            ncl = [nucleotides[newbps[0]],nucleotides[newbps[1]]]
+            log.debug('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+            #chainbraketest: chainbrake != in pairs
+            if ncl in Pairs:
+                basepairs.append(newbps)
+
+        if right and len(target_i_right) > 0:
+            newbps=[target_i_right[0][0],target_i_right[0][1]]
+            ncl = [nucleotides[newbps[0]],nucleotides[newbps[1]]]
+            log.debug('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+            if ncl in Pairs:
+                basepairs.append(newbps)
+
+    else:
+        #new interaction
+        if left:
+            newbps=[start_left[-1],end_left[0]]
+            ncl = [nucleotides[start_left[-1]],nucleotides[end_left[0]]]
+            log.debug('new interaction left: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+            #chainbraketest: chainbrake != in pairs
+            if ncl in Pairs:
+                basepairs.append(newbps)
+
+        if right:
+            newbps=[start_right[0],end_right[-1]]
+            ncl = [nucleotides[start_right[0]],nucleotides[end_right[-1]]]
+            log.debug('new interaction right: {} {}, {} {}'.format(newbps[0],ncl[0],newbps[1],ncl[1]))
+            if ncl in Pairs:
+                basepairs.append(newbps)
 
     basepairs.sort(key = lambda k: (k[0], -k[1]))
     '''
@@ -320,6 +396,7 @@ def main():
             out.write('\n')
     else:
         print("No expansion possible any more!")
+        exit()
 
 if __name__ == "__main__":
     main()

@@ -35,6 +35,7 @@ SEED=$(awk -F= '$1=="SEED"{print $2;exit}' $FILE)
 TREESEARCH=$(awk -F= '$1=="TREESEARCH"{print $2;exit}' $FILE)
 CONTSEARCH1=$(awk -F= '$1=="CONTSEARCH1"{print $2;exit}' $FILE)
 CONTSEARCH2=$(awk -F= '$1=="CONTSEARCH2"{print $2;exit}' $FILE)
+CONSECUTIVEPERFECT=$(awk -F= '$1=="CONSECUTIVEPERFECT"{print $2;exit}' $FILE)
 SEQ="${START}/${NAME}.seq"
 
 echo $NAME
@@ -60,8 +61,15 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 	ROLD="$(($CURRENTROUND-"1"))"
 	NAMESS=$START/"${NAME}_${CURRENTROUND}.ss"
 	NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
+	NAMESSTARGET=$START/"${NAME}_target.ss"
 
-	python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+	if [ "$CONSECUTIVEPERFECT" == true ] ; then
+		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+	fi
+
+	if [ "$CONSECUTIVEPERFECT" == false ] ; then
+		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
+	fi
 
 	if [ ! -f $NAMESS ]; then
 		echo "New number of rounds: $ROLD"
@@ -78,35 +86,12 @@ echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SI
 "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 wait
 
-#check if the SimRNA simulation runs without error
-#need only the first step for checking
-#if grep -Fxq "error" "${NAME}_${RELAX}_${ROUND}_1_1.log"; then
-#if [ ! -f "${NAME}_${RELAX}_${ROUND}_1_1.log" ]; then
-  #if codeword error found
-	#echo "yThere is an error in the SimRNA start - see logfile: ${NAME}_${RELAX}_${ROUND}_1_1.log"
-
-while grep -Fxq "error" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; do
-#while [ ! -f "$START/${NAME}_${RELAX}_${ROUND}_1_1.log" ] ; do
-	echo "There is an error in the SimRNA start - see logfile: ${NAME}_${RELAX}_${ROUND}_1_1.log"
-  echo "1. Error is fixed - try again"
-  echo "2. Quit"
-  ##echo -n "Type 1 or 2 :"
-  read -n 1 -p "Type 1 or 2 :" VAR </dev/tty #ToDo -t timeout if necessary
-	wait
-  printf "\n"
-  case $VAR in
-  1* )     "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
-					 wait ;;
-
-  2* )     exit 1;;
-
-  * )     echo "Try again.";;
-  esac
-done
-
-	#fi
-
-#fi
+if grep -q "error" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
+	cat "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"
+	echo "Error with ernwin PDB - want to change something?"
+	read -n 1 -p Continue?
+	"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
+fi
 
 mkdir $START/$ROUND
 #mv "${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
@@ -143,7 +128,7 @@ for step in $(seq 1 ${SIMROUND}); do
 
 		mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
 
-		python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1}
+		python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 		#get the forced structure and search within the individual runs
 
 		#SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
@@ -202,7 +187,7 @@ done
 if [ "$TREESEARCH" == false ] ; then
 	mv ${NAME}_${RELAX}* ${START}/$ROUND
 
-	python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1}
+	python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 	#get the forced structure and search within the individual runs
 
 	SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
@@ -267,7 +252,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 				declare -i ssold=$(cat "${START}/${ROLD}/${simstep}/${NAME}_${ROLD}.il")
 				echo "Interaction length old: $ssold; Interaction length new: $ssjet"
 
-	
+
 				if ([ $CURRENTROUND -eq 0 ] && [ $ssjet -eq $ssold ]) || ([ $ssjet -gt $ssold ] && [ $CURRENTROUND -ne 0 ]) ; then #greater than -gt, equal -eq, not euqal -ne, || or, && and
 					echo "Not the same = continue"
 
@@ -304,7 +289,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 					mv ${NAME}_${EXTEND}* $START/${CURRENTROUND}/${simstep}/
 
 					#find the starting structure for the next round
-					python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
+					python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
 					SSCCBP=($START/${CURRENTROUND}/${simstep}/*.ss_detected.bp)
 					BASIS=(${SSCCBP##*/})
@@ -383,7 +368,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 		mv ${NAME}_${EXTEND}* ${START}/${CURRENTROUND}/
 
 		#find the starting structure for the next round
-		python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}"
+		python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
 		SSCCBP=(${START}/${CURRENTROUND}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})

@@ -23,7 +23,7 @@ import csv
 import os
 import glob
 import pandas as pd
-
+from distutils.util import strtobool
 log = logging.getLogger(__name__)
 pd.options.display.max_colwidth = 500000000000 #otherwise it cut the strings
 
@@ -38,6 +38,7 @@ def main():
     parser.add_argument ('--first', help='First line in the dataframe') # CopStems_00.ss
     parser.add_argument ('--second', help='Second line in the dataframe') # CopStems_00.ss_cc
     parser.add_argument ('-i', '--initialname', help='CopStems_2rl_01, CopStems_2rl_02, ...')
+    parser.add_argument ('-c', '--consecutive', help='CONSECUTIVEPERFECT true/false')
     args = parser.parse_args()
 
     if args.verbose:
@@ -195,12 +196,20 @@ def main():
     file.write(bp)
     file.close()
 
-    consecutive_interaction_length= str(best3d['len_interaction'].values[0])
-    print("consecutive interaction length: {}".format(consecutive_interaction_length))
+    if bool(strtobool(args.consecutive)) == True:
+        consecutive_interaction_length= str(best3d['len_interaction'].values[0])
+        print("consecutive interaction length: {}".format(consecutive_interaction_length))
 
-    file = open( str((number.split('-')[0])+'-'+(number.split('-')[1])+'.il'), 'w')
-    file.write(consecutive_interaction_length)
-    file.close()
+        file = open( str((number.split('-')[0])+'-'+(number.split('-')[1])+'.il'), 'w')
+        file.write(consecutive_interaction_length)
+        file.close()
+    elif bool(strtobool(args.consecutive)) == False:
+        consecutive_interaction_length= str(best3d['interaction_countbp'].values[0])
+        print("consecutive interaction length: {}".format(consecutive_interaction_length))
+
+        file = open( str((number.split('-')[0])+'-'+(number.split('-')[1])+'.il'), 'w')
+        file.write(consecutive_interaction_length)
+        file.close()
 
     if args.printout:
         if args.force:

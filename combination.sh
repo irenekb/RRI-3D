@@ -29,7 +29,7 @@ if [[ ${DESIGNS} == 0 ]]; then
     mv ${NAME} "$START/"
     COUNTER=0
 
-    while [  $COUNTER -lt $ERNROUND ]; do #Scenario testing
+    while [  $COUNTER -lt $ERNROUND ]; do
       echo "ernwin reconstruction $COUNTER"
 
       python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/best$COUNTER.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
@@ -42,12 +42,12 @@ if [[ ${DESIGNS} == 0 ]]; then
       else
         echo "possible ernwin reconstruction $COUNTER"
         cp $RECONSTRUCTIONFILE  "$START/${NAME}_0.pdb"
+        ./ultimatescript.sh $FILE "${NAME}" "$START"
+
         break 1
       fi
 
       echo "ERROR: No ernwin reconstruction possible"
-
-      ./ultimatescript.sh $FILE "${NAME}" "$START"
 
       retVal=$?
       TRY="0"
@@ -88,19 +88,19 @@ if [[ ${DESIGNS} == 0 ]]; then
 
   #Calculation with ernwin clustering
   else
-    #python2 $ERNWIN "$START/${NAME}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
-    #wait
-    #mv ${NAME} "$START/"
+    python2 $ERNWIN "$START/${NAME}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
+    wait
+    mv ${NAME} "$START/"
     COUNTER=0
 
-    #python $PROGS/"ernwindiversity.py" -i "$START/${NAME}/simulation_01/" -n $ERNROUND -c $CLUSTER
+    python $PROGS/"ernwindiversity.py" -i "$START/${NAME}/simulation_01/" -n $ERNROUND -c $CLUSTER
 
     for CST in `seq 0 1 ${CLUSTER}`; do
       while IFS= read -r line; do
         echo "From cluster $CST sample : $line"
 
-        #python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/$line.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
-        #mv ${NAME} "$START/"
+        python2 $RECONSTRUCTION "$START/${NAME}/simulation_01/$line.coord" --source-cg-dir $CGS --source-pdb-dir $PDB --reassign-broken
+        mv ${NAME} "$START/"
         wait
         RECONSTRUCTIONFILE="$START/${NAME}/simulation_01/$line.coord.reconstr.pdb"
 
@@ -108,11 +108,12 @@ if [[ ${DESIGNS} == 0 ]]; then
         if [ -f "$RECONSTRUCTIONFILE" ]; then
           echo "possible ernwin reconstruction $line"
           mkdir "$START/cluster${CST}"
-          cp $RECONSTRUCTIONFILE  "$START/cluster${CST}/${NAME}c${CST}_0.pdb"
-          cp "$START/${NAME}.seq"  "$START/cluster${CST}/${NAME}c${CST}.seq"
-          cp "$START/${NAME}_0.ss"  "$START/cluster${CST}/${NAME}c${CST}_0.ss"
-          cp "$START/${NAME}_0.ss_cc"  "$START/cluster${CST}/${NAME}c${CST}_0.ss_cc"
-          cp "$START/${NAME}_0.il"  "$START/cluster${CST}/${NAME}c${CST}_0.il"
+          cp $RECONSTRUCTIONFILE "$START/cluster${CST}/${NAME}c${CST}_0.pdb"
+          cp "$START/${NAME}.seq" "$START/cluster${CST}/${NAME}c${CST}.seq"
+          cp "$START/${NAME}_0.ss" "$START/cluster${CST}/${NAME}c${CST}_0.ss"
+          cp "$START/${NAME}_0.ss_cc" "$START/cluster${CST}/${NAME}c${CST}_0.ss_cc"
+          cp "$START/${NAME}_0.il" "$START/cluster${CST}/${NAME}c${CST}_0.il"
+          cp "$START/${NAME}_target.ss" "$START/cluster${CST}/${NAME}c${CST}_target.ss"
 
           ./ultimatescript.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
           break 1
@@ -122,7 +123,7 @@ if [[ ${DESIGNS} == 0 ]]; then
       done < "$START/${NAME}/simulation_01/cluster$CST.csv"
     done
   fi
-  
+
 else
   python $PROGS/"RNAdesign.py" -i "$START/${BASENAME}_0.bb" -o ${BASENAME} -n $DESIGNS -s $DESIGNS #Scenario testing
   mv "${NAME}"* $START/.
@@ -139,6 +140,8 @@ else
       cp "$START/${NAME}_0.ss" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss"
       cp "$START/${NAME}_0.ss_cc" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.ss_cc"
       cp "$START/${NAME}${DESIGN}.fa" "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa"
+      #cp "$START/${NAME}_0.il"  "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_0.il"
+      #cp "$START/${NAME}_target.ss"  "$START/${NAME}${DESIGN}/${NAME}${DESIGN}_target.ss"
 
       python2 $ERNWIN "$START/${NAME}${DESIGN}/${NAME}${DESIGN}.fa" --save-n-best $ERNROUND --iterations $ERNITERATIONS --pseudoknots #Scenario testing
       wait
