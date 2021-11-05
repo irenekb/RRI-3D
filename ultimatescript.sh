@@ -36,6 +36,7 @@ TREESEARCH=$(awk -F= '$1=="TREESEARCH"{print $2;exit}' $FILE)
 CONTSEARCH1=$(awk -F= '$1=="CONTSEARCH1"{print $2;exit}' $FILE)
 CONTSEARCH2=$(awk -F= '$1=="CONTSEARCH2"{print $2;exit}' $FILE)
 CONSECUTIVEPERFECT=$(awk -F= '$1=="CONSECUTIVEPERFECT"{print $2;exit}' $FILE)
+TARGET=$(awk -F= '$1=="TARGET"{print $2;exit}' $FILE)
 SEQ="${START}/${NAME}.seq"
 
 echo $NAME
@@ -63,11 +64,11 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 	NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
 	NAMESSTARGET=$START/"${NAME}_target.ss"
 
-	if [ "$CONSECUTIVEPERFECT" == true ] ; then
+	if [ "$TARGET" == true ] ; then
 		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
 	fi
 
-	if [ "$CONSECUTIVEPERFECT" == false ] ; then
+	if [ "$TARGET" == false ] ; then
 		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
 	fi
 
