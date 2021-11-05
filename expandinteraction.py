@@ -249,8 +249,8 @@ def main():
             print("Target structure reached")
             exit()
 
-    target_interaction = interfunction(dotbracket_target,chainbreak)
-    print(target_interaction)
+        target_interaction = interfunction(dotbracket_target,chainbreak)
+        print(target_interaction)
 
     #new interaction + bufferzone
     start_left, end_left = list(), list()

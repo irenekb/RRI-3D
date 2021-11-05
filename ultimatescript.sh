@@ -52,7 +52,6 @@ echo $EXTEND
 echo $RELAX
 echo $SIMROUND
 
-#ln -s /home/irene/Programs/SimRNA_64bitIntel_Linux/data . #now simrna script does this
 
 #####EXPANSION PREPERATION
 #expansion to provide a bias through the SimRNA expansion
@@ -65,11 +64,11 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 	NAMESSTARGET=$START/"${NAME}_target.ss"
 
 	if [ "$TARGET" == true ] ; then
-		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
 	fi
 
 	if [ "$TARGET" == false ] ; then
-		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
+		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
 	fi
 
 	if [ ! -f $NAMESS ]; then
@@ -87,7 +86,7 @@ echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SI
 "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 wait
 
-if grep -q "error" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
+if grep -q "error(s)" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
 	cat "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"
 	echo "Error with ernwin PDB - want to change something?"
 	read -n 1 -p Continue?
@@ -112,7 +111,6 @@ for step in $(seq 1 ${SIMROUND}); do
 	###fi
 
 	if [ "$TREESEARCH" == true ] ; then
-		ls $START/$ROUND/
 		#write and analyse from every simRNA run all paralell runs (SimRounds)
 		NAMESS=$START/$ROUND/"${NAME}_${ROUND}.ss"
 		NAMECC=$START/$ROUND/"${NAME}_${ROUND}.ss_cc"
@@ -218,12 +216,9 @@ if [ "$TREESEARCH" == false ] ; then
 	rm -r "${START}/${ROUND}/analyse"
 fi #if no "treesearch" partII
 
-ls $START
-
 mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
 mv -T $START/$ROUNDNEW $START/${ROUND}
 
-ls $START
 
 #####EXPAND#####
 for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
