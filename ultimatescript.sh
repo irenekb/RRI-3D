@@ -212,7 +212,6 @@ if [ "$TREESEARCH" == false ] ; then
 	#clean up directory
 	cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/
 	mv "$START/${NAME}_${RELAX}"* ${START}/${ROUND}/
-	####cp "$START/${NAME}_0"* ${START}/${ROUND}/ #delet
 	rm -r "${START}/${ROUND}/analyse"
 fi #if no "treesearch" partII
 
