@@ -79,59 +79,117 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 
 done
 
-
-#####START from ernwin reconstructed pdb#####
-##extend_long03 = 100,000 steps save every 100th to relax the ernwin structure
-echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
-"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
-wait
-
-if grep -q "error(s)" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
-	cat "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"
-	echo "Error with ernwin PDB - want to change something?"
-	read -n 1 -p Continue?
+if ! [ ${RELAX} = "0" ]; then
+	#####START from ernwin reconstructed pdb#####
+	##extend_long03 = 100,000 steps save every 100th to relax the ernwin structure
+	echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 	"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
-fi
+	wait
 
-mkdir $START/$ROUND
-#mv "${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
-mv "${START}/${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
-ROUNDNEW="$(($ROUND+"1"))"
-mkdir $START/${ROUNDNEW}
-cp "$START/${NAME}_0"* ${START}/${ROUND}/
+	if grep -q "error(s)" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
+		cat "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"
+		echo "Error with ernwin PDB - want to change something?"
+		read -n 1 -p Continue?
+		"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
+	fi
 
-for step in $(seq 1 ${SIMROUND}); do
-	TRAFL="${NAME}_${RELAX}_${ROUND}_${step}_${step}.trafl"
-	PDB="${NAME}_${RELAX}_${ROUND}_${step}_${step}-000001.pdb"
+	mkdir $START/$ROUND
+	#mv "${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
+	mv "${START}/${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
+	ROUNDNEW="$(($ROUND+"1"))"
+	mkdir $START/${ROUNDNEW}
+	cp "$START/${NAME}_0"* ${START}/${ROUND}/
 
-	###if [ ! -f ${START}/${PDB} ]; then --> sollte davor schon abgefragt werden mit den kaputten pdb
-	###	echo "File does not exist in Bash: "${START}""
-	###	mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
-	###	exit 1
-	###fi
+	for step in $(seq 1 ${SIMROUND}); do
+		TRAFL="${NAME}_${RELAX}_${ROUND}_${step}_${step}.trafl"
+		PDB="${NAME}_${RELAX}_${ROUND}_${step}_${step}-000001.pdb"
 
-	if [ "$TREESEARCH" == true ] ; then
-		#write and analyse from every simRNA run all paralell runs (SimRounds)
-		NAMESS=$START/$ROUND/"${NAME}_${ROUND}.ss"
-		NAMECC=$START/$ROUND/"${NAME}_${ROUND}.ss_cc"
+		###if [ ! -f ${START}/${PDB} ]; then --> sollte davor schon abgefragt werden mit den kaputten pdb
+		###	echo "File does not exist in Bash: "${START}""
+		###	mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
+		###	exit 1
+		###fi
 
-		mkdir ${START}/$ROUND/$step
-		mkdir "${START}/$ROUND/$step/analyse"
+		if [ "$TREESEARCH" == true ] ; then
+			#write and analyse from every simRNA run all paralell runs (SimRounds)
+			NAMESS=$START/$ROUND/"${NAME}_${ROUND}.ss"
+			NAMECC=$START/$ROUND/"${NAME}_${ROUND}.ss_cc"
 
-		cp $START/$ROUND/${TRAFL} ${START}/$ROUND/${step}/analyse/
-		cp ${START}/$ROUND/${PDB} ${START}/$ROUND/${step}/analyse/
+			mkdir ${START}/$ROUND/$step
+			mkdir "${START}/$ROUND/$step/analyse"
 
-		SimRNA_trafl2pdbs $START/$ROUND/${step}/analyse/*.pdb $START/$ROUND/${step}/analyse/*.trafl :
+			cp $START/$ROUND/${TRAFL} ${START}/$ROUND/${step}/analyse/
+			cp ${START}/$ROUND/${PDB} ${START}/$ROUND/${step}/analyse/
 
-		python $PROGS/SSalignment.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
+			SimRNA_trafl2pdbs $START/$ROUND/${step}/analyse/*.pdb $START/$ROUND/${step}/analyse/*.trafl :
 
-		mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
+			python $PROGS/SSalignment.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
 
-		python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
+			mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
+
+			python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
+			#get the forced structure and search within the individual runs
+
+			#SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
+			SSCCBP=(${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
+			BASIS=(${SSCCBP##*/})
+			NR="$(cut -d'-' -f2 <<<${BASIS})"
+			NR="$(cut -d'.' -f1 <<<${NR})"
+			ROUNDSEL="$(cut -d'_' -f5 <<<${BASIS})"
+			ROUNDSEL="$(cut -d'-' -f1 <<<${ROUNDSEL})"
+			echo $BASIS
+			echo $NR
+			echo $ROUNDSEL
+
+			SimRNA_trafl2pdbs "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
+			mkdir $START/${ROUNDNEW}/${step} #for each of the simRNA-rounds
+
+			cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.pdb"
+			cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.ss_cc"
+
+			# interaction lenght + bp
+			####cp "$START/$ROUND/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
+			cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
+			cp $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
+			mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}_ernwinrelax.il"
+			mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.bp"
+
+			#clean up directory
+			#cp "$START/${NAME}_0"* ${START}/${ROUND}/
+			rm -r "${START}/${ROUND}/${step}/analyse"
+
+		elif [ "$TREESEARCH" == false ] ; then
+			NAMESS=$START/"${NAME}_${ROUND}.ss"
+			NAMECC=$START/"${NAME}_${ROUND}.ss_cc"
+
+			mkdir $START/$ROUND/analyse
+
+			mkdir ${START}/$ROUND/analyse/${step}
+
+			cp $START/$ROUND/${TRAFL} ${START}/$ROUND/analyse/${step}/
+			cp ${START}/$ROUND/${PDB} ${START}/$ROUND/analyse/${step}/
+
+			SimRNA_trafl2pdbs $START/$ROUND/analyse/${step}/*.pdb $START/$ROUND/analyse/${step}/*.trafl :
+
+			if [ $step = "1" ]; then
+				python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL
+			else #if no "treesearch" partI
+				python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL
+			fi
+
+		else
+			echo "Error wrong TREESEARCH value"
+			exit 1
+		fi
+	done
+
+	if [ "$TREESEARCH" == false ] ; then
+		mv ${NAME}_${RELAX}* ${START}/$ROUND
+
+		python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 		#get the forced structure and search within the individual runs
 
-		#SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
-		SSCCBP=(${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
+		SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
 		NR="$(cut -d'-' -f2 <<<${BASIS})"
 		NR="$(cut -d'.' -f1 <<<${NR})"
@@ -141,83 +199,37 @@ for step in $(seq 1 ${SIMROUND}); do
 		echo $NR
 		echo $ROUNDSEL
 
-		SimRNA_trafl2pdbs "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
-		mkdir $START/${ROUNDNEW}/${step} #for each of the simRNA-rounds
+		SimRNA_trafl2pdbs $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
 
-		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.pdb"
-		cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.ss_cc"
+		cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/"${NAME}_${ROUND}.pdb"
+		cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/"${NAME}_${ROUND}.ss_cc"
 
 		# interaction lenght + bp
-		####cp "$START/$ROUND/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
-		cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
-		cp $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
-		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}_ernwinrelax.il"
-		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.bp"
+		mv $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
+		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}_ernwinrelax.il"
+		mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}.bp"
 
 		#clean up directory
-		#cp "$START/${NAME}_0"* ${START}/${ROUND}/
-		rm -r "${START}/${ROUND}/${step}/analyse"
+		cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/
+		mv "$START/${NAME}_${RELAX}"* ${START}/${ROUND}/
+		rm -r "${START}/${ROUND}/analyse"
+	fi #if no "treesearch" partII
 
-	elif [ "$TREESEARCH" == false ] ; then
-		NAMESS=$START/"${NAME}_${ROUND}.ss"
-		NAMECC=$START/"${NAME}_${ROUND}.ss_cc"
+	mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
+	mv -T $START/$ROUNDNEW $START/${ROUND}
 
-		mkdir $START/$ROUND/analyse
+elif ([ $RELAX = "0" ] && [ "$TREESEARCH" == true ]) ; then #start without ernwin finegraining only for treesearch available
+	mkdir $START/$ROUND
+	ROUNDNEW="$(($ROUND+"1"))"
+	mkdir $START/${ROUNDNEW}
 
-		mkdir ${START}/$ROUND/analyse/${step}
-
-		cp $START/$ROUND/${TRAFL} ${START}/$ROUND/analyse/${step}/
-		cp ${START}/$ROUND/${PDB} ${START}/$ROUND/analyse/${step}/
-
-		SimRNA_trafl2pdbs $START/$ROUND/analyse/${step}/*.pdb $START/$ROUND/analyse/${step}/*.trafl :
-
-		if [ $step = "1" ]; then
-			python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL
-		else #if no "treesearch" partI
-			python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL
-		fi
-
-	else
-		echo "Error wrong TREESEARCH value"
-		exit 1
-	fi
-done
-
-if [ "$TREESEARCH" == false ] ; then
-	mv ${NAME}_${RELAX}* ${START}/$ROUND
-
-	python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
-	#get the forced structure and search within the individual runs
-
-	SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
-	BASIS=(${SSCCBP##*/})
-	NR="$(cut -d'-' -f2 <<<${BASIS})"
-	NR="$(cut -d'.' -f1 <<<${NR})"
-	ROUNDSEL="$(cut -d'_' -f5 <<<${BASIS})"
-	ROUNDSEL="$(cut -d'-' -f1 <<<${ROUNDSEL})"
-	echo $BASIS
-	echo $NR
-	echo $ROUNDSEL
-
-	SimRNA_trafl2pdbs $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
-
-	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/"${NAME}_${ROUND}.pdb"
-	cp $START/$ROUND/analyse/$ROUNDSEL/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/"${NAME}_${ROUND}.ss_cc"
-
-	# interaction lenght + bp
-	mv $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
-	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}_ernwinrelax.il"
-	mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/"${NAME}_${ROUND}.bp"
-
-	#clean up directory
-	cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/
-	mv "$START/${NAME}_${RELAX}"* ${START}/${ROUND}/
-	rm -r "${START}/${ROUND}/analyse"
-fi #if no "treesearch" partII
-
-mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
-mv -T $START/$ROUNDNEW $START/${ROUND}
-
+	for simstep in $(seq 1 ${SIMROUND}); do #each of the starting SimRounds
+		mkdir $START/$ROUND/${simstep}
+		cp $START/"${NAME}_${ROUND}.il" $START/$ROUND/${simstep}/"${NAME}_${ROUND}.il"
+		cp $START/"${NAME}_${ROUND}.ss_cc" $START/$ROUND/${simstep}/"${NAME}_${ROUND}.ss_cc"
+		cp $START/"${NAME}_${ROUND}.pdb" $START/$ROUND/${simstep}/"${NAME}_${ROUND}.pdb"
+	done
+fi
 
 #####EXPAND#####
 for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
@@ -248,7 +260,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 				echo "Interaction length old: $ssold; Interaction length new: $ssjet"
 
 
-				if ([ $CURRENTROUND -eq 0 ] && [ $ssjet -eq $ssold ]) || ([ $ssjet -gt $ssold ] && [ $CURRENTROUND -ne 0 ]) ; then #greater than -gt, equal -eq, not euqal -ne, || or, && and
+				if ([ $CURRENTROUND -eq 0 ] && [ $ssjet -eq $ssold ]) || ([ $ssjet -gt $ssold ] && [ $CURRENTROUND -ne 0 ]) || ([ $CURRENTROUND -eq 0 ] && [ $RELAX = "0" ]); then #greater than -gt, equal -eq, not euqal -ne, || or, && and
 					echo "Not the same = continue"
 
 					cp "$START/${NAME}_${CURRENTROUND}.ss" "$START/${CURRENTROUND}/."

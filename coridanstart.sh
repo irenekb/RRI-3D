@@ -7,7 +7,13 @@ CLUSTER=$(awk -F= '$1=="CLUSTER"{print $2;exit}' $FILE)
 NAME=$(awk -F= '$1=="NAME"{print $2;exit}' $FILE)
 START=$(awk -F= '$1=="START"{print $2;exit}' $FILE)
 
+if [ $CLUSTER = "0" ]; then
+  ./ultimatescript.sh $FILE "${NAME}" "$START"
 
-for CST in `seq 0 1 ${CLUSTER}`; do
-  ./ultimatescript.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
-done
+else
+
+  for CST in `seq 0 1 ${CLUSTER}`; do
+    ./ultimatescript.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
+  done
+
+fi
