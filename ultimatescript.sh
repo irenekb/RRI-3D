@@ -37,6 +37,7 @@ CONTSEARCH1=$(awk -F= '$1=="CONTSEARCH1"{print $2;exit}' $FILE)
 CONTSEARCH2=$(awk -F= '$1=="CONTSEARCH2"{print $2;exit}' $FILE)
 CONSECUTIVEPERFECT=$(awk -F= '$1=="CONSECUTIVEPERFECT"{print $2;exit}' $FILE)
 TARGET=$(awk -F= '$1=="TARGET"{print $2;exit}' $FILE)
+EXPANDBMODE=$(awk -F= '$1=="EXPANDBMODE"{print $2;exit}'  $FILE)
 SEQ="${START}/${NAME}.seq"
 
 echo $NAME
@@ -56,6 +57,15 @@ echo $SIMROUND
 #####EXPANSION PREPERATION
 #expansion to provide a bias through the SimRNA expansion
 echo "EXPANTION"
+
+# EXPANDBMODE 0: right and left at once
+# EXPANDBMODE 1: only right
+# EXPANDBMODE 2: only left
+# EXPANDBMODE 3: alternate right and left
+# EXPANDBMODE 4: alternate left and right
+# EXPANDBMODE 5: first right then left ; 1 and then 2
+# EXPANDBMODE 6: first left then right ; 2 and then 1
+
 for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 
 	ROLD="$(($CURRENTROUND-"1"))"
@@ -63,21 +73,76 @@ for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 	NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
 	NAMESSTARGET=$START/"${NAME}_target.ss"
 
-	if [ "$TARGET" == true ] ; then
-		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
-	fi
+  if [ "$TARGET" == true ] ; then
+    if [ "$EXPANDBMODE" = 0 ] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
 
-	if [ "$TARGET" == false ] ; then
-		python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
-	fi
+    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
 
-	if [ ! -f $NAMESS ]; then
+    elif [[ "$EXPANDBMODE" == 2 || "$EXPANDBMODE" == 6 ]] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+
+    elif [[ "$EXPANDBMODE" == 3 || "$EXPANDBMODE" == 4 ]]; then
+      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
+      else
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+      fi
+
+	  fi
+
+	elif [ "$TARGET" == false ] ; then
+    if [ "$EXPANDBMODE" = 0 ] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+
+    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+
+    elif [[ "$EXPANDBMODE" = 2 || "$EXPANDBMODE" = 6 ]] ; then
+      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+
+    elif [[ "$EXPANDBMODE" = 3 || "$EXPANDBMODE" = 4 ]]; then
+      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+      else
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+      fi
+
+	  fi
+  fi
+
+	if ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 5 ]) || ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 6 ]) ; then
+    if [ "$EXPANDBMODE" == 5 ] ; then
+      if [ "$TARGET" == true ] ; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+      elif [ "$TARGET" == false ] ; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+      fi
+
+    elif [ "$EXPANDBMODE" == 6 ] ; then
+      if [ "$TARGET" == true ] ; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
+      elif [ "$TARGET" == false ] ; then
+        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+      fi
+
+    fi
+
+    if [ ! -f $NAMESS ] ; then
+      echo "New number of rounds: $ROLD"
+      ROUNDS="${ROLD}"
+      break 1
+    fi
+
+  elif [ ! -f $NAMESS ] ; then
 		echo "New number of rounds: $ROLD"
 		ROUNDS="${ROLD}"
 		break 1
 	fi
 
 done
+
 
 if ! [ ${RELAX} = "0" ]; then
 	#####START from ernwin reconstructed pdb#####
