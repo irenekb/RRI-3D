@@ -28,11 +28,12 @@ def is_crossing(dotbracket,basepair):
 
     :param dotbracket: Current dotbracketline (list)
     :param baspair: Current basepair
+    :param chainbreak
     """
     count = 0
     crossing = True
-
     dotbracket_part = dotbracket[basepair[0]+1:basepair[1]]
+
 
     for element in dotbracket_part:
         if element == '(':
@@ -46,6 +47,19 @@ def is_crossing(dotbracket,basepair):
     log.debug('Crossing: baspair {}, count {}, crossing {}, {}'.format(basepair,count,crossing,dotbracket_part))
 
     return crossing
+
+def is_interaction(basepair,chainbreak):
+    """
+    Check if the basepairs are part of an interaction
+    """
+    inter = False
+
+    if basepair[0] < chainbreak and basepair[1] > chainbreak:
+        inter = True
+
+    log.debug('Interacting basepair {}, chainbreak {}, interaction {}'.format(basepair, chainbreak, inter))
+
+    return inter
 
 
 def is_taken(dotbracket, basepair):
@@ -75,6 +89,7 @@ def create_db(basepairs, sequencelength,chainbreak):
     dotbracket = [['.']*sequencelength]
     dotbracket[0][chainbreak] = ' '
     dotbracketline = 0
+    round = 0
 
     while len(basepairs) > 0:
         remaining_basepairs = []
@@ -83,7 +98,8 @@ def create_db(basepairs, sequencelength,chainbreak):
             log.debug('position {} basepair {}'.format(position, basepair))
             taken = is_taken(dotbracket[dotbracketline],basepair)
             crossing = is_crossing(dotbracket[dotbracketline],basepair)
-            if (crossing == False) and (taken == False):
+            inter = is_interaction(basepair,chainbreak)
+            if (crossing == False) and (taken == False) and (inter == False or (inter == True and round > 0)):
                 log.debug('checkpoint passed {}'.format(basepair))
                 dotbracket[dotbracketline][basepair[0]] = '('
                 dotbracket[dotbracketline][basepair[1]] = ')'
@@ -94,6 +110,7 @@ def create_db(basepairs, sequencelength,chainbreak):
         dotbracket.append(['.']*sequencelength)
         dotbracketline += 1
         dotbracket[dotbracketline][chainbreak] = ' '
+        round += 1
 
     return dotbracket
 
