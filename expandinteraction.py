@@ -289,14 +289,21 @@ def main():
         if left and len(target_i_left) > 0:
             for i in range(target_i_left[-1][0]-buffer,interaction[0][0]):
                 start_left.append(i)
+
             for i in range(interaction[0][-1]+1,target_i_left[-1][1]+buffer+1):
                 end_left.append(i)
+
+            start_left=[x for x in start_left if x > 0]
+            end_left=[x for x in end_left if x < sequencelength]
 
         if right and len(target_i_right) > 0:
             for i in range(interaction[-1][0]+1,target_i_right[0][0]+buffer+1):
                 start_right.append(i)
             for i in range(target_i_right[0][1]-buffer,interaction[-1][1]):
                 end_right.append(i)
+
+            start_right=[x for x in start_right if x <= chainbreak]
+            end_right=[x for x in end_right if x > chainbreak+1]
 
         print('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
 
