@@ -7,6 +7,8 @@ CLUSTER=$(awk -F= '$1=="CLUSTER"{print $2;exit}' $FILE)
 NAME=$(awk -F= '$1=="NAME"{print $2;exit}' $FILE)
 START=$(awk -F= '$1=="START"{print $2;exit}' $FILE)
 
+CLUSTER="$(($CLUSTER-"1"))"
+
 if [ $CLUSTER = "0" ]; then
   ./ultimatescript.sh $FILE "${NAME}" "$START"
 
