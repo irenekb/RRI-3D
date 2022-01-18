@@ -17,6 +17,7 @@ from operator import itemgetter
 import sys
 import numpy as np
 from sys import exit
+import itertools
 np.set_printoptions(threshold=sys.maxsize,linewidth =900)
 
 
@@ -302,10 +303,10 @@ def main():
             for i in range(target_i_right[0][1]-buffer,interaction[-1][1]):
                 end_right.append(i)
 
-            start_right=[x for x in start_right if x <= chainbreak]
-            end_right=[x for x in end_right if x > chainbreak+1]
+            start_right=[x for x in start_right if x < chainbreak]
+            end_right=[x for x in end_right if x > chainbreak]
 
-        print('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+        print('start and endpoints {}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
 
     else: #endless interaction expansion
         for i in range(buffer+1):
@@ -322,7 +323,14 @@ def main():
                 start_left.append(interaction[0][0]-i)
                 end_left.append(interaction[0][1]+i)
 
-            log.debug('{}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+            log.debug('start and endpoints 1 {}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
+
+            start_left=[x for x in start_left if x > 0]
+            end_left=[x for x in end_left if x < sequencelength]
+            start_right=[x for x in start_right if x < chainbreak]
+            end_right=[x for x in end_right if x > chainbreak]
+
+            log.debug('start and endpoints 2 {}, {}, {}, {}'.format(start_left,end_left, start_right, end_right))
 
     #Remove all brackets left
     if left:
@@ -337,6 +345,9 @@ def main():
             for pair in basepairs:
                 if base in pair:
                     removing_basepairs.append(pair)
+        removing_basepairs.sort()
+        removing_basepairs = list(removing_basepairs for removing_basepairs,_ in itertools.groupby(removing_basepairs))
+        log.debug('remove basepairs {}'.format(removing_basepairs))
         for pair in removing_basepairs:
             basepairs.remove(pair)
         log.debug('New interaction positions left: start {} end {}'.format(start_left, end_left))
@@ -353,7 +364,11 @@ def main():
             for pair in basepairs:
                 if base in pair:
                     removing_basepairs.append(pair)
+        removing_basepairs.sort()
+        removing_basepairs = list(removing_basepairs for removing_basepairs,_ in itertools.groupby(removing_basepairs))
+        log.debug('remove basepairs {}'.format(removing_basepairs))
         for pair in removing_basepairs:
+            print(pair)
             basepairs.remove(pair)
         log.debug('New interaction positions right: start {} end {}'.format(start_right, end_right))
 
