@@ -1,28 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-<title>Page Title</title>
-
-<style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #DDD;
-  }
-
-  tr {
-    border-bottom: 1px solid #ddd;
-  }
-</style>
-
-</head>
-
 <body>
 
 # Modeling the formation of RNA-RNA interactions in 3D
@@ -38,37 +16,11 @@
 
 ### STARTING THE PIPELINE
 
-#### BASH
   <div>
-
-  - initial
-  start a 16,000,000 million step run (stepsize 16,000) with a secondary structure and the sequence
-
-  - surface
-  10,000 step run (stepsize 1) only with the pdb-file
-
-  - expand
-  pdb-file and the new secondary structure constraint
-  expand           > iterations    10,000 stepsize   1
-  expand_long01    > iterations    20,000 stepsize   1
-  expand_long02    > iterations    30,000 stepsize   1
-  expand_long03    > iterations   100,000 stepsize 100
-  expand_long04    > iterations   300,000 stepsize 100
-  expand_long05    > iterations   600,000 stepsize 100
-  expand_long06    > iterations 1,000,000 stepsize 100
-
-  e.g.
-  Startfile-script                  In/Output directory               Name Round SimRNA place                    config_name
-  SimRNA_scripts/job_simrna_start_initial.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ initial
-  SimRNA_scripts/job_simrna_start_surface.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ surface
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long01
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long02
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long03
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long04
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long05
-  SimRNA_scripts/job_simrna_start_expand.sh SimRNA_interaction/1zci/ 1zci 00 ~/Programs/SimRNA_64bitIntel_Linux/ expand_long06
-
+  It is possible to start an interaction extension from an RNA sequence with the corresponding secondary structure (including the interaction start). For this purpose, the 3D start structure is predicted with the tool ernwin and converted into a full atom structure for the further pipline. For this purpose the script <code>combination.sh</code> is used. This start option additionally offers the possibility to calculate several sequence designs with one secondary structure (incl. interaction start) and one secondary target structure and to enter the pipeline with the respective design. <br /> <br />
+  Alternatively, it is also possible to start from an already existing 3D structure in PDB format. For this prupose the script <code>coridanstart.sh</code> is used.  <br />
+  Both scripts can process multiple clusters of the respective 3D structure. <br /> <br />
+  The input for the start of the pipeline is given by:
   </div>
 
 
@@ -157,7 +109,7 @@
           <td><a href="#dependency">[dependency]</a></td>
         </tr>
         <tr>
-          <td>CLUSTER</td>
+          <td>WHERE</td>
           <td>local | cluster</td>
           <td>run the SimRNA simulation locally or on a slurm cluster</td>
           <td><a href="#dependency">[dependency]</a></td>
@@ -287,8 +239,11 @@
             <table>
               <tr>
                 <td>Sequence</td>
-                <td><code>CUUGCUGAAGUGCACACAGCAAG CUUGCUGAAGUGCACACAGCAAG</code></td>
-                <td>Same sequence as in fasta file but the separator between two sequences is a whitespace</td>
+                <td>
+                <dl><code>CUUGCUGAAGUGCACACAGCAAG CUUGCUGAAGUGCACACAGCAAG</code></dl></td>
+                </tr>
+                <tr>
+                <td colspan="2"> Same sequence as in fasta file but the separator between two sequences is a whitespace</td>
               </tr>
             </table>
         <li>.ss</li>
@@ -300,8 +255,9 @@
               <td>
                 <dl><code>((((((.........))))))) (((((((.........)))))))</code><br />
                     <code>.........((............ .............)).......</code></dl>
-              </td>
-              <td>Dotbracket notation with classical round brackets and dots. <br />A "bracket" crossing requires the start of a new line, e.g. 1st line intramolecular structure, 2nd line interaction.<br /> For the start of the simulation the .ss-file contains the native start dotbracket notation.</td>
+              </td></tr>
+              <tr>
+              <td colspan="2"> Dotbracket notation with classical round brackets and dots. <br />A "bracket" crossing requires the start of a new line, e.g. 1st line intramolecular structure, 2nd line interaction.<br /> For the start of the simulation the .ss-file contains the native start dotbracket notation.</td>
             </tr>
           </table>
         <li>.ss_cc</li>
@@ -313,8 +269,9 @@
               <td>
                 <dl><code>((((((.........))))))) (((((((.........)))))))</code><br />
                     <code>.........((............ .............)).......</code></dl>
-              </td>
-              <td>In the previous extension step achieved secondary structure. <br /> For the first run it must conform to the .ss dotbracket notation by default.</td>
+              </td></tr>
+              <tr>
+              <td colspan="2">In the previous extension step achieved secondary structure. <br /> For the first run it must conform to the .ss dotbracket notation by default.</td>
             </tr>
           </table>
         <li>.il</li>
@@ -328,9 +285,10 @@
               <td>Dotbracket</td>
               <td>
                 <dl><code>(((((((.........))))))) (((((((.........)))))))</code><br />
-                    <code>.........((((.(........ .........).)))).......</code></dl>
-              </td>
-              <td>Without a target structure the extension stops when no more complimentary base pairing is possible <br />-> Only needed if the extended target interaction contains bulges. </td>
+                    <code>.........((((.(........ .........).))))........</code></dl>
+              </td></tr>
+              <tr>
+              <td colspan="2">Without a target structure the extension stops when no more complimentary base pairing is possible <br />-> Only needed if the extended target interaction contains bulges. </td>
             </tr>
           </table>
       </ul>
@@ -780,12 +738,8 @@
    </tr>
   </table>
 
-  <div> <strong>Values available in SimRNA <code>trafl</code> file: </strong><br />
-  c................. </div><br />
-
-
-  > python3 SSalignment.py p /place/with/all/ss-quences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile
-
+  <div> <strong>Sample: </strong> </div><br />
+  <code> > python3 SSalignment.py p /place/with/all/ss-quences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
 
 
 ### <code> continoussearch.py </code> <a id="simrna-script"></a>
@@ -794,18 +748,7 @@
   Parse over all SSalignment files (individual runs and the overview).
   Looking for the most common secondary  structure in the overview file.
   Look for this secondary structure in all individual runs and seperate them (max_file).
-  The structure with the best energy (3D) is the one for the next constrained run.
-
-  --force: instead of the most common secondary structure, the structure that fits
-           the given constrain best
-
-  python3 continoussearch.py -p 00/surface/analyse/ --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f
-
-
-  To get the pdb for the next run:
-  SimRNA_trafl2pdbsstructure.pdb trajectory.trafl {list} AA
-  AA ... all atom reconstruction
-  list ... frame in the list
+  The structure with the best energy (3D) is the one for the next constrained SimRNA run in the pipeline
   </div>
 
   <table>
@@ -880,8 +823,8 @@
    </tr>
   </table>
 
-  <div> <strong>Values available in SimRNA <code>trafl</code> file: </strong><br />
-  c................. </div><br />
+  <div> <strong>Sample: </strong> </div><br />
+  <code> >python3 continoussearch.py -p 00/surface/analyse/ --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f </code>
 
 
 ## Dependencies <a id="dependency"></a>
@@ -894,19 +837,30 @@
     <ul>- scikit-learn V.0.24.1 </ul>
   <dt>SimRNA <a href="https://genesilico.pl/SimRNAweb">[link]</a> </dt>
   <dt>Ernwin <a href="https://github.com/ViennaRNA/ernwin">[link]</a></dt>
-    <ul>- for ernwin use: </ul>
+    <div>& for ernwin use: </div>
     <ul>- python 2 </ul>
     <ul>- forgi <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
     <ul>- Note: incl. setup for all-atom reconstruction </ul>
   <dt>for RNA design:</dt>
     <ul>- ViennaRNA package <a href="https://www.tbi.univie.ac.at/RNA/">[link]</a> </ul>
     <ul>- RNAblueprint <a href="https://github.com/ViennaRNA/RNAblueprint">[link]</a> </ul>
-
 </dl>
 
 
 ###### References
 
+<dl>
+  <dt>If you use this software package, please cite the follwing publication: </dt>
+    <ul>WILL BE ANNOUNCED </ul>
+
+  <dt>For the pipeline presented here, some of the following already published software was used: </dt>
+    <ul><a href="https://doi.org/10.12688/f1000research.18458.2">B.C, Thiel et al. (2019) "3D based on 2D: Calculating helix angles and stacking patterns using forgi 2.0, an RNA Python library centered on secondary structure elements." F1000Research, 8:287</a></ul>
+    <ul><a href="https://doi.org/10.1261/rna.047522.114">P. Kerpedjiev P et al. (2015)"Predicting RNA 3D structure using a coarse-grain helix-centered model" RNA. 21(6): 1110–1121</a></ul>
+    <ul><a href="https://doi.org/10.1093/nar/gkv1479">M.J. Boniecki et al. (2016) “SimRNA: a coarse-grained method for RNA folding simulations and 3D structure prediction” Nucleic acids research vol. 44,7: e63</a> </ul>
+    <ul><a href="https://doi.org/10.1093/bioinformatics/btx263">S. Hammer et al. (2017) "RNAblueprint: flexible multiple target nucleic acid sequence design" Bioinformatics vol. 33, Issue 18, pp 2850–2858</a></ul>
+    <ul><a href="https://doi.org/10.1186/1748-7188-6-26">R. Lorenz et al. (2011), "ViennaRNA Package 2.0", Algorithms for Molecular Biology, 6:26</a></ul>
+    <ul><a href="https://doi.org/10.1007/BF00818163">I.L. Hofacker et al. (1994), "Fast folding and comparison of RNA secondary structures", Monatshefte fuer Chemie, vol. 125, Issue 2, pp 167-188</a></ul>
+  </dl>
 
 
 <a id="ernwin"></a>
