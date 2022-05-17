@@ -54,6 +54,7 @@ def main():
 
     ##filenames: CopStems_expand_long_00_001.csv -u CopStems_03_10000_0.csv
     individualpath = glob.glob(os.path.join(path, str(initialname+'_***.csv'))) #list of directory files
+    print(individualpath)
     individualpath.sort(key=lambda x: int(os.path.basename(x).split('.')[-2].split('_')[-1])) #nr of the file
     path_sumofruns = glob.glob(os.path.join(path, str(initialname+'.csv')))
 
@@ -63,6 +64,7 @@ def main():
     print(path_sumofruns[0])
     #transfer to dataframe
     sumofruns = pd.read_csv(path_sumofruns[0],sep="\t",encoding='utf-8')
+    print(sumofruns)
 
     for n, run in enumerate(individualpath):
         if n==0:
@@ -72,8 +74,10 @@ def main():
             df = pd.read_csv(run,encoding='utf-8' ,sep="\t") #create dataframe for reading current csv
             individual = individual.append(df)#appends current csv to final DF
 
+    print(individual)
     # Get names of indexes for which column Age has value 30
     constrained_line = args.first
+
     index_constrain = individual[individual['number'] == constrained_line].index
     if args.second:
         start_line = args.second
@@ -132,12 +136,12 @@ def main():
         df_count_interaction_cc = df_count_interaction[df_count_interaction['count_constraint']==df_count_interaction['count_constraint'].min()]
 
         print('count_interaction {}, shape {} (rows, columns)'.format(count_interaction, df_count_interaction.shape))
-        log.debug('df_count_interaction')
-        log.debug(df_count_interaction)
+        print('df_count_interaction')
+        print(df_count_interaction)
 
         print('count_interaction_constraint {}, shape {} (rows, columns)'.format(count_interaction_cc, df_count_interaction_cc.shape))
-        log.debug('df_count_interaction_cc')
-        log.debug(df_count_interaction_cc)
+        print('df_count_interaction_cc')
+        print(df_count_interaction_cc)
 
         interim_best3d = {}
         # seperate for the 3D structure in the individual runs with the certain 2D structure
