@@ -13,9 +13,8 @@ import re
 import copy
 from operator import itemgetter
 import itertools
-from itertools import groupby, count
 import sys
-import pandas
+import pandas as pd
 from more_itertools import consecutive_groups
 
 log = logging.getLogger(__name__)
@@ -23,7 +22,6 @@ log = logging.getLogger(__name__)
 def db2bps(db):
     """
     Get base pair list from db string.
-
     :param db: String of dotbracket
     """
     opening_bps = []
@@ -37,8 +35,15 @@ def db2bps(db):
     return bps
 
 def trafl(traflfile):
-    #fieldnames = ['row_in_trafl','consec_write_number', 'replica_number',
-    #              'energy_values_plus_restraint_score', 'energy_value','current_temp']
+    """
+    Parse the SimRNA trajectory file
+
+    :param traflfile: *.trafl file with the fields: ['row_in_trafl',
+                        'consec_write_number', 'replica_number',
+                        'energy_values_plus_restraint_score',
+                        'energy_value','current_temp']
+    """
+
     with open(traflfile, mode='r') as FILE:
         lines =  FILE.read().split('\n')
         coordinates = {}
@@ -69,7 +74,6 @@ def difference(bigset,smalset):
     :param bigset: dictionary of eg all basepairs from the constraint, startpoint,
                   initial interaction, bp before...
     :param smalset: current set for comparison
-    :param bp_dict: wich bps are unstable
     '''
 
     difference_bp= [x for x in smalset if x not in bigset] + [x for x in bigset if x not in smalset]
@@ -87,67 +91,131 @@ def find_interaction(interim_interaction_db,chainbreak):
     :return interaction: list of lists with the basepairs
     '''
 
-    findinteractionline = dict()
+    bplist = list()
+    intra = list()
+    consec_sum = list()
+
+    nonconsecutive = dict()
 
     for nr, db_line in enumerate(interim_interaction_db): #line includes only noncrossing bps
-        bp_count = 0
+        print(nr)
+        print(db_line)
+        bp_list = list()
         pairline = []
+
+        c =list()
+        consecutive = list()
+
         interim_interaction_bps = db2bps(db_line)
-        for pair in interim_interaction_bps: #counting interaction pairs
-                if pair[0] < chainbreak and pair[1] > chainbreak:
-                    bp_count += 1
-        #al lines with an interaction with the bp count und the bps
-        findinteractionline[nr] = [bp_count,interim_interaction_bps]
-        log.debug(findinteractionline)
+        interim_interaction_bps.sort()
 
-    #sort identified interactions ascending and take the last entry (most interaction bps)
-    interaction_list = list(sorted(findinteractionline.values()))[-1]
-    interaction = interaction_list[1]
-    #how many bps are involved in the interaction
-    interaction_countbp = interaction_list[0]
-    #sort the interaction pairs ascending (first base)
-    interaction.sort(key = lambda k: (k[0], -k[1]))
+        stop = len(interim_interaction_bps)-1
 
-    #how long is the consecutive lenght of the interaction
-    for pair in interaction:
-        pairline.append(int(pair[0]))
-        pairline.append(int(pair[1]))
+        count1 = 0
+        for count2, pair in enumerate(interim_interaction_bps):
+            print('here count1 {} count2 {} pair {} cb {}'.format(count1, count2, pair,chainbreak))
 
-    log.debug('pairline')
-    log.debug(pairline)
+            #counting interaction pairs
+            if pair[0] < chainbreak and pair[1] > chainbreak:
+                if count1 == 0:
+                    bp0,bp1 = pair[0],pair[1]
+                    c.append(pair)
+                    count1 += 1
+                    #print('start {} {}'.format(bp0,bp1))
+                else:
+                    if pair[0] == bp0+1 and pair[1] == bp1-1:
+                        #print('append {} {}'.format(pair[0],pair[1]))
+                        c.append(pair)
+                        if count2 == stop:
+                            consecutive.append(c.copy())
+                            consec_sum.append(c.copy())
+                            c.clear()
 
-    if interaction_countbp > 0:
-        len_interaction = consecutive_interaction_length(pairline)
+                    else:
+                        consecutive.append(c.copy())
+                        consec_sum.append(c.copy())
+                        c.clear()
+                        c.append(pair)
+
+                    bp0,bp1 = pair[0],pair[1]
+
+
+            #collect all intramolecular bases
+            else:
+                intra.append(pair[0])
+                intra.append(pair[1])
+
+            if count2 == stop:
+                if c:
+                    consecutive.append(c.copy())
+                    consec_sum.append(c.copy())
+                    c.clear()
+
+        print('consecutive stems {}'.format(consecutive))
+
+        if consecutive:
+            pos = 1
+            print('HERE')
+            for conseccount, cstem in enumerate(consecutive):
+                print('stem  to check {} {}'.format(conseccount,cstem))
+                if conseccount == 0:
+                    pos = 1
+                    stem1 = cstem
+                    start1 = stem1[-1][0]
+                    end1 = stem1[-1][1]
+                    nonconsecutive[(str(nr) + str(pos))] = [stem1]
+                    print('nr {} , start1 {}, end1 {}'.format((str(nr) + str(pos)), start1, end1))
+
+                else:
+                    stem2 = cstem
+                    start2 = stem2[0][0]
+                    end2 = stem2[0][1]
+                    print('nr {} , start1 {}, end1 {}, start2 {}, end2 {}'.format((str(nr) + str(pos)), start1, end1, start2, end2))
+                    check =list()
+
+                    for i in intra:
+                        if (i > start1 and i < start2) or (i > end2 and i < end1):
+                            check.append(i)
+                    print (check)
+                    if not check:
+                        nonconsecutive[(str(nr) + str(pos))].append(stem2)
+                    else:
+
+                        pos += 1
+                        nonconsecutive[(str(nr) + str(pos))] = [stem2]
+                    start1 = stem2[-1][0]
+                    end1 = stem2[-1][1]
+
+    print('all consec {} '.format(consec_sum) )
+    for k, ss in nonconsecutive.items():
+        print('nonconsecutive pos {} {}'.format(k, ss))
+    print('intras {}'.format(intra))
+
+    if consec_sum:
+        maxconsecutive_bp = max((x) for x in consec_sum)
+        maxconsecutive_len = max(len(x) for x in consec_sum)
     else:
-        len_interaction = 0
+        maxconsecutive_bp = 0
+        maxconsecutive_len = 0
+    length = 0
 
-    log.debug('interaction {}'.format(interaction))
-    log.debug('Interaction_countbp {}'.format(interaction_countbp))
-    log.debug('Interaction Length {}'.format(len_interaction))
+    if nonconsecutive:
+        for k, currentbps in nonconsecutive.items():
+            print (k,currentbps)
+            currentbps = [j for i in currentbps for j in i]
+            if len(currentbps) > length:
+                maxinteraction_bp = currentbps
+                maxinteraction_len = len(currentbps)
+                length = maxinteraction_len
+    else:
+        maxinteraction_bp = 0
+        maxinteraction_len = 0
 
-    return interaction, interaction_countbp, len_interaction
+    print('RESULT')
+    print(maxinteraction_bp,  maxinteraction_len, maxconsecutive_len,maxconsecutive_bp)
+    return maxinteraction_bp,  maxinteraction_len, maxconsecutive_len
+    #return interaction, interaction_countbp, len_interaction
 
-
-def consecutive_interaction_length(pairline):
-    '''
-    Find the longest consecutive interaction
-
-    :param pairline: list of all bases that are involved in the interaction
-    :return len_interaction: length of the longest consectuive interaction
-    '''
-    pairset = list()
-    c = count()
-
-    for element in pairline: #Hash all array elements
-        pairset.append(element)
-    pairset.sort()
-    log.debug('len pairline {}, pairline {}, pairset {}'.format(len(pairline),pairline,pairset))
-
-    longest_interaction = max((list(g) for _, g in groupby (pairset, lambda x : x-next(c))), key=len)
-    len_interaction = len(longest_interaction)
-    log.debug('interaction len {}'.format(len_interaction))
-
-    return (len_interaction)
 
 def main():
     parser = argparse.ArgumentParser(description='Align SS from SimRNA')
@@ -155,8 +223,10 @@ def main():
     parser.add_argument ('-i', '--input', help='Input ss-sequence')
     parser.add_argument ('-c', '--constraint', help='Constrained ss-sequence')
     parser.add_argument ('-o', '--output', help='Name of the outputfile')
-    parser.add_argument ('-m','--outputmode', choices=['w','a'], default='w', help="Overwrite ('w') or append ('a')")
-    parser.add_argument ('-u', '--uniqueoutput', help='Name of the unique outputfile/or the already existing one')
+    parser.add_argument ('-m','--outputmode', choices=['w','a'], default='w',
+                        help="Overwrite ('w') or append ('a')")
+    parser.add_argument ('-u', '--uniqueoutput',
+                        help='Name of the unique outputfile/or the already existing one')
     parser.add_argument ('-t', '--trafl', help='Traflfile')
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
 
@@ -181,7 +251,9 @@ def main():
     dic = OrderedDict()
     dic_unique = OrderedDict() #dictionary for all already collected unique sequences with all the other data
 
-    goal_start,goal_constraint,goal_interaction = 0,0,0 #How often do we get the contstrained secondary structure
+    #COUNTER: How often do we get the contstrained secondary structure
+    goal_start,goal_constraint,goal_interaction = 0,0,0
+
     count_unique = {} #dictionary for bpstr and a counter
     unique_universal = {} #final dictonary for all unique sequences
     bp_dict_before = {} #collect the bps and how often do they change compared to the structure before
@@ -386,7 +458,36 @@ def main():
                 unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11]
 
 
+    columnnames_individual = ['number','sequence','count_constraint',
+                              'count_start','count_before','constancy',
+                              'dif_constraint','dif_start','dif_before',
+                              'bp','time','energy_values_plus_restraint_score',
+                              'energy_value','current_temp','interaction',
+                              'interaction_countbp','len_interaction',
+                              'count_interaction_constraint','dif_interaction_cc']
 
+    columnnames_unique = ['sequence','count_how_often','count_constraint',
+                          'count_start','dif_constraint','dif_start',
+                          'bp','bpstr','interaction',
+                          'interaction_countbp','len_interaction',
+                          'count_interaction_constraint','dif_interaction_cc']
+
+
+    #df_individual = pd.DataFrame.from_dict(dic, orient='index', columns= columnnames_individual)
+    #df_unique = pd.DataFrame.from_dict(unique_universal, orient='index', columns=columnnames_unique)
+    df_individual = pd.DataFrame.from_dict(dic,orient='index').reset_index()
+    df_individual.columns = columnnames_individual
+    df_unique = pd.DataFrame.from_dict(unique_universal, orient='index' ).reset_index()
+    df_unique.columns = columnnames_unique
+
+
+    # save the files
+    df_individual.to_csv(output, sep='\t',index=False)
+
+    df_unique.to_csv(unique_outputfile, sep='\t',index=False)
+
+
+    '''
     #save the work
     with open(output, 'w') as csvfile:
         header = ['number', 'sequence','count_constraint',\
@@ -422,7 +523,7 @@ def main():
                              'bp':v[5],'bpstr':v[6],'interaction':v[7],\
                              'interaction_countbp':v[8],'len_interaction':v[9],\
                              'count_interaction_constraint':v[10],'dif_interaction_cc':v[11]})
-
+    '''
 
     header = ['nr','bp1','bp2', 'count']
     with open(output_bp, 'w') as csvfile:
@@ -455,7 +556,6 @@ Filename old
     4. Run
     5. Timepoint
     6. ss_detected
-
 Filename new
     CopStems_expand_long00_03_1_1-005001.ss_detected
     1. Which element
