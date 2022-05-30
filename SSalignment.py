@@ -75,9 +75,15 @@ def difference(bigset,smalset):
                   initial interaction, bp before...
     :param smalset: current set for comparison
     '''
+    log.debug("bigset {}".format(bigset))
+    log.debug("smalset {}".format(smalset))
 
-    difference_bp= [x for x in smalset if x not in bigset] + [x for x in bigset if x not in smalset]
-    count_difference = len(difference_bp)
+    if smalset == 0:
+        difference_bp = bigset
+        count_difference = len(bigset)
+    else:
+        difference_bp= [x for x in smalset if x not in bigset] + [x for x in bigset if x not in smalset]
+        count_difference = len(difference_bp)
 
     return difference_bp, count_difference
 
@@ -98,8 +104,8 @@ def find_interaction(interim_interaction_db,chainbreak):
     nonconsecutive = dict()
 
     for nr, db_line in enumerate(interim_interaction_db): #line includes only noncrossing bps
-        print(nr)
-        print(db_line)
+        log.debug(nr)
+        log.debug(db_line)
         bp_list = list()
         pairline = []
 
@@ -113,7 +119,7 @@ def find_interaction(interim_interaction_db,chainbreak):
 
         count1 = 0
         for count2, pair in enumerate(interim_interaction_bps):
-            print('here count1 {} count2 {} pair {} cb {}'.format(count1, count2, pair,chainbreak))
+            log.debug('count1 {} count2 {} pair {} cb {}'.format(count1, count2, pair,chainbreak))
 
             #counting interaction pairs
             if pair[0] < chainbreak and pair[1] > chainbreak:
@@ -151,32 +157,30 @@ def find_interaction(interim_interaction_db,chainbreak):
                     consec_sum.append(c.copy())
                     c.clear()
 
-        print('consecutive stems {}'.format(consecutive))
+        log.debug('consecutive stems {}'.format(consecutive))
 
         if consecutive:
             pos = 1
-            print('HERE')
             for conseccount, cstem in enumerate(consecutive):
-                print('stem  to check {} {}'.format(conseccount,cstem))
+                log.debug('stem  to check {} {}'.format(conseccount,cstem))
                 if conseccount == 0:
                     pos = 1
                     stem1 = cstem
                     start1 = stem1[-1][0]
                     end1 = stem1[-1][1]
                     nonconsecutive[(str(nr) + str(pos))] = [stem1]
-                    print('nr {} , start1 {}, end1 {}'.format((str(nr) + str(pos)), start1, end1))
+                    log.debug('nr {} , start1 {}, end1 {}'.format((str(nr) + str(pos)), start1, end1))
 
                 else:
                     stem2 = cstem
                     start2 = stem2[0][0]
                     end2 = stem2[0][1]
-                    print('nr {} , start1 {}, end1 {}, start2 {}, end2 {}'.format((str(nr) + str(pos)), start1, end1, start2, end2))
+                    log.debug('nr {} , start1 {}, end1 {}, start2 {}, end2 {}'.format((str(nr) + str(pos)), start1, end1, start2, end2))
                     check =list()
 
                     for i in intra:
                         if (i > start1 and i < start2) or (i > end2 and i < end1):
                             check.append(i)
-                    print (check)
                     if not check:
                         nonconsecutive[(str(nr) + str(pos))].append(stem2)
                     else:
@@ -186,10 +190,10 @@ def find_interaction(interim_interaction_db,chainbreak):
                     start1 = stem2[-1][0]
                     end1 = stem2[-1][1]
 
-    print('all consec {} '.format(consec_sum) )
+    log.debug('all consec {} '.format(consec_sum) )
     for k, ss in nonconsecutive.items():
-        print('nonconsecutive pos {} {}'.format(k, ss))
-    print('intras {}'.format(intra))
+        log.debug('nonconsecutive pos {} {}'.format(k, ss))
+    log.debug('intras {}'.format(intra))
 
     if consec_sum:
         maxconsecutive_bp = max((x) for x in consec_sum)
@@ -201,7 +205,6 @@ def find_interaction(interim_interaction_db,chainbreak):
 
     if nonconsecutive:
         for k, currentbps in nonconsecutive.items():
-            print (k,currentbps)
             currentbps = [j for i in currentbps for j in i]
             if len(currentbps) > length:
                 maxinteraction_bp = currentbps
@@ -211,8 +214,8 @@ def find_interaction(interim_interaction_db,chainbreak):
         maxinteraction_bp = 0
         maxinteraction_len = 0
 
-    print('RESULT')
-    print(maxinteraction_bp,  maxinteraction_len, maxconsecutive_len,maxconsecutive_bp)
+    log.debug('RESULT')
+    log.debug(maxinteraction_bp,  maxinteraction_len, maxconsecutive_len,maxconsecutive_bp)
     return maxinteraction_bp,  maxinteraction_len, maxconsecutive_len
     #return interaction, interaction_countbp, len_interaction
 
@@ -273,7 +276,6 @@ def main():
 
         interim_interaction_db =[]
         for line in content:
-            print(line)
             bp_constraint.extend(db2bps(line))
             constraint_sequence = constraint_sequence +' '+ line
             interim_interaction_db.append(line)
@@ -348,8 +350,8 @@ def main():
                 pairstr = str(bp1+', '+bp2)
                 bp_dict_unique[pairstr] = int(count)
 
-    print(path)
-    print(start_ss)
+    #print(path)
+    #print(start_ss)
 
     Files = glob.glob(os.path.join(path, '*.ss_detected')) #list of directory files
     Files.sort(key=lambda x: int(os.path.basename(x).split('.')[-2].split('-')[-1])) #nr of the file (for old and new)
@@ -385,7 +387,12 @@ def main():
             #If the current sequence differ to the one before safe it
             bpstr = ''.join(str(s) for s in bp)
 
+            log.debug('check 1 {} {}'.format(bp_constraint,bp))
+
             dif_constraint,count_constraint = difference(bp_constraint,bp)
+
+            log.debug('check 2 {} {}'.format(interaction_cc,interaction))
+
             dif_interaction_cc, count_interaction_constraint = difference(interaction_cc,interaction)
             dif_before, count_before = difference(bp_before,bp)
             dif_start, count_start = difference(bp_start,bp)
