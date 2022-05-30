@@ -93,7 +93,7 @@
         <tr>
           <td>FALLBACKSTATES</td>
           <td>true | false</td>
-          <td>Save the best (lowest rmsd) n structures during a ernwin simulation</td>
+          <td>Over 50000 short artificial structures that can be used as fallback fragments when less or no examples of a secondary structure element could be found in the PDB. </td>
           <td><a href="#ernwin">[ernwin]</a></td>
         </tr>
         <tr>
@@ -153,7 +153,7 @@
         <tr>
           <td>ROUND</td>
           <td>0</td>
-          <td></td>
+          <td>Start with Round <code></td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
@@ -203,12 +203,6 @@
           <td>force | interaction | </td>
           <td></td>
           <td><a href="#continuousserach">[continuousserach]</a></td>
-        </tr>
-        <tr>
-          <td>TOTAL</td>
-          <td>NO ????</td>
-          <td></td>
-          <td></td>
         </tr>
       </table>
     <li> Structure information
@@ -742,7 +736,7 @@
   <code> > python3 SSalignment.py p /place/with/all/ss-quences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
 
 
-### <code> continoussearch.py </code> <a id="simrna-script"></a>
+### <code> continoussearch.py </code> <a id="continuousserach"></a>
   <div>
   Find the best 3D structure after a SimRNA surface run and the SSAllignment analysis
   Parse over all SSalignment files (individual runs and the overview).
@@ -835,8 +829,8 @@
     <ul>- numpy V.1.20.1 </ul>
     <ul>- pandas V.1.2.2 </ul>
     <ul>- scikit-learn V.0.24.1 </ul>
-  <dt>SimRNA <a href="https://genesilico.pl/SimRNAweb">[link]</a> </dt>
-  <dt>Ernwin <a href="https://github.com/ViennaRNA/ernwin">[link]</a></dt>
+  <dt>SimRNA <a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
+  <dt>Ernwin <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
     <div>& for ernwin use: </div>
     <ul>- python 2 </ul>
     <ul>- forgi <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
@@ -853,7 +847,7 @@
   <dt>If you use this software package, please cite the follwing publication: </dt>
     <ul>WILL BE ANNOUNCED </ul>
 
-  <dt>For the pipeline presented here, some of the following already published software was used: </dt>
+  <dt>For the pipeline presented here, some of the following already published software-features were used: </dt>
     <ul><a href="https://doi.org/10.12688/f1000research.18458.2">B.C, Thiel et al. (2019) "3D based on 2D: Calculating helix angles and stacking patterns using forgi 2.0, an RNA Python library centered on secondary structure elements." F1000Research, 8:287</a></ul>
     <ul><a href="https://doi.org/10.1261/rna.047522.114">P. Kerpedjiev P et al. (2015)"Predicting RNA 3D structure using a coarse-grain helix-centered model" RNA. 21(6): 1110–1121</a></ul>
     <ul><a href="https://doi.org/10.1093/nar/gkv1479">M.J. Boniecki et al. (2016) “SimRNA: a coarse-grained method for RNA folding simulations and 3D structure prediction” Nucleic acids research vol. 44,7: e63</a> </ul>
@@ -863,10 +857,7 @@
   </dl>
 
 
-<a id="ernwin"></a>
-<a id="SimRNA"></a>
 <a id="network"></a>
-<a id="continuousserach"></a>
 
 </body>
 </html>
