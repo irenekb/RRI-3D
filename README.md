@@ -14,7 +14,7 @@
   <img src="overview.png" alt="Overview">
 
 ### How can an expansion design look like:
-  <img style="max-width: 40%; height: auto; " src="doc/design-expansion-pathway.png" alt=expansion  >
+  <img style="width: 50%; height: auto; " src="doc/design-expansion-pathway.png" alt=expansion  >
 
 
 ### STARTING THE PIPELINE
