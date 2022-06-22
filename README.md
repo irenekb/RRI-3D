@@ -13,6 +13,9 @@
 
   <img src="overview.png" alt="Overview">
 
+### How can an expansion design look like:
+  <img style="max-width: 40%; height: auto; " src="doc/design-expansion-pathway.png" alt=expansion  >
+
 
 ### STARTING THE PIPELINE
 
@@ -22,7 +25,6 @@
   Both scripts can process multiple clusters of the respective 3D structure. <br /> <br />
   The input for the start of the pipeline is given by:
   </div>
-
 
 
 #### Input
@@ -376,26 +378,30 @@
     <tr>
       <td><code>-v </code></td>
       <td><code>--verbose </code></td>
-      <td>action: store_true </td>
+      <td>store_true</td>
       <td>FALSE </td>
       <td>Be verbose </td>
     </tr>
   </table>
 <div>
-<strong>Further Descriptions & Examples</strong><br /><br />
-  <dl>
-    Expand the interaction right (-r) or left (-l):<br />
-    <code>
-    ((((.............)))) ((((.(((...............)))))))<br />
-    ....R(((((((((((L.... .........L)))))))))))R........<br />
-    </code><br />
-    -b 2 / --buffer 2 <br />
-    <code>
-    (---............---)) ((((.((---...........---))))))<br />
-    ....R(((((((((((L.... .........L)))))))))))R........<br />
-    </code>
 
-  </dl>
+<strong>Further Descriptions & Examples</strong><br /><br />
+  <table>
+    <tr>
+      <td>Expand the interaction right (-r) or left (-l):</td></tr>
+      <td>
+        <dl><code>((((.............)))) ((((.(((...............)))))))</code><br />
+            <code>....R(((((((((((L.... .........L)))))))))))R........</code></dl>
+      </td></tr>
+      <tr><td> -b 2 / --buffer 2 </td></tr>
+      <td>
+        <dl><code>(---............---)) ((((.((---...........---))))))</code><br />
+            <code>....R(((((((((((L.... .........L)))))))))))R........</code></dl>
+      </td></tr>
+    </tr>
+  </table>
+
+
 </div>
 
 ### <code> RNAdesign.py </code> <a id="RNAblueprint"></a>
@@ -457,7 +463,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -469,10 +475,14 @@
        The first structure describes the two seperate hairpins with a connection element (A)
        the second structure should ensure the complementarity cleaveage of the two hairpins.
        With the objective2 function every designed hearpin will be evaluated separately.</dl>
-       <code>
-       1  (((((((.........))))))) (((((((.........)))))))<br />
-       2  ((((((((((((((((((((((( )))))))))))))))))))))))<br />
-       </code>
+       <table>
+         <tr>
+           <td>
+             <dl><code>1  (((((((.........))))))) (((((((.........)))))))</code><br />
+                 <code>2  ((((((((((((((((((((((( )))))))))))))))))))))))</code></dl>
+           </td></tr>
+      </table>
+
 
 </div>
 
@@ -515,7 +525,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -561,7 +571,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -592,7 +602,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -641,7 +651,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -726,7 +736,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
@@ -762,21 +772,21 @@
    </tr>
    <td><code> </code></td>
    <td><code>--printout </code></td>
-   <td>action: store_true </td>
+   <td>store_true</td>
    <td>none </td>
    <td>Print a csv-file with all minEnergy relevant files</td>
    </tr>
    </tr>
    <td><code>-f </code></td>
    <td><code>--force </code></td>
-   <td>action: store_true </td>
+   <td>store_true</td>
    <td>none </td>
    <td>Instead of the most common secondary structure: find the secundary-structures most similar to the contrained one</td>
    </tr>
    </tr>
    <td><code> </code></td>
    <td><code>--interaction </code></td>
-   <td>action: store_true </td>
+   <td>store_true</td>
    <td>none </td>
    <td>Instead of the most common secondary structure: Find the interaction-structure most similar to the contrained one</td>
    </tr>
@@ -811,7 +821,7 @@
    <tr>
      <td><code>-v </code></td>
      <td><code>--verbose </code></td>
-     <td>action: store_true </td>
+     <td>store_true</td>
      <td>FALSE </td>
      <td>Be verbose </td>
    </tr>
