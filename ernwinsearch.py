@@ -24,7 +24,6 @@ log = logging.getLogger(__name__)
 def main():
     parser = argparse.ArgumentParser(description='Find minE file from a trafl-file')
     parser.add_argument ('-i', '--input', help='Path to Inputfiles')
-    parser.add_argument ('-n', '--linenumber', help='Linenumber used for the selection')
     parser.add_argument('-v', '--verbose', action='store_true', help='Be verbose')
 
     args = parser.parse_args()

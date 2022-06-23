@@ -21,7 +21,7 @@ def main():
     parser.add_argument ('-p', '--path', help='Path to Inputfiles')
     parser.add_argument ('-o', '--output', help='Output')
     parser.add_argument('-n', '--natural', action='store_true',
-                        help='minE without constrained energy')
+                        help='minE without constrained energy') #TODO
     parser.add_argument('-v', '--verbose', action='store_true', help='Be verbose')
 
     args = parser.parse_args()

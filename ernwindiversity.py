@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Find minE file from a trafl-file')
+    parser = argparse.ArgumentParser(description='Cluster the ernwin structures based on the used fragments.')
     parser.add_argument ('-i', '--input', help='Path to Inputfiles')
     parser.add_argument ('-n', '--number', type=int, help='Number of "--save-n-best" in ernwin')
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
