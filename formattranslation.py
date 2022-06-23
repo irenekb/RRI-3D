@@ -137,8 +137,8 @@ def main():
 
     for n in range(args.count):
         n=str(n+1)
-        SEQUENCEFILE = path+"/"+name+n+'.seq'
-        OUTPUTNAME = path+"/"+name+n+'.fa'
+        SEQUENCEFILE = path+"/"+name+'design'+n+'.seq'
+        OUTPUTNAME = path+"/"+name+'design'+n+'.fa'
         log.debug('Sequencefile: {} Outputname: {}'.format(SEQUENCEFILE,OUTPUTNAME))
         with open (SEQUENCEFILE, 'r') as FILE:
             for line in FILE:
