@@ -26,7 +26,7 @@ PROGS=$(awk -F= '$1=="PROGS"{print $2;exit}' $FILE)
 SIMRNA=$(awk -F= '$1=="SIMRNA"{print $2;exit}'  $FILE)
 WHERE=$(awk -F= '$1=="WHERE"{print $2;exit}' $FILE)
 BUFFER=$(awk -F= '$1=="BUFFER"{print $2;exit}'  $FILE)
-TOTAL=$(awk -F= '$1=="TOTAL"{print $2;exit}' $FILE)
+#TOTAL=$(awk -F= '$1=="TOTAL"{print $2;exit}' $FILE)
 TYPE=$(awk -F= '$1=="TYPE"{print $2;exit}'  $FILE)
 EXTEND=$(awk -F= '$1=="EXTEND"{print $2;exit}' $FILE)
 RELAX=$(awk -F= '$1=="RELAX"{print $2;exit}' $FILE)
@@ -48,7 +48,7 @@ echo $PROGS
 echo $SIMRNA
 echo $WHERE
 echo $BUFFER
-echo $TOTAL
+#echo $TOTAL
 echo $EXTEND
 echo $RELAX
 echo $SIMROUND
