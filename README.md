@@ -186,7 +186,7 @@
           <td>EXPANDBMODE</td>
           <td>1-6</td>
           <td>
-            <ol start=0>
+            <ol type="1" start=0>
               <li>right and left at once</li>
               <li>only right</li>
               <li>only left</li>
