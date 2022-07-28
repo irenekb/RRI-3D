@@ -184,8 +184,18 @@
         </tr>
         <tr>
           <td>EXPANDBMODE</td>
-          <td>1-5</td>
-          <td></td>
+          <td>1-6</td>
+          <td>
+            <ol start=0>
+              <li>right and left at once</li>
+              <li>only right</li>
+              <li>only left</li>
+              <li>alternate right and left</li>
+              <li>alternate left and right</li>
+              <li>first right then left ; 1 and then 2</li>
+              <li>first left then right ; 2 and then 1</li>
+            </ol>
+          </td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
