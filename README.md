@@ -155,31 +155,25 @@
         <tr>
           <td>ROUND</td>
           <td>0</td>
-          <td>Start with Round <code></td>
+          <td>Start with Round <code>0</code></td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
           <td>ROUNDS</td>
           <td>100</td>
-          <td></td>
-          <td><a href="#expansion settings">[expansion settings]</a></td>
-        </tr>
-        <tr>
-          <td>ROUND</td>
-          <td>0</td>
-          <td></td>
+          <td>Number of expansion rounds</td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
           <td>TARGET</td>
           <td>true | false</td>
-          <td></td>
+          <td>Instead of an expansion until there is no more complementarity, it is based on a target interaction. </td>
           <td> </td>
         </tr>
         <tr>
           <td>BUFFER</td>
           <td>2</td>
-          <td></td>
+          <td>length of linker/buffer region around the interaction site</td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
@@ -200,20 +194,21 @@
         </tr>
         <tr>
           <td>CONSECUTIVEPERFECT<a id="CONSECUTIVEPERFECT"></a></td>
-          <td>true | false | </td>
-          <td></td>
+          <td>true | false </td>
+          <td>Selection of the best/longest interaction for the next expansion
+          based on a consecutive interaction / an interaction incl. bulges</td>
           <td><a href="#continuousserach">[continuousserach]</a></td>
         </tr>
         <tr>
           <td>CONTSEARCH1</td>
           <td>force | interaction | </td>
-          <td></td>
+          <td>Structure selection type after the relax-run</td>
           <td><a href="#continuousserach">[continuousserach]</a></td>
         </tr>
         <tr>
           <td>CONTSEARCH2</td>
           <td>force | interaction | </td>
-          <td></td>
+          <td>Structure selection type for the next expansion step</td>
           <td><a href="#continuousserach">[continuousserach]</a></td>
         </tr>
       </table>
