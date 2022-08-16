@@ -294,7 +294,7 @@
           </table>
       </ul>
       <li> <code> config.dat </code>
-        <dl>The config file contains the settings for a SimRNA run (see dependencies: <a href="#dependency">SimRNa</a>) and can be found <a href="#SimRNApath">here</a>. You can distinguish between the relaxing run after simulating the start structure (longer run recommended) and the runs to extend the interaction (short runs recommended). <br />
+        <dl>The config file contains the settings for a SimRNA run (see dependencies: <a href="#dependency">SimRNA</a>) and can be found <a href="#SimRNApath">here</a>. You can distinguish between the relaxing run after simulating the start structure (longer run recommended) and the runs to extend the interaction (short runs recommended). <br />
         In the folder  <code>SimRNA_config</code> you can find several example config files.</dl>
   </ol>
 </dl>
@@ -748,7 +748,7 @@
   </table>
 
   <div> <strong>Sample: </strong> </div><br />
-  <code> > python3 SSalignment.py p /place/with/all/ss-quences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
+  <code> > python3 SSalignment.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
 
 
 ### <code> continoussearch.py </code> <a id="continuousserach"></a>
@@ -833,7 +833,7 @@
   </table>
 
   <div> <strong>Sample: </strong> </div><br />
-  <code> >python3 continoussearch.py -p 00/surface/analyse/ --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f </code>
+  <code> >python3 continoussearch.py -p 00/surface/analyse/ --print --first 1zci_00.ss --second 1zci_00.ss_cc -f </code>
 
 
 ## Dependencies <a id="dependency"></a>
