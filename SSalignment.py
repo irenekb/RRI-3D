@@ -1,8 +1,5 @@
 #!usr/bin/env python3
 
-'''
-    #python3 SimRNA-Scripts/trafls-analyse.py  -i /scr/coridan/irene/Data_interaction/SimRNA_Temp-constant/CopStems_inital_2buffer/output/CopStems_01_01.trafl -f CopStems_01 -t CopStems_01 -o n
-'''
 import logging
 import argparse
 import csv
@@ -350,8 +347,6 @@ def main():
                 pairstr = str(bp1+', '+bp2)
                 bp_dict_unique[pairstr] = int(count)
 
-    #print(path)
-    #print(start_ss)
 
     Files = glob.glob(os.path.join(path, '*.ss_detected')) #list of directory files
     Files.sort(key=lambda x: int(os.path.basename(x).split('.')[-2].split('-')[-1])) #nr of the file (for old and new)
@@ -480,8 +475,6 @@ def main():
                           'count_interaction_constraint','dif_interaction_cc']
 
 
-    #df_individual = pd.DataFrame.from_dict(dic, orient='index', columns= columnnames_individual)
-    #df_unique = pd.DataFrame.from_dict(unique_universal, orient='index', columns=columnnames_unique)
     df_individual = pd.DataFrame.from_dict(dic,orient='index').reset_index()
     df_individual.columns = columnnames_individual
     df_unique = pd.DataFrame.from_dict(unique_universal, orient='index' ).reset_index()
@@ -492,45 +485,6 @@ def main():
     df_individual.to_csv(output, sep='\t',index=False)
 
     df_unique.to_csv(unique_outputfile, sep='\t',index=False)
-
-
-    '''
-    #save the work
-    with open(output, 'w') as csvfile:
-        header = ['number', 'sequence','count_constraint',\
-                  'count_start','count_before','constancy',\
-                  'dif_constraint','dif_start','dif_before',\
-                  'bp','time','energy_values_plus_restraint_score',\
-                  'energy_value','current_temp','interaction',\
-                  'interaction_countbp','len_interaction',\
-                  'count_interaction_constraint','dif_interaction_cc']
-        writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
-        writer.writeheader()
-        for k,v in dic.items():
-            writer.writerow({'number':k,'sequence':v[0],'count_constraint':v[1],\
-                             'count_start':v[2],'count_before':v[3],'constancy':v[4],\
-                             'dif_constraint':v[5],'dif_start':v[6],'dif_before':v[7],\
-                             'bp':v[8],'time':v[9],'energy_values_plus_restraint_score':v[10],\
-                             'energy_value':v[11],'current_temp':v[12],'interaction':v[13],\
-                             'interaction_countbp':v[14],'len_interaction': v[15],\
-                             'count_interaction_constraint':v[16],'dif_interaction_cc':v[17]})
-
-    #with open(unique_outputfile, args.outputmode) as csvfile:
-    with open(unique_outputfile, 'w') as csvfile:
-        header = ['sequence','count_how_often','count_constraint',\
-                  'count_start','dif_constraint','dif_start',\
-                  'bp','bpstr','interaction',\
-                  'interaction_countbp','len_interaction',\
-                  'count_interaction_constraint','dif_interaction_cc']
-        writer = csv.DictWriter(csvfile, fieldnames=header, delimiter = '\t')
-        writer.writeheader()
-        for k,v in unique_universal.items():
-            writer.writerow({'sequence':k,'count_how_often':v[0],'count_constraint':v[1],\
-                             'count_start':v[2],'dif_constraint':v[3],'dif_start':v[4],\
-                             'bp':v[5],'bpstr':v[6],'interaction':v[7],\
-                             'interaction_countbp':v[8],'len_interaction':v[9],\
-                             'count_interaction_constraint':v[10],'dif_interaction_cc':v[11]})
-    '''
 
     header = ['nr','bp1','bp2', 'count']
     with open(output_bp, 'w') as csvfile:
@@ -553,23 +507,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-'''NOTES:
-Filename old
-    CopStems_long-surface_10000_01-000001.ss_detected
-    1. Which element
-    2. surface from what
-    3. Iterations
-    4. Run
-    5. Timepoint
-    6. ss_detected
-Filename new
-    CopStems_expand_long00_03_1_1-005001.ss_detected
-    1. Which element
-    2. SimRNA script
-    3. SimRNA config file
-    4. interaction expansion round
-    5. round for 'this' run
-    6. seed
-    7. Outputline
-'''

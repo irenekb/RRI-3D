@@ -21,10 +21,7 @@ if [ "$FALLBACKSTATES" == true ] ; then
   FALLBACK="$COARSE/RESOURCES/fallback.stats"
 fi
 
-
-####SECONDDESIGN=(1 3 7 8 11 13 14 16 17 19 20 21 22 23 24 25 26 29 34 35 36 37 39 41 44 45 46 49 52 53 54 55 56 57 58 59 61 62 63 68 69 71 72 76 78 79 80 83 87 89 90 92 93 98 99 100)
-
-######./ultimatescriptstart.sh "${START}/$DESIGN" "CopStemsdesign${DESIGN}" "/home/irene/Programs/GitHub/RNA-Interaction-Workflow/inputvalues.dat"
+######./main.sh "${START}/$DESIGN" "CopStemsdesign${DESIGN}" "inputvalues.dat"
 
 if [[ ${DESIGNS} == 0 ]]; then
   if [ "$CLUSTER" -eq "0" ]; then
@@ -56,7 +53,7 @@ if [[ ${DESIGNS} == 0 ]]; then
       else
         echo "possible ernwin reconstruction $COUNTER"
         cp $RECONSTRUCTIONFILE  "$START/${NAME}_0.pdb"
-        ./ultimatescript.sh $FILE "${NAME}" "$START"
+        ./main.sh $FILE "${NAME}" "$START"
 
         break 1
       fi
@@ -92,7 +89,7 @@ if [[ ${DESIGNS} == 0 ]]; then
           echo "ERROR: No ernwin reconstruction possible"
         done
 
-        ./ultimatescript.sh $FILE "${NAME}" "$START"
+        ./main.sh $FILE "${NAME}" "$START"
         retVal=$?
 
         if [ $retVal -ne 0 ]; then
@@ -142,7 +139,7 @@ if [[ ${DESIGNS} == 0 ]]; then
           cp "$START/${NAME}_0.il" "$START/cluster${CST}/${NAME}c${CST}_0.il"
           cp "$START/${NAME}_target.ss" "$START/cluster${CST}/${NAME}c${CST}_target.ss"
 
-          ./ultimatescript.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
+          ./main.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
           break 1
         fi
 
@@ -205,7 +202,7 @@ else
         echo "ERROR: No ernwin reconstruction possible"
       done
 
-      ./ultimatescript.sh $FILE "${NAME}design${DESIGN}" "$START/${NAME}${DESIGN}/"
+      ./main.sh $FILE "${NAME}design${DESIGN}" "$START/${NAME}${DESIGN}/"
 
       retVal=$?
       TRY="0"
@@ -237,7 +234,7 @@ else
           echo "ERROR: No ernwin reconstruction possible"
         done
 
-        ./ultimatescript.sh $FILE "${NAME}design${DESIGN}" "$START/${NAME}${DESIGN}/"
+        ./main.sh $FILE "${NAME}design${DESIGN}" "$START/${NAME}${DESIGN}/"
         retVal=$?
 
         if [ $retVal -ne 0 ]; then
@@ -299,7 +296,7 @@ else
             cp "$START/${NAME}${DESIGN}/${NAME}design${DESIGN}_0.il"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}design${DESIGN}c${CST}_0.il"
             cp "$START/${NAME}${DESIGN}/${NAME}design${DESIGN}_target.ss"  "$START/${NAME}${DESIGN}/cluster${CST}/${NAME}design${DESIGN}c${CST}_target.ss"
 
-            ./ultimatescript.sh $FILE "${NAME}design${DESIGN}c${CST}" "$START/${NAME}${DESIGN}/cluster${CST}"
+            ./main.sh $FILE "${NAME}design${DESIGN}c${CST}" "$START/${NAME}${DESIGN}/cluster${CST}"
             break 1
           fi
 

@@ -8,6 +8,7 @@ The structure with the best energy (3D) is the one for the next constrained run.
 --force: instead of the most common secondary structure, the structure that fits
          the given constrain best
 
+e.g.:
 python3 continoussearch.py -p 00/surface/analyse/ --print --first 'CopStems_00.ss' --second 'CopStems_00_00_000000.ss' -f
 
 
@@ -83,13 +84,6 @@ def main():
         start_line = args.second
         index_start = individual[ individual['number'] == start_line].index
 
-    #get the start and constrained ss and remove them from the df
-    #constrain_bp = individual.loc[individual['number'] == constrained_line].loc[0,'bp'].values[0]
-    #log.debug('constrain: {}'.format(constrain_bp))
-    #if args.second:
-        #start_bp = individual.loc[individual['number'] == start_line].loc[1,'bp'].values[0]
-        #log.debug('start:  {}'.format(start_bp))
-    # Delete these row indexes from dataFrame
     individual.drop(index_constrain, inplace=True)
     if args.second:
         individual.drop(index_start, inplace=True)

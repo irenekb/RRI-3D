@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 #WITH INPUTFILE
-#/home/irene/Programs/GitHub/RNA-Interaction-Workflow/inputvalues.dat
+#inputvalues.dat
 FILE=$(realpath "$1")
 
 
@@ -146,7 +146,6 @@ done
 
 if ! [ ${RELAX} = "0" ]; then
 	#####START from ernwin reconstructed pdb#####
-	##extend_long03 = 100,000 steps save every 100th to relax the ernwin structure
 	echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 	"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
 	wait
@@ -159,7 +158,7 @@ if ! [ ${RELAX} = "0" ]; then
 	fi
 
 	mkdir $START/$ROUND
-	#mv "${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
+
 	mv "${START}/${NAME}_${RELAX}_${ROUND}"* ${START}/${ROUND}/.
 	ROUNDNEW="$(($ROUND+"1"))"
 	mkdir $START/${ROUNDNEW}
@@ -168,12 +167,6 @@ if ! [ ${RELAX} = "0" ]; then
 	for step in $(seq 1 ${SIMROUND}); do
 		TRAFL="${NAME}_${RELAX}_${ROUND}_${step}_${step}.trafl"
 		PDB="${NAME}_${RELAX}_${ROUND}_${step}_${step}-000001.pdb"
-
-		###if [ ! -f ${START}/${PDB} ]; then --> sollte davor schon abgefragt werden mit den kaputten pdb
-		###	echo "File does not exist in Bash: "${START}""
-		###	mv "${START}/${NAME}_${RELAX}_${ROUND}_"* ${START}/${ROUND}/.
-		###	exit 1
-		###fi
 
 		if [ "$TREESEARCH" == true ] ; then
 			#write and analyse from every simRNA run all paralell runs (SimRounds)
@@ -188,14 +181,13 @@ if ! [ ${RELAX} = "0" ]; then
 
 			SimRNA_trafl2pdbs $START/$ROUND/${step}/analyse/*.pdb $START/$ROUND/${step}/analyse/*.trafl :
 
-			python $PROGS/SSalignment.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
+			python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
 
 			mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
 
-			python ${PROGS}/continoussearch.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
+			python ${PROGS}/selectnext.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 			#get the forced structure and search within the individual runs
 
-			#SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
 			SSCCBP=(${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
 			BASIS=(${SSCCBP##*/})
 			NR="$(cut -d'-' -f2 <<<${BASIS})"
@@ -213,14 +205,12 @@ if ! [ ${RELAX} = "0" ]; then
 			cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.ss_cc"
 
 			# interaction lenght + bp
-			####cp "$START/$ROUND/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
 			cp "$START/${NAME}_${ROUND}.il" $START/$ROUND/${step}/
 			cp $START/$ROUND/"${NAME}_${ROUND}.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.il"
 			mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.il" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}_ernwinrelax.il"
 			mv "${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}.ss_detected.bp" ${START}/${ROUNDNEW}/${step}/"${NAME}_${ROUND}.bp"
 
 			#clean up directory
-			#cp "$START/${NAME}_0"* ${START}/${ROUND}/
 			rm -r "${START}/${ROUND}/${step}/analyse"
 
 		elif [ "$TREESEARCH" == false ] ; then
@@ -237,9 +227,9 @@ if ! [ ${RELAX} = "0" ]; then
 			SimRNA_trafl2pdbs $START/$ROUND/analyse/${step}/*.pdb $START/$ROUND/analyse/${step}/*.trafl :
 
 			if [ $step = "1" ]; then
-				python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL
 			else #if no "treesearch" partI
-				python $PROGS/SSalignment.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL
 			fi
 
 		else
@@ -251,7 +241,7 @@ if ! [ ${RELAX} = "0" ]; then
 	if [ "$TREESEARCH" == false ] ; then
 		mv ${NAME}_${RELAX}* ${START}/$ROUND
 
-		python ${PROGS}/continoussearch.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
+		python ${PROGS}/selectnext.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 		#get the forced structure and search within the individual runs
 
 		SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
@@ -351,17 +341,17 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 						if [ $step = "1" ]; then
 							#first round + create outputfiles
-							python $PROGS/SSalignment.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
 						else
 							#append the following output
-							python $PROGS/SSalignment.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
 						fi
 					done
 
 					mv ${NAME}_${EXTEND}* $START/${CURRENTROUND}/${simstep}/
 
 					#find the starting structure for the next round
-					python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
+					python ${PROGS}/selectnext.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
 					SSCCBP=($START/${CURRENTROUND}/${simstep}/*.ss_detected.bp)
 					BASIS=(${SSCCBP##*/})
@@ -430,17 +420,17 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 			if [ $step = "1" ]; then
 				#first round + create outputfiles
-				python $PROGS/SSalignment.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
 			else
 				#append the following output
-				python $PROGS/SSalignment.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
 			fi
 		done
 
 		mv ${NAME}_${EXTEND}* ${START}/${CURRENTROUND}/
 
 		#find the starting structure for the next round
-		python ${PROGS}/continoussearch.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
+		python ${PROGS}/selectnext.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
 		SSCCBP=(${START}/${CURRENTROUND}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
