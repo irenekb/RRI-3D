@@ -300,9 +300,6 @@
 </dl>
 
 ## Available Skripts & Additional Features <a id="skripts">
-<a href="#footer">Jump to footnote</a>
-<br />
-<a name="footer"></a>Footnote content
 
 ### <code> expandinteraction.py <a id="expansion settings"></a> </code>
   <div>Create dotbracket files with an interaction site between two RNA chains.<br />
