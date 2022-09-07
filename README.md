@@ -20,7 +20,7 @@
 ### STARTING THE PIPELINE
 
   <div>
-  It is possible to start an interaction extension from an RNA sequence with the corresponding secondary structure (including the interaction start). For this purpose, the 3D start structure is predicted with the tool ernwin and converted into a full atom structure for the further pipline. For this purpose the script <code>combination.sh</code> is used. This start option additionally offers the possibility to calculate several sequence designs with one secondary structure (incl. interaction start) and one secondary target structure and to enter the pipeline with the respective design. <br /> <br />
+  It is possible to start an interaction extension from an RNA sequence with the corresponding secondary structure (including the interaction start). For this purpose, the 3D start structure is predicted with the tool ernwin and converted into a full atom structure for the further pipline. For this purpose the script <code>selectnext.sh</code> is used. This start option additionally offers the possibility to calculate several sequence designs with one secondary structure (incl. interaction start) and one secondary target structure and to enter the pipeline with the respective design. <br /> <br />
   Alternatively, it is also possible to start from an already existing 3D structure in PDB format. For this prupose the script <code>coridanstart.sh</code> is used.  <br />
   Both scripts can process multiple clusters of the respective 3D structure. <br /> <br />
   The input for the start of the pipeline is given by:
@@ -666,7 +666,7 @@
   The function to read/write the structure with the minimum free from a trafl file is also provided by SimRNA directly.In this case, however, the energy_value is used without the constraint - here in this script primarily the energy value plus restraints score. Furthermore, the SimRNA script is only available in a python3 environment. Alternatively this script can be used. </div>
 
 
-### <code> ssalignment.py </code> <a id="simrna-script"></a>
+### <code> comparison.py </code> <a id="simrna-script"></a>
   <div>
   Compare all secondary structures files (calculated via SimRNA – SimRNA-style) with the start ss-sequence, the constrained ss-sequence and with each other.
   For comparing the energy the SimRNA trafl file is used.
@@ -745,13 +745,13 @@
   </table>
 
   <div> <strong>Sample: </strong> </div><br />
-  <code> > python3 SSalignment.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
+  <code> > python3 comparison.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
 
 
-### <code> continoussearch.py </code> <a id="continuousserach"></a>
+### <code> selectnext.py </code> <a id="continuousserach"></a>
   <div>
   Find the best 3D structure after a SimRNA surface run and the SSAllignment analysis
-  Parse over all SSalignment files (individual runs and the overview).
+  Parse over all comparison.py files (individual runs and the overview).
   Looking for the most common secondary  structure in the overview file.
   Look for this secondary structure in all individual runs and seperate them (max_file).
   The structure with the best energy (3D) is the one for the next constrained SimRNA run in the pipeline
@@ -830,7 +830,7 @@
   </table>
 
   <div> <strong>Sample: </strong> </div><br />
-  <code> >python3 continoussearch.py -p 00/surface/analyse/ --print --first 1zci_00.ss --second 1zci_00.ss_cc -f </code>
+  <code> >python3 selectnext.py -p 00/surface/analyse/ --print --first 1zci_00.ss --second 1zci_00.ss_cc -f </code>
 
 
 ## Dependencies <a id="dependency"></a>
