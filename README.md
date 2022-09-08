@@ -95,7 +95,7 @@
         <tr>
           <td>FALLBACKSTATES</td>
           <td>true | false</td>
-          <td>Over 50000 short artificial structures that can be used as fallback fragments when less or no examples of a secondary structure element could be found in the PDB. </td>
+          <td>Additional short artificial structures that can be used as fallback fragments if less or no examples of a secondary structure element (ernwin) could be found in the PDB. </td>
           <td><a href="#ernwin">[ernwin]</a></td>
         </tr>
         <tr>
