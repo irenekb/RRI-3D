@@ -217,6 +217,31 @@ def find_interaction(interim_interaction_db,chainbreak):
     #return interaction, interaction_countbp, len_interaction
 
 
+def find_intra(bp,interaction_countbp,chainbreak):
+    '''
+    Return the intramolecular basepairs for both chains seperatly
+    '''
+
+    bp_set = set(map(tuple, bp))
+    interaction_countbp_set = set(map(tuple, interaction_countbp))
+    #remove already identified interaction pairs
+    bp_rest = bp_set.symmetric_difference(interaction_countbp_set)
+
+    intra_chainA = list()
+    intra_chainB = list()
+    otherinter = list()
+
+    for bp in bp_rest:
+        if bp[0] < chainbreak and bp[1] < chainbreak:
+            intra_chainA.append(bp)
+        if bp[0] > chainbreak and bp[1] > chainbreak:
+            intra_chainB.append(bp)
+        if bp[0] < chainbreak and bp[1] > chainbreak:
+            otherinter.append(bp)
+
+    return len(intra_chainA), len(intra_chainB), otherinter
+
+
 def main():
     parser = argparse.ArgumentParser(description='Align SS from SimRNA')
     parser.add_argument ('-p', '--path', help='Path to Inputfiles')
@@ -289,13 +314,15 @@ def main():
 
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
+        intra_chainA, intra_chainB, otherbp = find_intra(bp_constraint,interaction_cc,chainbreak)
+
         #bp_constraint = sorted(bp_constraint, key=lambda bp_constraint: bp_constraint[0])
         bp_constraint = sorted(bp_constraint, key=itemgetter(0))
         bp_constraint_str = ''.join(str(s) for s in bp_constraint)
         bp_interaction_str = ''.join(str(s) for s in interaction_cc)
         constraint_ssf = str(os.path.basename(constraint_ss))
         log.debug('constrain {}'.format(constraint_ssf))
-        dic[constraint_ssf] = constraint_sequence,0,0,0,0,0,0,0,bp_constraint,0,0,0,0,interaction_cc,interaction_countbp_cc, len_interaction_cc,0,0
+        dic[constraint_ssf] = constraint_sequence,0,0,0,0,0,0,0,bp_constraint,0,0,0,0,interaction_cc,interaction_countbp_cc, len_interaction_cc,0,0,intra_chainA, intra_chainB, otherbp
         # [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]      [8]
         # sequence,count_constraint,count_start,count_before,constancy,dif_constraint,dif_start,dif_before,bp
 
@@ -313,6 +340,7 @@ def main():
             interim_interaction_db.append(line)
 
         interaction, interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
+        intra_chainA, intra_chainB, otherbp = find_intra(bp_start,interaction,chainbreak)
 
         #bp_start = sorted(bp_start, key=lambda bp_start: bp_start[0])
         bp_start = sorted(bp_start, key=itemgetter(0))
@@ -325,7 +353,7 @@ def main():
 
         dif_interaction_cc,count_interaction_constraint = difference(interaction_cc,interaction)
 
-        dic[start_ssf] = start_sequence, count_constraint,0,0,0,dif_constraint,0,0,bp_start,0,0,0,0,interaction, interaction_countbp, len_interaction, count_interaction_constraint,dif_interaction_cc
+        dic[start_ssf] = start_sequence, count_constraint,0,0,0,dif_constraint,0,0,bp_start,0,0,0,0,interaction, interaction_countbp, len_interaction, count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
         # [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]      [8] [9]
         # sequence,count_constraint,count_start,count_before,constancy,dif_constraint,dif_start,dif_before,bp, time
 
@@ -335,9 +363,9 @@ def main():
         with open(args.uniqueoutput,'r') as Uniquefile:
             next(Uniquefile)
             for line in Uniquefile:
-                seq,count_how_often,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc = line.strip('\n').split('\t')
+                seq,count_how_often,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp = line.strip('\n').split('\t')
                 count_unique[bpstr] = int(count_how_often)
-                dic_unique[seq] = count_how_often,count_constraint,count_start, dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc
+                dic_unique[seq] = count_how_often,count_constraint,count_start, dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
                 #                       [0]                 [1]         [2]          [3]            [4]  [5] [6]   [7]              [8]              [9]                [10]                          [11]
 
         with open(unique_start_bp, 'r') as Bplist:
@@ -373,6 +401,7 @@ def main():
             filename = str(os.path.basename(File)) #exctract filename
             log.debug(filename)
             interaction,interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
+            intra_chainA, intra_chainB, otherbp = find_intra(bp,interaction,chainbreak)
 
             #get the last entry from dict TODO: make it smarter
             last_key = str(list(dic.keys())[-1])
@@ -423,7 +452,7 @@ def main():
                     continue
 
             # create the new entry in the dictonary
-            dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc
+            dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
             #                  [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]   [8]    [9]         [10]                                [11]           [12]     [13]            [14]                  [15]                       [16]
 
             bp = sorted(bp, key=itemgetter(0))
@@ -446,7 +475,7 @@ def main():
             #If the current sequence is an unique one safe it
             if bpstr not in count_unique.keys():
                 count_unique[bpstr] = 1
-                dic_unique[sequence] = 1,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc
+                dic_unique[sequence] = 1,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
                 #                       [0]                 [1]         [2]          [3]            [4]  [5] [6]   [7]              [8]              [9]                [10]                          [11]
             else: #increase the count for how often the structure appears
                 for k,v in count_unique.items():
@@ -457,7 +486,7 @@ def main():
     for k, v in dic_unique.items():
         for key, value in count_unique.items(): #[k]bpstr [v]count_how_often
             if key == v[6]:
-                unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11]
+                unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11],v[12],v[13],v[14]
 
 
     columnnames_individual = ['number','sequence','count_constraint',
@@ -466,13 +495,15 @@ def main():
                               'bp','time','energy_values_plus_restraint_score',
                               'energy_value','current_temp','interaction',
                               'interaction_countbp','len_interaction',
-                              'count_interaction_constraint','dif_interaction_cc']
+                              'count_interaction_constraint','dif_interaction_cc',
+                              'intra_chainA', 'intra_chainB', 'otherbp']
 
     columnnames_unique = ['sequence','count_how_often','count_constraint',
                           'count_start','dif_constraint','dif_start',
                           'bp','bpstr','interaction',
                           'interaction_countbp','len_interaction',
-                          'count_interaction_constraint','dif_interaction_cc']
+                          'count_interaction_constraint','dif_interaction_cc',
+                          'intra_chainA', 'intra_chainB', 'otherbp']
 
 
     df_individual = pd.DataFrame.from_dict(dic,orient='index').reset_index()
