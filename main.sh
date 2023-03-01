@@ -65,84 +65,87 @@ echo "EXPANTION"
 # EXPANDBMODE 4: alternate left and right
 # EXPANDBMODE 5: first right then left ; 1 and then 2
 # EXPANDBMODE 6: first left then right ; 2 and then 1
+# EXPANDBMODE 7: user provided DB with all intermediates
 
-for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 
-	ROLD="$(($CURRENTROUND-"1"))"
-	NAMESS=$START/"${NAME}_${CURRENTROUND}.ss"
-	NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
-	NAMESSTARGET=$START/"${NAME}_target.ss"
+if [ "$EXPANDBMODE" -lt 7 ]; then
+	for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
 
-  if [ "$TARGET" == true ] ; then
-    if [ "$EXPANDBMODE" = 0 ] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
+		ROLD="$(($CURRENTROUND-"1"))"
+		NAMESS=$START/"${NAME}_${CURRENTROUND}.ss"
+		NAMESSOLD=$START/"${NAME}_${ROLD}.ss"
+		NAMESSTARGET=$START/"${NAME}_target.ss"
 
-    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
+	  if [ "$TARGET" == true ] ; then
+	    if [ "$EXPANDBMODE" = 0 ] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS -t $NAMESSTARGET
 
-    elif [[ "$EXPANDBMODE" == 2 || "$EXPANDBMODE" == 6 ]] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+	    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
 
-    elif [[ "$EXPANDBMODE" == 3 || "$EXPANDBMODE" == 4 ]]; then
-      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
-      else
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
-      fi
+	    elif [[ "$EXPANDBMODE" == 2 || "$EXPANDBMODE" == 6 ]] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
 
+	    elif [[ "$EXPANDBMODE" == 3 || "$EXPANDBMODE" == 4 ]]; then
+	      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
+	      else
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+	      fi
+
+		  fi
+
+		elif [ "$TARGET" == false ] ; then
+	    if [ "$EXPANDBMODE" = 0 ] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+
+	    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+
+	    elif [[ "$EXPANDBMODE" = 2 || "$EXPANDBMODE" = 6 ]] ; then
+	      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+
+	    elif [[ "$EXPANDBMODE" = 3 || "$EXPANDBMODE" = 4 ]]; then
+	      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+	      else
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+	      fi
+
+		  fi
 	  fi
 
-	elif [ "$TARGET" == false ] ; then
-    if [ "$EXPANDBMODE" = 0 ] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -l -o $NAMESS
+		if ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 5 ]) || ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 6 ]) ; then
+	    if [ "$EXPANDBMODE" == 5 ] ; then
+	      if [ "$TARGET" == true ] ; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
+	      elif [ "$TARGET" == false ] ; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+	      fi
 
-    elif [[ "$EXPANDBMODE" = 1 || "$EXPANDBMODE" = 5 ]] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+	    elif [ "$EXPANDBMODE" == 6 ] ; then
+	      if [ "$TARGET" == true ] ; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
+	      elif [ "$TARGET" == false ] ; then
+	        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
+	      fi
 
-    elif [[ "$EXPANDBMODE" = 2 || "$EXPANDBMODE" = 6 ]] ; then
-      python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
+	    fi
 
-    elif [[ "$EXPANDBMODE" = 3 || "$EXPANDBMODE" = 4 ]]; then
-      if [ "$(( $CURRENTROUND % 2 ))" -eq 0 ]; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
-      else
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
-      fi
+	    if [ ! -f $NAMESS ] ; then
+	      echo "New number of rounds: $ROLD"
+	      ROUNDS="${ROLD}"
+	      break 1
+	    fi
 
-	  fi
-  fi
+	  elif [ ! -f $NAMESS ] ; then
+			echo "New number of rounds: $ROLD"
+			ROUNDS="${ROLD}"
+			break 1
+		fi
 
-	if ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 5 ]) || ([ ! -f $NAMESS ] && [ "$EXPANDBMODE" == 6 ]) ; then
-    if [ "$EXPANDBMODE" == 5 ] ; then
-      if [ "$TARGET" == true ] ; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS -t $NAMESSTARGET
-      elif [ "$TARGET" == false ] ; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -l -o $NAMESS
-      fi
-
-    elif [ "$EXPANDBMODE" == 6 ] ; then
-      if [ "$TARGET" == true ] ; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS -t $NAMESSTARGET
-      elif [ "$TARGET" == false ] ; then
-        python $PROGS/expandinteraction.py -b $BUFFER -n $SEQ -d $NAMESSOLD -r -o $NAMESS
-      fi
-
-    fi
-
-    if [ ! -f $NAMESS ] ; then
-      echo "New number of rounds: $ROLD"
-      ROUNDS="${ROLD}"
-      break 1
-    fi
-
-  elif [ ! -f $NAMESS ] ; then
-		echo "New number of rounds: $ROLD"
-		ROUNDS="${ROLD}"
-		break 1
-	fi
-
-done
-
+	done
+fi
 
 if ! [ ${RELAX} = "0" ]; then
 	#####START from ernwin reconstructed pdb#####
@@ -180,16 +183,20 @@ if ! [ ${RELAX} = "0" ]; then
 			cp ${START}/$ROUND/${PDB} ${START}/$ROUND/${step}/analyse/
 
 			SimRNA_trafl2pdbs $START/$ROUND/${step}/analyse/*.pdb $START/$ROUND/${step}/analyse/*.trafl :
-
+			wait
 			python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
-
+			echo python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
+			wait
 			mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
 
 			python ${PROGS}/selectnext.py -p ${START}/$ROUND/$step --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 			#get the forced structure and search within the individual runs
-
+			wait
 			SSCCBP=(${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
 			BASIS=(${SSCCBP##*/})
+                        #BASIS=$(basename -s .ss_detected.bp "${START}/*.ss_detected.bp")
+			#BASIS=$(basename -s .ss_detected.bp "${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp"") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
+			#BASIS=(${SSCCBP##*/})
 			NR="$(cut -d'-' -f2 <<<${BASIS})"
 			NR="$(cut -d'.' -f1 <<<${NR})"
 			ROUNDSEL="$(cut -d'_' -f5 <<<${BASIS})"
@@ -198,7 +205,10 @@ if ! [ ${RELAX} = "0" ]; then
 			echo $NR
 			echo $ROUNDSEL
 
+                        #declare -i ssjet=$(cat "$START/${ROUND}/${step}/${NAME}_${ROUND}.nr" ) 
+
 			SimRNA_trafl2pdbs "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
+			wait
 			mkdir $START/${ROUNDNEW}/${step} #for each of the simRNA-rounds
 
 			cp $START/$ROUND/${step}/analyse/"${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-${NR}_AA.pdb" $START/$ROUNDNEW/${step}/"${NAME}_${ROUND}.pdb"
@@ -236,6 +246,7 @@ if ! [ ${RELAX} = "0" ]; then
 			echo "Error wrong TREESEARCH value"
 			exit 1
 		fi
+		wait
 	done
 
 	if [ "$TREESEARCH" == false ] ; then
@@ -244,6 +255,7 @@ if ! [ ${RELAX} = "0" ]; then
 		python ${PROGS}/selectnext.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 		#get the forced structure and search within the individual runs
 
+		#BASIS=$(basename -s .ss_detected.bp "${START}/${NAME}/*.ss_detected.bp")
 		SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
 		NR="$(cut -d'-' -f2 <<<${BASIS})"
@@ -270,8 +282,12 @@ if ! [ ${RELAX} = "0" ]; then
 		rm -r "${START}/${ROUND}/analyse"
 	fi #if no "treesearch" partII
 
-	mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
-	mv -T $START/$ROUNDNEW $START/${ROUND}
+	#mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
+	#mv -T $START/$ROUNDNEW $START/${ROUND}
+	echo mv $START/$ROUND $START/"${ROUND}ernwinfinegrain"
+	echo mv $START/$ROUNDNEW $START/${ROUND}
+	mv $START/$ROUND $START/"${ROUND}ernwinfinegrain"
+	mv $START/$ROUNDNEW $START/${ROUND}
 
 elif ([ $RELAX = "0" ] && [ "$TREESEARCH" == true ]) ; then #start without ernwin finegraining only for treesearch available
 	mkdir $START/$ROUND
@@ -295,9 +311,9 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 			#if neither of the simsteps are expanded in the last round - stop simulation
 			if [[ ! -z "$(ls -A $START/$CURRENTROUND)" ]]; then
-    				echo "Directory is NOT empty - continue interction expansion!"
+    			echo "Directory is NOT empty - continue interaction expansion!"
 			else
-    				echo "Directory is empty! - no SimRNA-simulation can be expanded, end simulation!"
+    			echo "Directory is empty! - no SimRNA-simulation can be expanded, end simulation!"
 				rm $START/${CURRENTROUND}
 				break 1
 			fi
@@ -338,21 +354,27 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 						cp ${START}/${CURRENTROUND}/${simstep}/${TRAFL} ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/
 						cp ${START}/${CURRENTROUND}/${simstep}/${PDB} ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/
 						SimRNA_trafl2pdbs ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/*.pdb ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/*.trafl :
-
+						wait
 						if [ $step = "1" ]; then
 							#first round + create outputfiles
 							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							wait
 						else
 							#append the following output
 							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							wait
 						fi
+						wait
 					done
 
 					mv ${NAME}_${EXTEND}* $START/${CURRENTROUND}/${simstep}/
 
 					#find the starting structure for the next round
 					python ${PROGS}/selectnext.py -p ${START}/${CURRENTROUND}/${simstep} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
-
+					wait
+					#BASIS=$(basename -s .ss_detected.bp "${START}/${CURRENTROUND}/${simstep}/*.ss_detected.bp")
 					SSCCBP=($START/${CURRENTROUND}/${simstep}/*.ss_detected.bp)
 					BASIS=(${SSCCBP##*/})
 					NR="$(cut -d'-' -f2 <<<${BASIS})"
@@ -365,7 +387,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 					#calculate a full atom strucutre
 					SimRNA_trafl2pdbs $START/$CURRENTROUND/${simstep}/analyse/$ROUNDSEL/"${NAME}_${EXTEND}_${CURRENTROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" $START/$CURRENTROUND/${simstep}/analyse/$ROUNDSEL/"${NAME}_${EXTEND}_${CURRENTROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
-
+					wait
 					#prepare everything for the next round
 					ROUNDNEW="$(($CURRENTROUND+"1"))"
 					mkdir $START/$ROUNDNEW
@@ -392,6 +414,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 				echo "Interaction il-files does not exist"
 			fi
 
+			wait
 		done
 
 
@@ -432,6 +455,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 		#find the starting structure for the next round
 		python ${PROGS}/selectnext.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
+		#BASIS=$(basename -s .ss_detected.bp "${START}/${CURRENTROUND}/*.ss_detected.bp")
 		SSCCBP=(${START}/${CURRENTROUND}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
 		NR="$(cut -d'-' -f2 <<<${BASIS})"
@@ -472,7 +496,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 			echo "Not the same = continue"
 		else
 			echo "The same"
-			rm -r data
+			#rm -r data
 			exit 0
 		fi
 
@@ -486,4 +510,4 @@ done
 
 echo "SIMULATION DONE"
 
-rm -r data
+#rm -r data

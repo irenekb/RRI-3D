@@ -9,8 +9,8 @@ import glob
 import re
 import copy
 from operator import itemgetter
-import itertools
-import sys
+#import itertools
+#import sys
 import pandas as pd
 from more_itertools import consecutive_groups
 
@@ -223,9 +223,13 @@ def find_intra(bp,interaction_countbp,chainbreak):
     '''
 
     bp_set = set(map(tuple, bp))
-    interaction_countbp_set = set(map(tuple, interaction_countbp))
-    #remove already identified interaction pairs
-    bp_rest = bp_set.symmetric_difference(interaction_countbp_set)
+
+    if interaction_countbp == 0:
+        bp_rest = bp_set
+    else:
+        interaction_countbp_set = set(map(tuple, interaction_countbp))
+        #remove already identified interaction pairs
+        bp_rest = bp_set.symmetric_difference(interaction_countbp_set)
 
     intra_chainA = list()
     intra_chainB = list()
@@ -314,6 +318,7 @@ def main():
 
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
+        #if args.intra: 
         intra_chainA, intra_chainB, otherbp = find_intra(bp_constraint,interaction_cc,chainbreak)
 
         #bp_constraint = sorted(bp_constraint, key=lambda bp_constraint: bp_constraint[0])
