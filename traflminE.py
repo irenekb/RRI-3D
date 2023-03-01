@@ -5,13 +5,19 @@ Extract the structure from a traflfile with the best constrained minimum free
 Energy.
 Input .trafl an outputfile from SimRNA
 Output min.trafl file
+
+Values given by the trafl-file:
+    'consec_write_number'
+    'replica_number'
+    'energy_value_plus_restraints_score'
+    'energy_value'
+    'current_temperature'
+    'datapoints/cord' (newline)
+ 
 '''
 
 import logging
 import argparse
-import csv
-import pandas as pd
-import glob
 import os
 log = logging.getLogger(__name__)
 
@@ -33,47 +39,36 @@ def main():
         logging.basicConfig(level = logging.WARNING)
 
     path = args.path
-    input = glob.glob(os.path.join(path, str(args.input)))
-    output = glob.glob(os.path.join(path, str(args.output)))
-
-    trafl_df = pd.DataFrame(columns=['consec_write_number','replica_number',
-                                    'energy_value_plus_restraints_score','energy_value',
-                                    'current_temperature','datapoints'])
-
+    cord_count = 1
     step = 2 #only need every second line
+
     with open(os.path.join(path,args.input)) as FILE:
         for nr, line in enumerate(FILE):
-            if nr % step == 0:
-                dat= [float(x) for x in line.split()]
-                log.debug(dat)
+            if nr == 0:
+                dat0= [float(x) for x in line.split()]
+
+            elif nr % step == 0:
+                dat1= [float(x) for x in line.split()]
+
+                if dat1[3] < dat0[3]:
+                    dat0 = [float(x) for x in line.split()]
+                    cord_count = nr+1
+
+            elif nr == cord_count:
+                cord = line
+
             else:
-                coord = line
-                trafl_df = trafl_df.append(pd.Series([dat[0],dat[1],dat[2],
-                                                    dat[3],dat[4],coord],
-                                                    index=trafl_df.columns),
-                                                    ignore_index=True)
+                continue
 
-    trafl_df.sort_values('energy_value',ascending=True, inplace=True)
-    log.debug (trafl_df)
-
-    bestenergy = (trafl_df.head(1))
-    print('Best energy without constraint:')
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print (bestenergy)
-
-    trafl_df.sort_values('energy_value_plus_restraints_score',ascending=True, inplace=True)
-    bestenergy_cc = (trafl_df.head(1))
-    print('Best energy with constraint:')
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print(bestenergy_cc)
-
-    coord = bestenergy_cc.iloc[0]['datapoints']
-    bestenergy_cc = bestenergy_cc.drop('datapoints', 1)
-
-    bestenergy_cc.to_csv(os.path.join(path,args.output), mode='w',index=False, header=False,sep=" ")
-
-    with open(os.path.join(path,args.output), "a") as FILE:
-        FILE.write(coord)
+    #dat0[0]=1
+   
+    #dat0[1]=int(dat0[1])
+    
+    with open (os.path.join(path,args.output), "w") as FILE:
+        for element in dat0:
+            FILE.write("{} ".format(element))
+        FILE.write("\n")
+        FILE.write("{}".format(cord))
 
 if __name__ == "__main__":
     main()
