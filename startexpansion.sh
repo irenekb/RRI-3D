@@ -16,7 +16,8 @@ else
 
   for CST in `seq 0 1 ${CLUSTER}`; do
     cp "$START/${NAME}_0.il" "$START/cluster${CST}/${NAME}c${CST}_0.il" #check in startscript!
-    ./main.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}"
+    ./main.sh $FILE "${NAME}c${CST}" "$START/cluster${CST}" 
+    wait
   done
 
 fi
