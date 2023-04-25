@@ -47,26 +47,20 @@
         <tr>
           <td>BASENAME <a id="START"></a></td>
           <td>1zci</td>
-          <td>Core name of the file/structure</td>
+          <td>File/Structure name for the RNAdesign</td>
           <td></td>
         </tr>
         <tr>
           <td>NAME</td>
           <td>1zci</td>
-          <td>???</td>
+          <td>Core name of the file/structure</td>
           <td></td>
         </tr>
         <tr>
           <td>PROGS</td>
           <td>/home/RRI3D</td>
-          <td>Path to this git repro and its scripts </td>
+          <td>Path to this git repro and it's scripts </td>
           <td><a href="#skripts">[skripts]</a></td>
-        </tr>
-        <tr>
-          <td>PROGS</td>
-          <td>/home/RRI3D</td>
-          <td>Path to this git repro</td>
-          <td></td>
         </tr>
         <tr>
           <td>DESIGNS</td>
@@ -255,7 +249,7 @@
               <td>Dotbracket</td>
               <td>
                 <dl><code>((((((.........))))))) (((((((.........)))))))</code><br />
-                    <code>.........((............ .............)).......</code></dl>
+                    <code>........((((........... .........)))).........</code></dl>
               </td></tr>
               <tr>
               <td colspan="2"> Dotbracket notation with classical round brackets and dots. <br />A "bracket" crossing requires the start of a new line, e.g. 1st line intramolecular structure, 2nd line interaction.<br /> For the start of the simulation the .ss-file contains the native start dotbracket notation.</td>
@@ -263,13 +257,13 @@
           </table>
         <li>.ss_cc</li>
           <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#skripts">pipeline-skripts</a> <br />
-          Secondary structure constraint from  for the current extension round</dd>
+          Secondary structure constraint from  the last extension round</dd>
           <table>
             <tr>
               <td>Dotbracket</td>
               <td>
                 <dl><code>((((((.........))))))) (((((((.........)))))))</code><br />
-                    <code>.........((............ .............)).......</code></dl>
+                    <code>........((............ ..........))..........</code></dl>
               </td></tr>
               <tr>
               <td colspan="2">In the previous extension step achieved secondary structure. <br /> For the first run it must conform to the .ss dotbracket notation by default.</td>
@@ -283,13 +277,17 @@
               Secondary structure to be reached</dd>
           <table>
             <tr>
-              <td>Dotbracket</td>
+              <td>.ss </td>
               <td>
                 <dl><code>(((((((.........))))))) (((((((.........)))))))</code><br />
-                    <code>.........((((.(........ .........).))))........</code></dl>
+                    <code>.........((((((........ .........))))))........</code></dl>
+              </td></tr>
+              <td>_target.ss</td>
+              <td>
+                <dl><code>(((((((..((((((.((((((( )))))))..)))))).)))))))</code></dl>
               </td></tr>
               <tr>
-              <td colspan="2">Without a target structure the extension stops when no more complimentary base pairing is possible <br />-> Only needed if the extended target interaction contains bulges. </td>
+              <td colspan="2">Without a target structure the extension stops when no more complimentary base pairing is possible <br />-> Needed if the extended target interaction contains bulges. </td>
             </tr>
           </table>
       </ul>
@@ -304,7 +302,8 @@
 ### <code> expandinteraction.py <a id="expansion settings"></a> </code>
   <div>Create dotbracket files with an interaction site between two RNA chains.<br />
   The expansion can be started from a dotbracket structure (SimRNA format), as well as from a base pair list. Allowed are complimentary (A-U, G-C) as well as G-U base pairings.  By default, the interaction will be extended by the closest base pair (without bulge). If no extension is possible in the respective step, the simulation stops. If a bulge is desired/structurally necessary it is recommended to specify a target structure to extend to.<br />
-  An extension can be done to both sides of the interaction simultaneously, as well as to one side only. Another option is to extend the interaction by several base pairs in one step. Furthermore, a buffer/linker region without base pairing between intramolecular and intermolecular structure can be specified.   </div> <br />
+  An extension can be done to both sides of the interaction simultaneously, as well as to one only chain direction. Another option is to extend the interaction by several base pairs in one step. Furthermore, a buffer/linker region without base pairing between intramolecular and intermolecular structure can be specified.   </div>
+   <br />
   The following parsing options can be selected:<br />
   <table>
     <tr>
@@ -375,7 +374,7 @@
       <td><code>--buffer </code></td>
       <td>int </td>
       <td>0 </td>
-      <td>Lngth of the buffer/linker region, no intra- and interaction allowed, before and after the interaction site. </td>
+      <td>Length of the buffer/linker region, no intra- and interaction allowed, before and after the interaction site. </td>
     </tr>
     <tr>
       <td><code>-v </code></td>
