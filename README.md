@@ -7,27 +7,40 @@
 
 ## Background and Motivation
   <div>Interactions between RNAs are an essential mechanism in cell regulation processes in all domains of life. In many cases, knowledge of the secondary (2D) structure is sufficient to understand the function of an RNA. There are already computationally efficient 2D tools for predicting reasonably accurate RNA structures that can easily be embedded in a 3D tertiary structure. However, when there are interactions or pseudoknots in the structure, predictions can be sterically infeasible or kinetically inaccessible. This is especially important when we want to observe RNA-RNA interaction trajectories.</div>
+  <br />
 
 ## THE PIPELINE
-  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically reachable. While 3D modeling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse grained representations to model 3D conformation changes as a series of small steps. At the end the models can be translated back to an atomic resolution. In sum, this offers us detailed insights into the structural dynamics of kissing hairpin formation. It explores to what extent 2D structure predictions are compromised by neglecting 3D structure modelling and allows us to suggest rules, such as maximal helix lengths, that can be used to filter or constrain 2D predictions.</div> <br />
+  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically reachable. While 3D modeling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse grained representations to model 3D conformation changes as a series of small steps. At the end the models can be translated back to an atomic resolution and offer a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
 
-  <img src="overview.png" alt="Overview">
+  <img src="pipeline_overview.png" alt="Overview">
 
-### STARTING THE PIPELINE
+#### <strong>QUICKSTART WITH AN EXAMPLE</strong>
+To get a quick overview of the pipeline or to test if the pipeline and all dependencies are set up correctly some example interactions are provided (<code>/examples/</code>). The following <a href="#dependency">dependencies</a> are needed to start the pipeline. To start the pipeline, different parameters are needed, given in a file (<a href="#inputdat"><code>inputvalues.dat</code></a>, e.g. see in the respective example folder). Before starting, the paths to Ernwin, SimRNA and the pipeline itself must be updated. 
+
+ Start the test interaction expansion with: <br />
+<code>./start.sh examples/from_2D/test/inputvalues_test.dat</code>
+<br />
+<br />
+
+
+## <strong>DOCUMENTATION</strong>
 
   <div>
-  It is possible to start an interaction extension from an RNA sequence with the corresponding secondary structure (including the interaction start). For this purpose, the 3D start structure is predicted with the tool ernwin and converted into a full atom structure for the further pipline. For this purpose the script <code>selectnext.sh</code> is used. This start option additionally offers the possibility to calculate several sequence designs with one secondary structure (incl. interaction start) and one secondary target structure and to enter the pipeline with the respective design. <br /> <br />
-  Alternatively, it is also possible to start from an already existing 3D structure in PDB format. For this prupose the script <code>coridanstart.sh</code> is used.  <br />
-  Both scripts can process multiple clusters of the respective 3D structure. <br /> <br />
-  The input for the start of the pipeline is given by:
-  </div>
+  There are two opportunities to start an interaction extension with this pipeline. First from an RNA sequence with the corresponding secondary dotbracket representation (including the interaction start). For this purpose the script <code>start.sh</code> is used (e.g for all examples in  <code>examples/from_2D/</code> ). <br />
+  Second, it is also possible to start from an already existing 3D structure in PDB format. For this prupose the script <code>startexpansion.sh</code> is used (e.g for the HIV kissing hairpin interaction in <code>examples/from_pdb/</code> ).  <br />
+  Both start variants allow the custom setting of the pipeline conditions of the interaction extension (<td><a href="#inputdat"><code>inputvalues.dat</code></a></td> ).
+  </div><br />
 
 
-#### Input
+ <br />
+
+### INPUT 
+
 <dl>
   <ol>
     <li> <code> inputvalues.dat </code>
       <table>
+      <a id="inputdat"></a> 
         <tr>
           <td><strong>VARIABLE</strong></td>
           <td><strong>VALUE/SAMPLE</strong></td>
@@ -36,25 +49,25 @@
         </tr>
         <tr>
           <td>START <a id="START"></a></td>
-          <td>/home/1zci</td>
+          <td>/pathto/RRI-3D/examples/from_2D</td>
           <td>Input path for all structure conditional files which are needed for the start and Output path </td>
           <td><a href="#needed structure files">[required files]</a></td>
         </tr>
         <tr>
           <td>BASENAME <a id="START"></a></td>
-          <td>1zci</td>
+          <td>test0</td>
           <td>File/Structure name for the RNAdesign</td>
           <td></td>
         </tr>
         <tr>
           <td>NAME</td>
-          <td>1zci</td>
+          <td>test0</td>
           <td>Core name of the file/structure</td>
           <td></td>
         </tr>
         <tr>
           <td>PROGS</td>
-          <td>/home/RRI3D</td>
+          <td>/pathto/RRI-3D/src</td>
           <td>Path to this git repro and it's scripts </td>
           <td><a href="#skripts">[skripts]</a></td>
         </tr>
@@ -66,7 +79,7 @@
         </tr>
         <tr>
           <td>ERNWIN</td>
-          <td>/home/ernwin</td>
+          <td>/pathto/ernwin</td>
           <td>Path to ernwin</td>
           <td><a href="#dependency">[dependency]</a></td>
         </tr>
@@ -91,12 +104,12 @@
         <tr>
           <td>CLUSTER</td>
           <td>10</td>
-          <td>Cluster the ernwin structures based on the used coarse grained elements</td>
+          <td><code>n<sub>cluster</sub></code>; Cluster the ernwin structures based on the used coarse grained elements</td>
           <td><a href="#ernwin-script">[ernwin-script]</a></td>
         </tr>
         <tr>
           <td>SIMRNA</td> <a id="SimRNApath">
-          <td>/home/simrna</td>
+          <td>/pathto/simrna</td>
           <td>Path to simrna</td>
           <td><a href="#dependency">[dependency]</a></td>
         </tr>
@@ -109,7 +122,7 @@
         <tr>
           <td>SIMROUND</td>
           <td>5</td>
-          <td>Number of SimRNA runs with the same setting but a different seed. </td>
+          <td><code>n<sub>run</sub></code>; Number of SimRNA runs with the same setting but a different seed. </td>
           <td><a href="#SimRNA">[SimRNA]</a></td>
         </tr>
         <tr>
@@ -132,14 +145,14 @@
         </tr>
         <tr>
           <td>RELAX</td>
-          <td>expand_100000</td>
-          <td>SimRNA settings for a first relaxed run</td>
+          <td>relax_test</td>
+          <td>SimRNA settings for a first relaxed run. E.g. <code>examples/from_2D/config_relax_test.dat</code>. </td>
           <td><a href="#SimRNA">[SimRNA]</a></td>
         </tr>
         <tr>
           <td>EXTEND</td>
-          <td>expand_50000</td>
-          <td>SimRNA settings for the expansion mode</td>
+          <td>expand_test</td>
+          <td>SimRNA settings for the expansion mode. E.g. <code>examples/from_2D/config_expand_test.dat</code>.</td>
           <td><a href="#SimRNA">[SimRNA]</a></td>
         </tr>
         <tr>
@@ -151,7 +164,7 @@
         <tr>
           <td>ROUNDS</td>
           <td>100</td>
-          <td>Number of expansion rounds</td>
+          <td>Number of expansion rounds. A value > the possible interaction length corresponds to an automatic extension up to the longest continuous (perfect helix) interaction (exception: TARGET = true). </td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
         <tr>
@@ -168,7 +181,7 @@
         </tr>
         <tr>
           <td>EXPANDBMODE</td>
-          <td>1-6</td>
+          <td>1-7</td>
           <td>
             <ol type="1" start=0>
               <li>right and left at once</li>
@@ -178,7 +191,8 @@
               <li>alternate left and right</li>
               <li>first right then left ; 1 and then 2</li>
               <li>first left then right ; 2 and then 1</li>
-            </ol>
+              <li>provided dotbracket notation with all intermediates<li>
+              </ol>
           </td>
           <td><a href="#expansion settings">[expansion settings]</a></td>
         </tr>
@@ -211,7 +225,7 @@
           <table>
             <tr>
               <td>>Name</td>
-              <td><code>>1zci</code></td>
+              <td><code>>test0</code></td>
               <td>NAME = BASE NAME</td>
             </tr>
             <tr>
@@ -283,15 +297,16 @@
                 <dl><code>(((((((..((((((.((((((( )))))))..)))))).)))))))</code></dl>
               </td></tr>
               <tr>
-              <td colspan="2">Without a target structure the extension stops when no more complimentary base pairing is possible <br />-> Needed if the extended target interaction contains bulges. </td>
+              <td colspan="2">Without a target structure (TARGET = FALSE) the extension stops when no more complimentary base pairing is possible -> Needed if the extended target interaction contains bulges. </td>
             </tr>
           </table>
       </ul>
       <li> <code> config.dat </code>
-        <dl>The config file contains the settings for a SimRNA run (see dependencies: <a href="#dependency">SimRNA</a>) and can be found <a href="#SimRNApath">here</a>. You can distinguish between the relaxing run after simulating the start structure (longer run recommended) and the runs to extend the interaction (short runs recommended). <br />
-        In the folder  <code>SimRNA_config</code> you can find several example config files.</dl>
+        <dl>The config.dat file contains the settings for a SimRNA run (see dependencies: <a href="#dependency">SimRNA</a>) and can be found <a href="#SimRNApath">here</a>. You can distinguish between the relaxing run (inputfile variable: RELAX) after simulating the start structure (longer run recommended) and the runs to extend the interaction (inputfile variable: EXPAND) (short runs recommended). <br />
+        In the folder  <code>src/SimRNA_config</code> you can find several example ''.dat'' files. If you want to use these configurations please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the original SimRNA folder individually and according to the pipeline. </dl>
   </ol>
 </dl>
+<br />
 
 ## Available Skripts & Additional Features <a id="skripts">
 
@@ -381,8 +396,8 @@
     </tr>
   </table>
 <div>
-
-<strong>Further Descriptions & Examples</strong><br /><br />
+<br />
+<strong>Further Descriptions & Examples</strong><br />
   <table>
     <tr>
       <td>Expand the interaction right (-r) or left (-l):</td></tr>
@@ -397,9 +412,8 @@
       </td></tr>
     </tr>
   </table>
-
-
 </div>
+<br />
 
 ### <code> RNAdesign.py </code> <a id="RNAblueprint"></a>
   <div>
@@ -466,11 +480,11 @@
    </tr>
    </table>
 
-   <dl>
-   <strong>Further Descriptions & Examples</strong><br /><br />
+  <br />
+  <strong>Further Descriptions & Examples</strong><br />
        <dl>The input:<br />
-       The first structure describes the two seperate hairpins with a connection element (A)
-       the second structure should ensure the complementarity cleaveage of the two hairpins.
+       The first structure (1) describes the two seperate hairpins with a connection element (A)
+       the second structure (2) should ensure the complementarity cleaveage of the two hairpins.
        With the objective2 function every designed hearpin will be evaluated separately.</dl>
        <table>
          <tr>
@@ -479,14 +493,11 @@
                  <code>2  ((((((((((((((((((((((( )))))))))))))))))))))))</code></dl>
            </td></tr>
       </table>
-
-
 </div>
 
 ### <code> formattranslation.py </code> <a id="RNAblueprint"></a>
   <div>Transform the Dotbracket structure and the nucleatide sequence form several
   RNA designs into seperate fasta files (needed for the ernwin simualtion).
-  </div>
 
   <table>
    <tr>
@@ -527,15 +538,15 @@
      <td>Be verbose </td>
    </tr>
   </table>
-
-  <strong>Further Descriptions & Examples</strong><br /><br />
-    <dl> TESTINPUT <br />
+    <dl> Testinput <br />
     <code>> python formattranslation.py -p PATHtoINPUTFILES -n NAMEofINPUTFILES -c 100</code>
     </dl>
-
+  </div>
+  <br />
 
 ### <code> ernwindiversity.py </code> <a id="ernwin-script"></a>
 <div>Cluster the ernwin structures based on the used fragments. Output is a list with all clusters each started with the structure with the best (min) energy.</div>
+<div>
   <table>
    <tr>
      <td><strong>FLAG</strong></td>
@@ -573,6 +584,8 @@
      <td>Be verbose </td>
    </tr>
   </table>
+  </div>
+  <br />
 
 
 ### <code> ernwinsearch.py </code> <a id="ernwin-script"></a>
@@ -580,7 +593,7 @@
   Find the structure from a ernwin out.log-file with the best minimum free. <br />
   Output: number of the ernwin sample
   </div>
-
+  <br />
   <table>
    <tr>
      <td><strong>FLAG</strong></td>
@@ -604,18 +617,18 @@
      <td>Be verbose </td>
    </tr>
   </table>
-
+ 
   <div> <strong>Values available in ernwin <code>out.log</code> file: </strong><br />
   Step, Sampling_Energy, Constituing_Energies, ROG, ACC, Asphericity, Anisotropy, Local-Coverage, Tracked Energy, Tracked Energy, Tracked Energy, time, Sampling Move, Rej.Clashes, Rej.BadMls
   </div>
+  <br />
 
 
 ### <code> traflminE.py </code> <a id="simrna-script"></a>
   <div> Extract the structure (trafl-line) with the best constrained minimum free
-  energy from a traflfile. <br />
-  Output min.trafl file
+  energy from a traflfile. Output ''min.trafl'' file
   </div>
-
+  <br />
   <table>
    <tr>
      <td><strong>FLAG</strong></td>
@@ -659,6 +672,7 @@
 
   <div> <strong>Note</strong><br />
   The function to read/write the structure with the minimum free from a trafl file is also provided by SimRNA directly.In this case, however, the energy_value is used without the constraint - here in this script primarily the energy value plus restraints score. Furthermore, the SimRNA script is only available in a python3 environment. Alternatively this script can be used. </div>
+  <br />
 
 
 ### <code> comparison.py </code> <a id="simrna-script"></a>
@@ -739,8 +753,10 @@
    </tr>
   </table>
 
-  <div> <strong>Sample: </strong> </div><br />
+  <br />
+  <strong>Further Descriptions & Examples</strong><br />
   <code> > python3 comparison.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
+  <br /><br />
 
 
 ### <code> selectnext.py </code> <a id="continuousserach"></a>
@@ -778,35 +794,35 @@
    <td><code>--force </code></td>
    <td>store_true</td>
    <td>none </td>
-   <td>Instead of the most common secondary structure: find the secundary-structures most similar to the contrained one</td>
+   <td>Instead of the most common secondary structure: find the secundary-structures most similar to the constrained one</td>
    </tr>
    </tr>
    <td><code> </code></td>
    <td><code>--interaction </code></td>
    <td>store_true</td>
    <td>none </td>
-   <td>Instead of the most common secondary structure: Find the interaction-structure most similar to the contrained one</td>
+   <td>Instead of the most common secondary structure: Find the interaction-structure most similar to the constrained one</td>
    </tr>
    </tr>
    <td><code> </code></td>
    <td><code>--first </code></td>
    <td> name </td>
    <td>none </td>
-   <td>Verify the first line in the dataframe - FILENAME for the first line e.g 1zci_00.ss</td>
+   <td>Verify the first line in the dataframe - FILENAME for the first line e.g test0_00.ss</td>
    </tr>
    </tr>
    <td><code> </code></td>
    <td><code>--second </code></td>
    <td> name </td>
    <td>none </td>
-   <td>Verify the second line in the dataframe - FILENAME for the second line e.g 1zci_00.ss_cc</td>
+   <td>Verify the second line in the dataframe - FILENAME for the second line e.g test0_00.ss_cc</td>
    </tr>
    </tr>
    <td><code>-i </code></td>
    <td><code>--initialname </code></td>
    <td> name </td>
    <td>none </td>
-   <td>e.g. 1zci_01, 1zci_02, ...</td>
+   <td>e.g. test0_01, test0_02, ...</td>
    </tr>
    </tr>
    <td><code>-c </code></td>
@@ -823,38 +839,38 @@
      <td>Be verbose </td>
    </tr>
   </table>
-
-  <div> <strong>Sample: </strong> </div><br />
-  <code> >python3 selectnext.py -p 00/surface/analyse/ --print --first 1zci_00.ss --second 1zci_00.ss_cc -f </code>
+  <br />
+  <strong>Further Descriptions & Examples</strong><br />
+  <code> >python3 selectnext.py -p 00/surface/analyse/ --print --first test0_00.ss --second test0_00.ss_cc -f </code>
+  <br /><br />
 
 
 ## Dependencies <a id="dependency"></a>
 <dl>
-  <dt>python 3.7</dt>
+  <dt>python V3.11</dt>
     <ul> - Standard packeges: argparse, collections,csv, disutils, glob, itertools, json, logging, operator, optparse, os, random, re, sys, math </ul>
-    <ul>- more-itertools V.8.4.0 </ul>
-    <ul>- numpy V.1.20.1 </ul>
-    <ul>- pandas V.1.2.2 </ul>
-    <ul>- scikit-learn V.0.24.1 </ul>
-  <dt>SimRNA <a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
-  <dt>Ernwin <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
-    <div>& for ernwin use: </div>
-    <ul>- python 2 </ul>
-    <ul>- forgi <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
-    <ul>- Note: incl. setup for all-atom reconstruction </ul>
+    <ul>- more-itertools V.9.0.0 </ul>
+    <ul>- numpy V.1.24.2 </ul>
+    <ul>- pandas V.1.5.3 </ul>
+    <ul>- scikit-learn V.1.2.1 </ul>
+  <dt>SimRNA V3.2<a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
+  <ul>The files supplied with the RRI-3D package under <code>src/SimRNA_config/config*</code> are example SimRNA configurations for this pipeline. If you want to use these please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the SimRNA folder individually and according to the pipeline. </ul>
+  <dt>Ernwin V1.2 <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
+    <ul>- forgi V2.2.2 <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
+    <ul>- Note: incl. setup for all-atom reconstruction and fallbackstates </ul>
   <dt>for RNA design:</dt>
     <ul>- ViennaRNA package <a href="https://www.tbi.univie.ac.at/RNA/">[link]</a> </ul>
     <ul>- RNAblueprint <a href="https://github.com/ViennaRNA/RNAblueprint">[link]</a> </ul>
 </dl>
+<br />
 
-
-###### References
+## References
 
 <dl>
   <dt>If you use this software package, please cite the follwing publication: </dt>
     <ul>WILL BE ANNOUNCED </ul>
 
-  <dt>For the pipeline presented here, some of the following already published software-features were used: </dt>
+  <dt>For the pipeline presented here, parts of the following already published software-features are used: </dt>
     <ul><a href="https://doi.org/10.12688/f1000research.18458.2">B.C, Thiel et al. (2019) "3D based on 2D: Calculating helix angles and stacking patterns using forgi 2.0, an RNA Python library centered on secondary structure elements." F1000Research, 8:287</a></ul>
     <ul><a href="https://doi.org/10.1261/rna.047522.114">P. Kerpedjiev P et al. (2015)"Predicting RNA 3D structure using a coarse-grain helix-centered model" RNA. 21(6): 1110–1121</a></ul>
     <ul><a href="https://doi.org/10.1093/nar/gkv1479">M.J. Boniecki et al. (2016) “SimRNA: a coarse-grained method for RNA folding simulations and 3D structure prediction” Nucleic acids research vol. 44,7: e63</a> </ul>

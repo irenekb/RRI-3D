@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-## ./coridanstart.sh inputvalues_100-000.dat
+## ./startexpansion.sh inputvalues.dat
 
 FILE=$(realpath "$1")
 CLUSTER=$(awk -F= '$1=="CLUSTER"{print $2;exit}' $FILE)

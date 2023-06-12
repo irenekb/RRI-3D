@@ -19,14 +19,12 @@ else
 	START=$(realpath "$3")
 fi
 
-
 ROUND=$(awk -F= '$1=="ROUND"{print $2;exit}' $FILE)
 ROUNDS=$(awk -F= '$1=="ROUNDS"{print $2;exit}'  $FILE)
 PROGS=$(awk -F= '$1=="PROGS"{print $2;exit}' $FILE)
 SIMRNA=$(awk -F= '$1=="SIMRNA"{print $2;exit}'  $FILE)
 WHERE=$(awk -F= '$1=="WHERE"{print $2;exit}' $FILE)
 BUFFER=$(awk -F= '$1=="BUFFER"{print $2;exit}'  $FILE)
-#TOTAL=$(awk -F= '$1=="TOTAL"{print $2;exit}' $FILE)
 TYPE=$(awk -F= '$1=="TYPE"{print $2;exit}'  $FILE)
 EXTEND=$(awk -F= '$1=="EXTEND"{print $2;exit}' $FILE)
 RELAX=$(awk -F= '$1=="RELAX"{print $2;exit}' $FILE)
@@ -48,7 +46,6 @@ echo $PROGS
 echo $SIMRNA
 echo $WHERE
 echo $BUFFER
-#echo $TOTAL
 echo $EXTEND
 echo $RELAX
 echo $SIMROUND
@@ -58,15 +55,14 @@ echo $SIMROUND
 #expansion to provide a bias through the SimRNA expansion
 echo "EXPANTION"
 
-# EXPANDBMODE 0: right and left at once
-# EXPANDBMODE 1: only right
-# EXPANDBMODE 2: only left
-# EXPANDBMODE 3: alternate right and left
-# EXPANDBMODE 4: alternate left and right
-# EXPANDBMODE 5: first right then left ; 1 and then 2
-# EXPANDBMODE 6: first left then right ; 2 and then 1
-# EXPANDBMODE 7: user provided DB with all intermediates
-
+# EXPANDBMODE 0: both directions at once
+# EXPANDBMODE 1: only 'right'
+# EXPANDBMODE 2: only 'left'
+# EXPANDBMODE 3: alternate 'right' and 'left'
+# EXPANDBMODE 4: alternate 'left' and 'right'
+# EXPANDBMODE 5: first 'right' then 'left' ; 1 and then 2
+# EXPANDBMODE 6: first 'left' then 'right' ; 2 and then 1
+# EXPANDBMODE 7: user provided dotbracket notation with all intermediates
 
 if [ "$EXPANDBMODE" -lt 7 ]; then
 	for CURRENTROUND in `seq 1 1 ${ROUNDS}`; do
@@ -149,15 +145,15 @@ fi
 
 if ! [ ${RELAX} = "0" ]; then
 	#####START from ernwin reconstructed pdb#####
-	echo "$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
-	"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
+	echo "$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_config/"
+	"$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_config/"
 	wait
 
 	if grep -q "error(s)" "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"; then
 		cat "$START/${NAME}_${RELAX}_${ROUND}_1_1.log"
 		echo "Error with ernwin PDB - want to change something?"
 		read -n 1 -p Continue?
-		"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_scripts/"
+		"$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_config/"
 	fi
 
 	mkdir $START/$ROUND
@@ -194,9 +190,6 @@ if ! [ ${RELAX} = "0" ]; then
 			wait
 			SSCCBP=(${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
 			BASIS=(${SSCCBP##*/})
-                        #BASIS=$(basename -s .ss_detected.bp "${START}/*.ss_detected.bp")
-			#BASIS=$(basename -s .ss_detected.bp "${START}/"${NAME}_${RELAX}_0_${step}_${step}-******.ss_detected.bp"") #e.g. CopStemsdesign1c0_expand_long03_0_2_2-000613.trafl
-			#BASIS=(${SSCCBP##*/})
 			NR="$(cut -d'-' -f2 <<<${BASIS})"
 			NR="$(cut -d'.' -f1 <<<${NR})"
 			ROUNDSEL="$(cut -d'_' -f5 <<<${BASIS})"
@@ -204,8 +197,6 @@ if ! [ ${RELAX} = "0" ]; then
 			echo $BASIS
 			echo $NR
 			echo $ROUNDSEL
-
-                        #declare -i ssjet=$(cat "$START/${ROUND}/${step}/${NAME}_${ROUND}.nr" ) 
 
 			SimRNA_trafl2pdbs "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}-000001.pdb" "$START/$ROUND/$step/analyse/${NAME}_${RELAX}_${ROUND}_${ROUNDSEL}_${ROUNDSEL}.trafl" ${NR} AA
 			wait
@@ -255,7 +246,6 @@ if ! [ ${RELAX} = "0" ]; then
 		python ${PROGS}/selectnext.py -p ${START}/$ROUND --print --first "${NAME}_${ROUND}.ss" --second "${NAME}_${ROUND}.ss_cc" -i "${NAME}_${RELAX}_${ROUND}" --${CONTSEARCH1} --consecutive $CONSECUTIVEPERFECT
 		#get the forced structure and search within the individual runs
 
-		#BASIS=$(basename -s .ss_detected.bp "${START}/${NAME}/*.ss_detected.bp")
 		SSCCBP=(${START}/${NAME}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
 		NR="$(cut -d'-' -f2 <<<${BASIS})"
@@ -282,10 +272,6 @@ if ! [ ${RELAX} = "0" ]; then
 		rm -r "${START}/${ROUND}/analyse"
 	fi #if no "treesearch" partII
 
-	#mv -T $START/$ROUND $START/"${ROUND}ernwinfinegrain"
-	#mv -T $START/$ROUNDNEW $START/${ROUND}
-	echo mv $START/$ROUND $START/"${ROUND}ernwinfinegrain"
-	echo mv $START/$ROUNDNEW $START/${ROUND}
 	mv $START/$ROUND $START/"${ROUND}ernwinfinegrain"
 	mv $START/$ROUNDNEW $START/${ROUND}
 
@@ -342,7 +328,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 					NAMESSOLD=$START/${ROLD}/"${NAME}_${ROLD}.ss"
 
 					#start the SimRNA expansion job
-					"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" ${START}/${CURRENTROUND}/${simstep}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_scripts/"
+					"$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" ${START}/${CURRENTROUND}/${simstep}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_config/"
 					wait
 
 					mkdir ${START}/${CURRENTROUND}/${simstep}/analyse
@@ -428,7 +414,7 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 		#+ checking algorithm - now both  before the SimRNA expantion
 
 		#start the SimRNA expansion job
-		"$PROGS/SimRNA_scripts/job_simrna_start_${TYPE}.sh" $START/${CURRENTROUND}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_scripts/"
+		"$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START/${CURRENTROUND}/ $NAME $CURRENTROUND $SIMRNA $EXTEND $WHERE $SEED $SIMROUND "$PROGS/SimRNA_config/"
 		wait
 
 		#analyse of the SimRNA run
@@ -455,7 +441,6 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 		#find the starting structure for the next round
 		python ${PROGS}/selectnext.py -p ${START}/${CURRENTROUND} --print --first "${NAME}_${CURRENTROUND}.ss" --second "${NAME}_${CURRENTROUND}.ss_cc" --${CONTSEARCH2} -i "${NAME}_${EXTEND}_${CURRENTROUND}" --consecutive $CONSECUTIVEPERFECT
 
-		#BASIS=$(basename -s .ss_detected.bp "${START}/${CURRENTROUND}/*.ss_detected.bp")
 		SSCCBP=(${START}/${CURRENTROUND}/*.ss_detected.bp)
 		BASIS=(${SSCCBP##*/})
 		NR="$(cut -d'-' -f2 <<<${BASIS})"
