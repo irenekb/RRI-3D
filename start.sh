@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 FILE=$(realpath "$1")
 START=$(awk -F= '$1=="START"{print $2;exit}' $FILE)

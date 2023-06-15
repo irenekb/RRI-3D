@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #WITH INPUTFILE
 #inputvalues.dat
