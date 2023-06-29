@@ -10,7 +10,7 @@
   <br />
 
 ## THE PIPELINE
-  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically accessible. While 3D modelling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse-grained representations to model 3D conformational changes as a series of small steps. At the end the models can be translated back to an atomic resolution, providing a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
+  <div>The computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically accessible. While 3D modelling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse-grained representations to model 3D conformational changes as a series of small steps. At the end the models can be translated back to an atomic resolution, providing a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
 
   <img src="pipeline_overview.png" alt="Overview">
 
