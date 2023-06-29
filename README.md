@@ -6,11 +6,11 @@
 # Modeling the formation of RNA-RNA interactions in 3D
 
 ## Background and Motivation
-  <div>Interactions between RNAs are an essential mechanism in cell regulation processes in all domains of life. In many cases, knowledge of the secondary (2D) structure is sufficient to understand the function of an RNA. There are already computationally efficient 2D tools for predicting reasonably accurate RNA structures that can easily be embedded in a 3D tertiary structure. However, when there are interactions or pseudoknots in the structure, predictions can be sterically infeasible or kinetically inaccessible. This is especially important when we want to observe RNA-RNA interaction trajectories.</div>
+  <div>Interactions between RNAs are an essential mechanism in cell regulation processes in all domains of life. In many cases, knowledge of the secondary (2D) structure is sufficient to understand the function of an RNA. There are already computationally efficient 2D tools for predicting reasonably accurate RNA structures,which can easily be embedded in a 3D tertiary structure. However, if there are interactions or pseudoknots in the structure, predictions may be sterically infeasible or kinetically inaccessible, which is particularly important if we want to observe RNA-RNA interaction trajectories.</div>
   <br />
 
 ## THE PIPELINE
-  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically reachable. While 3D modeling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse grained representations to model 3D conformation changes as a series of small steps. At the end the models can be translated back to an atomic resolution and offer a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
+  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically accessible. While 3D modelling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse-grained representations to model 3D conformational changes as a series of small steps. At the end the models can be translated back to an atomic resolution, providing a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
 
   <img src="pipeline_overview.png" alt="Overview">
 
@@ -26,9 +26,9 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 ## <strong>DOCUMENTATION</strong>
 
   <div>
-  There are two opportunities to start an interaction extension with this pipeline. First from an RNA sequence with the corresponding secondary dotbracket representation (including the interaction start). For this purpose the script <code>start.sh</code> is used (e.g for all examples in  <code>examples/from_2D/</code> ). <br />
-  Second, it is also possible to start from an already existing 3D structure in PDB format. For this prupose the script <code>startexpansion.sh</code> is used (e.g for the HIV kissing hairpin interaction in <code>examples/from_pdb/</code> ).  <br />
-  Both start variants allow the custom setting of the pipeline conditions of the interaction extension (<td><a href="#inputdat"><code>inputvalues.dat</code></a></td> ).
+  There are two opportunities to start an interaction extension with this pipeline. First from an RNA sequence with the corresponding secondary dotbracket representation (including the interaction start). This is done using the script <code>start.sh</code> (e.g for all examples in <code>examples/from_2D/</code> ). <br />
+  Second, it is also possible to start from an already existing 3D structure in PDB format. The script <code>startexpansion.sh</code> is used for this purpose (e.g for the HIV kissing hairpin interaction in <code>examples/from_pdb/</code> ). <br />
+  Both start options allow you to costumise the pipeline conditions of the interaction extension (<td><a href="#inputdat"><code>inputvalues.dat</code></a></td> ).
   </div><br />
 
 
@@ -267,7 +267,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           </table>
         <li>.ss_cc</li>
           <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#skripts">pipeline-skripts</a> <br />
-          Secondary structure constraint from  the last extension round</dd>
+          Secondary structure constraint from the last extension round</dd>
           <table>
             <tr>
               <td>Dotbracket</td>
@@ -302,8 +302,8 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           </table>
       </ul>
       <li> <code> config.dat </code>
-        <dl>The config.dat file contains the settings for a SimRNA run (see dependencies: <a href="#dependency">SimRNA</a>) and can be found <a href="#SimRNApath">here</a>. You can distinguish between the relaxing run (inputfile variable: RELAX) after simulating the start structure (longer run recommended) and the runs to extend the interaction (inputfile variable: EXPAND) (short runs recommended). <br />
-        In the folder  <code>src/SimRNA_config</code> you can find several example ''.dat'' files. If you want to use these configurations please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the original SimRNA folder individually and according to the pipeline. </dl>
+        <dl>The config.dat file contains parameters for the SimRNA simulations, e.g how many n<sub>steps</sub> should be made per n<sub>sim</sub>. SimRNA comes with a default config.dat file (see <a href="#dependency">dependencies</a>), but it is recommended to customise it for the use with the pipeline. This can be done separately for the relaxation run after simulating the start structure in Ernwin on the one hand (inputfile variable: RELAX), and for the runs to extend the interaction site (input variable: EXPAND) on the other. <br />
+        In the folder <code>src/SimRNA_config</code> you can find several example ''.dat'' files. If you want to use these configurations please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the original SimRNA folder individually and according to the pipeline. <a id="configdat"> </dl>
   </ol>
 </dl>
 <br />
@@ -311,9 +311,9 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 ## Available Skripts & Additional Features <a id="skripts">
 
 ### <code> expandinteraction.py <a id="expansion settings"></a> </code>
-  <div>Create dotbracket files with an interaction site between two RNA chains.<br />
-  The expansion can be started from a dotbracket structure (SimRNA format), as well as from a base pair list. Allowed are complimentary (A-U, G-C) as well as G-U base pairings.  By default, the interaction will be extended by the closest base pair (without bulge). If no extension is possible in the respective step, the simulation stops. If a bulge is desired/structurally necessary it is recommended to specify a target structure to extend to.<br />
-  An extension can be done to both sides of the interaction simultaneously, as well as to one only chain direction. Another option is to extend the interaction by several base pairs in one step. Furthermore, a buffer/linker region without base pairing between intramolecular and intermolecular structure can be specified.   </div>
+  <div>Create dotbracket files with an interaction site between two RNA strands.<br />
+  The expansion can be started from a dotbracket structure (SimRNA format), as well as from a base pair list. Allowed are complimentary (A-U, G-C) as well as G-U base pairings. By default, the interaction will be extended by the closest base pair (without bulge). If no extension is possible in the respective step, the simulation stops. If a bulge is desired/structurally necessary it is recommended to specify a target structure to extend to.<br />
+  An extension can be done to both sides of the interaction simultaneously, as well as to one only chain direction. Another option is to extend the interaction by several base pairs in one step. Furthermore, a buffer/linker region without base pairing between intramolecular and intermolecular structure can be specified.</div>
    <br />
   The following parsing options can be selected:<br />
   <table>
@@ -418,11 +418,11 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 ### <code> RNAdesign.py </code> <a id="RNAblueprint"></a>
   <div>
   Design RNA sequences for two specific secondary structures with RNAblueprint.<br />
-  RNAblueprint is a library to sample sequences that are compatible with multiple
-  structure constraints. This allows us to generate multi-stable RNAs, i.e. RNAs
-  that switch between multiple predefined structures.<br />
-  The main function performs a simple optimization procedure using simulated annealing.
-  The crucial part is the objective() function, which is designed such that it
+  RNAblueprint is a library for designing sequences that are compatible with multiple
+  structural constraints. This allows us to generate multi-stable RNAs, i.e. RNAs
+  that switch between several pre-defined structures.<br />
+  The main function performs a simple optimization using simulated annealing.
+  The crucial part is the objective() function, which is now designed such that it
   becomes minimal when the Boltzmann ensemble is dominated by the two target
   structures.<br />
 
@@ -483,7 +483,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
   <br />
   <strong>Further Descriptions & Examples</strong><br />
        <dl>The input:<br />
-       The first structure (1) describes the two seperate hairpins with a connection element (A)
+       The first structure (1) describes the two separate hairpins with a connection element (A)
        the second structure (2) should ensure the complementarity cleaveage of the two hairpins.
        With the objective2 function every designed hearpin will be evaluated separately.</dl>
        <table>
@@ -496,8 +496,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 </div>
 
 ### <code> formattranslation.py </code> <a id="RNAblueprint"></a>
-  <div>Transform the Dotbracket structure and the nucleatide sequence form several
-  RNA designs into seperate fasta files (needed for the ernwin simualtion).
+  <div>Convert the dotbracket structure and nucleotide sequence from multiple RNA designs into separate fasta files (required for the ernwin simualtion).
 
   <table>
    <tr>
@@ -545,7 +544,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
   <br />
 
 ### <code> ernwindiversity.py </code> <a id="ernwin-script"></a>
-<div>Cluster the ernwin structures based on the used fragments. Output is a list with all clusters each started with the structure with the best (min) energy.</div>
+<div>Cluster the ernwin structures based on the fragments used. The output is a list of all clusters,starting with the structure with the best (min) energy.</div>
 <div>
   <table>
    <tr>
@@ -671,19 +670,18 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
   consec_write_number, replica_number, energy_value_plus_restraints_score, energy_value, current_temperature, datapoints </div><br />
 
   <div> <strong>Note</strong><br />
-  The function to read/write the structure with the minimum free from a trafl file is also provided by SimRNA directly.In this case, however, the energy_value is used without the constraint - here in this script primarily the energy value plus restraints score. Furthermore, the SimRNA script is only available in a python3 environment. Alternatively this script can be used. </div>
+  The function to read/write the structure with the minimum free from a trafl file is also provided directly by SimRNA, bin in this case the the energy_value is used without the constraint - here in this script mainly the energy value plus the constrainet score. Also, the SimRNA script is only available in a python3 environment. Alternatively, this script can be used. </div>
   <br />
 
 
 ### <code> comparison.py </code> <a id="simrna-script"></a>
   <div>
-  Compare all secondary structures files (calculated via SimRNA – SimRNA-style) with the start ss-sequence, the constrained ss-sequence and with each other.
-  For comparing the energy the SimRNA trafl file is used.
+  Compare all secondary structure files (calculated using SimRNA – SimRNA style) with the start ss-sequence, the constrained ss-sequence and with each other. The SimRNA trafl file is used for the energy comparison.<br /><br />
 
-  The first output is a csv-file with the following information regarding one specific random number seed of a full run:
-  number, sequence, count_constraint, count_start, count_before, constancy, dif_constraint, dif_start, dif_before, bp, time, energy_values_plus_restraint_score, energy_value, current_temp, interaction, len_interaction, count_interaction_constraint, dif_interaction_cc
+  The first output is a csv-file with the following information for each n<sub>sim</sub> in an extension step:<br />
+  number, sequence, count_constraint, count_start, count_before, constancy, dif_constraint, dif_start, dif_before, bp, time, energy_values_plus_restraint_score, energy_value, current_temp, interaction, len_interaction, count_interaction_constraint, dif_interaction_cc<br /><br />
 
-  The second output is a csv.file with all unique structures over several (offered) random number seeds of a full run:
+  The second output is a csv.file with all unique structures collected over all n<sub>sim</sub> in an extension step:<br />
   sequence, count_how_often, count_constraint, count_start, dif_constraint, dif_start, bp, bpstr, interaction, len_interaction, count_interaction_constraint, dif_interaction_cc
   </div>
 
@@ -763,9 +761,9 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
   <div>
   Find the best 3D structure after a SimRNA surface run and the SSAllignment analysis
   Parse over all comparison.py files (individual runs and the overview).
-  Looking for the most common secondary  structure in the overview file.
-  Look for this secondary structure in all individual runs and seperate them (max_file).
-  The structure with the best energy (3D) is the one for the next constrained SimRNA run in the pipeline
+  Search for the most frequent secondary structure in the overview file.
+  Search for this secondary structure in all individual runs and separate them (max_file).
+  The structure with the best energy (3D) is the one for the next constrained SimRNA run in the pipeline.
   </div>
 
   <table>
@@ -854,7 +852,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
     <ul>- pandas V.1.5.3 </ul>
     <ul>- scikit-learn V.1.2.1 </ul>
   <dt>SimRNA V3.2<a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
-  <ul>The files supplied with the RRI-3D package under <code>src/SimRNA_config/config*</code> are example SimRNA configurations for this pipeline. If you want to use these please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the SimRNA folder individually and according to the pipeline. </ul>
+  <ul>Note: The files supplied with the RRI-3D package under <code>src/SimRNA_config/config*</code> are example SimRNA configurations for this pipeline. If you want to use these please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the SimRNA folder individually and according to the pipeline, e.g. see section <a href="#configdat">config.dat</a> </ul>
   <dt>Ernwin V1.2 <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
     <ul>- forgi V2.2.2 <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
     <ul>- Note: incl. setup for all-atom reconstruction and fallbackstates </ul>
