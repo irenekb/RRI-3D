@@ -6,16 +6,16 @@
 # Modeling the formation of RNA-RNA interactions in 3D
 
 ## Background and Motivation
-  <div>Interactions between RNAs are an essential mechanism in cell regulation processes in all domains of life. In many cases, knowledge of the secondary (2D) structure is sufficient to understand the function of an RNA. There are already computationally efficient 2D tools for predicting reasonably accurate RNA structures,which can easily be embedded in a 3D tertiary structure. However, if there are interactions or pseudoknots in the structure, predictions may be sterically infeasible or kinetically inaccessible, which is particularly important if we want to observe RNA-RNA interaction trajectories.</div>
+  <div>Interactions between RNAs are an essential mechanism in cell regulation processes in all domains of life. In many cases, knowledge of the secondary (2D) structure is sufficient to understand the function of an RNA. There are already computationally efficient 2D tools for predicting reasonably accurate RNA structures, which can easily be embedded in a 3D tertiary structure. However, if there are interactions or pseudoknots in the structure, predictions may be sterically infeasible or kinetically inaccessible, which is particularly important if we want to observe RNA-RNA interaction trajectories.</div>
   <br />
 
 ## THE PIPELINE
-  <div>Our computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically accessible. While 3D modelling of RNAs remains computationally challenging, our designed pipeline is efficient by using coarse-grained representations to model 3D conformational changes as a series of small steps. At the end the models can be translated back to an atomic resolution, providing a detailed insight into the structural dynamics of a kissing hairpin formation.</div> <br />
+  <div>This computational pipeline can be used to decide whether pseudoknots or interactions proposed by 2D prediction are indeed sterically feasible and kinetically accessible. While 3D modelling of RNAs remains computationally challenging, the designed pipeline is efficient by using coarse-grained representations to model 3D conformational changes as a series of small steps. At the end the models can be translated back to an atomic resolution, providing a detailed insight into the structural dynamics of an RNA interaction formation.</div> <br />
 
   <img src="pipeline_overview.png" alt="Overview">
 
 #### <strong>QUICKSTART WITH AN EXAMPLE</strong>
-To get a quick overview of the pipeline or to test if the pipeline and all dependencies are set up correctly some example interactions are provided (<code>/examples/</code>). The following <a href="#dependency">dependencies</a> are needed to start the pipeline. To start the pipeline, different parameters are needed, given in a file (<a href="#inputdat"><code>inputvalues.dat</code></a>, e.g. see in the respective example folder). Before starting, the paths to Ernwin, SimRNA and the pipeline itself must be updated. 
+To get a quick overview of the pipeline and to test if the pipeline and all dependencies are set up correctly some example interactions are provided (<code>/examples/</code>). The following <a href="#dependency">dependencies</a> are needed to start the pipeline. To start the pipeline, several parameters are needed, given in a file (<a href="#inputdat"><code>inputvalues.dat</code></a>, e.g. see in the respective example folder). Before starting, the paths to Ernwin, SimRNA and the pipeline itself must be updated in the <code>inputvalues.dat</code> file. 
 
  Start the test interaction expansion with: <br />
 <code>./start.sh examples/from_2D/test/inputvalues_test.dat</code>
@@ -26,9 +26,9 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 ## <strong>DOCUMENTATION</strong>
 
   <div>
-  There are two opportunities to start an interaction extension with this pipeline. First from an RNA sequence with the corresponding secondary dotbracket representation (including the interaction start). This is done using the script <code>start.sh</code> (e.g for all examples in <code>examples/from_2D/</code> ). <br />
+  There are two opportunities to start an interaction extension. First from an RNA sequence with the corresponding secondary dotbracket representation (including the interaction start). This is done using the script <code>start.sh</code> (e.g for all examples in <code>examples/from_2D/</code> ). <br />
   Second, it is also possible to start from an already existing 3D structure in PDB format. The script <code>startexpansion.sh</code> is used for this purpose (e.g for the HIV kissing hairpin interaction in <code>examples/from_pdb/</code> ). <br />
-  Both start options allow you to costumise the pipeline conditions of the interaction extension (<td><a href="#inputdat"><code>inputvalues.dat</code></a></td> ).
+  Both start options allow you to costumise the pipeline conditions of the interaction extension  through the parameters defined in the <td><a href="#inputdat"><code>inputvalues.dat</code></a></td> file.
   </div><br />
 
 
@@ -45,7 +45,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           <td><strong>VARIABLE</strong></td>
           <td><strong>VALUE/SAMPLE</strong></td>
           <td><strong>DESCRIPTION</strong></td>
-          <td><strong>more Info</strong></td>
+          <td><strong>more Details</strong></td>
         </tr>
         <tr>
           <td>START <a id="START"></a></td>
@@ -54,7 +54,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           <td><a href="#needed structure files">[required files]</a></td>
         </tr>
         <tr>
-          <td>BASENAME <a id="START"></a></td>
+          <td>BASENAME <a id="BASENAME"></a></td>
           <td>test0</td>
           <td>File/Structure name for the RNAdesign</td>
           <td></td>
@@ -69,7 +69,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           <td>PROGS</td>
           <td>/pathto/RRI-3D/src</td>
           <td>Path to this git repro and it's scripts </td>
-          <td><a href="#skripts">[skripts]</a></td>
+          <td><a href="#scripts">[scripts]</a></td>
         </tr>
         <tr>
           <td>DESIGNS</td>
@@ -129,7 +129,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           <td>TREESEARCH</td>
           <td>true | false</td>
           <td> </td>
-          <td><a href="#network">[network]</a></td>
+          <td></td>
         </tr>
         <tr>
           <td>SEED</td>
@@ -201,26 +201,26 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
           <td>true | false </td>
           <td>Selection of the best/longest interaction for the next expansion
           based on a consecutive interaction / an interaction incl. bulges</td>
-          <td><a href="#continuousserach">[continuousserach]</a></td>
+          <td><a href="#selectnext">[selectnext]</a></td>
         </tr>
         <tr>
           <td>CONTSEARCH1</td>
           <td>force | interaction | </td>
           <td>Structure selection type after the relax-run</td>
-          <td><a href="#continuousserach">[continuousserach]</a></td>
+          <td><a href="#selectnext">[selectnext]</a></td>
         </tr>
         <tr>
           <td>CONTSEARCH2</td>
           <td>force | interaction | </td>
           <td>Structure selection type for the next expansion step</td>
-          <td><a href="#continuousserach">[continuousserach]</a></td>
+          <td><a href="#selectnext">[selectnext]</a></td>
         </tr>
       </table>
     <li> Structure information
       <a id="needed structure files"></a>
-      <dl> Each filename must consist of the <a href="#BASENAME">BASENAME</a> and the respective ending and must be stored in the <a href="#START">START</a> . <br /> For a smooth run through the pipline, the nucleodide sequence must be written in capital letters. Allowed are the four nucleobases: adenine, guanine, cytosine, uracil.</dl>
+      <dl> Each filename must consist of the <a href="#BASENAME">BASENAME</a> and the respective ending (see below) and must be stored in the <a href="#START">START</a> directory. <br /> The nucleodide sequence must be written in capital letters. Allowed are the four nucleobases: adenine, guanine, cytosine, uracil.</dl>
       <ul>
-        <li>.fa</li>
+        <li>*.fa</li>
           <dd>FASTA-FILE for <a href="#ernwin">ernwin_start</a></dd>
           <table>
             <tr>
@@ -239,8 +239,8 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
               <td>Single line dotbracket notation; each pseudonode/interaction is represented by a new bracket type e.g.b [ ], { }, < ></td>
             </tr>
           </table>
-        <li>.seq</li>
-            <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#skripts">pipeline-skripts</a></dd>
+        <li>*.seq</li>
+            <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#scripts">pipeline-scripts</a></dd>
             <table>
               <tr>
                 <td>Sequence</td>
@@ -251,8 +251,8 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
                 <td colspan="2"> Same sequence as in fasta file but the separator between two sequences is a whitespace</td>
               </tr>
             </table>
-        <li>.ss</li>
-          <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#skripts">pipeline-skripts</a> <br />
+        <li>*.ss</li>
+          <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#scripts">pipeline-scripts</a> <br />
               Represents the secondary structure constraint for the current extension round</dd>
           <table>
             <tr>
@@ -265,8 +265,8 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
               <td colspan="2"> Dotbracket notation with classical round brackets and dots. <br />A "bracket" crossing requires the start of a new line, e.g. 1st line intramolecular structure, 2nd line interaction.<br /> For the start of the simulation the .ss-file contains the native start dotbracket notation.</td>
             </tr>
           </table>
-        <li>.ss_cc</li>
-          <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#skripts">pipeline-skripts</a> <br />
+        <li>*.ss_cc</li>
+          <dd>Usage: <a href="#SimRNA">SimRNA</a> & <a href="#scripts">pipeline-scripts</a> <br />
           Secondary structure constraint from the last extension round</dd>
           <table>
             <tr>
@@ -279,10 +279,10 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
               <td colspan="2">In the previous extension step achieved secondary structure. <br /> For the first run it must conform to the .ss dotbracket notation by default.</td>
             </tr>
           </table>
-        <li>.il</li>
+        <li>*.il</li>
           <dl>If no extension (no longer interaction) compared to the previous run is recorded in this file, the respective run stops.<br />
               Control file which specifies how many base pairs make up the extended interaction of the "best" structure of a run.<br /> Must contain a <code>0</code> at the beginning.</dl>
-        <li>_target.ss</li>
+        <li>*_target.ss</li>
           <dd>Usage: <a href="#expansion settings">expansion settings</a>  <br />
               Secondary structure to be reached</dd>
           <table>
@@ -308,7 +308,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
 </dl>
 <br />
 
-## Available Skripts & Additional Features <a id="skripts">
+## Available Scripts & Additional Features <a id="scripts">
 
 ### <code> expandinteraction.py <a id="expansion settings"></a> </code>
   <div>Create dotbracket files with an interaction site between two RNA strands.<br />
@@ -757,7 +757,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
   <br /><br />
 
 
-### <code> selectnext.py </code> <a id="continuousserach"></a>
+### <code> selectnext.py </code> <a id="selectnext"></a>
   <div>
   Find the best 3D structure after a SimRNA surface run and the SSAllignment analysis
   Parse over all comparison.py files (individual runs and the overview).
@@ -827,7 +827,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
    <td><code>--consecutive </code></td>
    <td>boolean</td>
    <td>none</td>
-   <td><a href="#CONSECUTIVEPERFECT">CONSECUTIVEPERFECT</a> true/false</td>
+   <td>true/false , given through <a href="#CONSECUTIVEPERFECT">CONSECUTIVEPERFECT</a> </td>
    </tr>
    <tr>
      <td><code>-v </code></td>
@@ -851,7 +851,7 @@ To get a quick overview of the pipeline or to test if the pipeline and all depen
     <ul>- numpy V.1.24.2 </ul>
     <ul>- pandas V.1.5.3 </ul>
     <ul>- scikit-learn V.1.2.1 </ul>
-  <dt>SimRNA V3.2<a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
+  <dt>SimRNA V3.2 <a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
   <ul>Note: The files supplied with the RRI-3D package under <code>src/SimRNA_config/config*</code> are example SimRNA configurations for this pipeline. If you want to use these please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the SimRNA folder individually and according to the pipeline, e.g. see section <a href="#configdat">config.dat</a> </ul>
   <dt>Ernwin V1.2 <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
     <ul>- forgi V2.2.2 <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
