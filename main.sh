@@ -19,6 +19,9 @@ else
 	START=$(realpath "$3")
 fi
 
+CLUSTERSTARTIME=$(date +%s.%N)
+printf "Cluster start: ${CLUSTERSTARTIME} for ${NAME}"
+
 ROUND=$(awk -F= '$1=="ROUND"{print $2;exit}' $FILE)
 ROUNDS=$(awk -F= '$1=="ROUNDS"{print $2;exit}'  $FILE)
 PROG=$(awk -F= '$1=="PROGS"{print $2;exit}' $FILE)
@@ -146,6 +149,8 @@ fi
 
 if ! [ ${RELAX} = "0" ]; then
 	#####START from ernwin reconstructed pdb#####
+	RELAXTIME=$(date +%s.%N)
+
 	echo "$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_config/"
 	"$PROGS/SimRNA_config/job_simrna_start_${TYPE}.sh" $START $NAME $ROUND $SIMRNA $RELAX "${WHERE}" "${SEED}" $SIMROUND "$PROGS/SimRNA_config/"
 	wait
@@ -255,6 +260,10 @@ if ! [ ${RELAX} = "0" ]; then
 		wait
 	done
 
+	echo $NAME
+	RELAXDURATION=$(echo "$(date +%s.%N) - $RELAXTIME" | bc)
+	printf "Relaxationtime: %.6f seconds" $RELAXDURATION
+
 	if [ "$TREESEARCH" == false ] ; then
 		mv ${NAME}_${RELAX}* ${START}/$ROUND
 
@@ -305,6 +314,7 @@ fi
 
 #####EXPAND#####
 for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
+	ROUNDTIME=$(date +%s.%N)
 
 	if [ "$TREESEARCH" == true ] ; then
 		if [ "$CURRENTROUND" -ne 0 ]; then
@@ -522,7 +532,13 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 	fi
 
+	echo $NAME $CURRENTROUND
+	ROUNDDURATION=$(echo "$(date +%s.%N) - $ROUNDTIME" | bc)
+	printf "Execution time for this extension: %.6f seconds" $ROUNDDURATION
 done
+
+DURATIONCLUSTER=$(echo "$(date +%s.%N) - $CLUSTERSTARTIME" | bc)
+printf "Execution time for this cluster: %.6f seconds" $DURATIONCLUSTER
 
 echo "SIMULATION DONE"
 
