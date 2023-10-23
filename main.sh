@@ -21,7 +21,8 @@ fi
 
 ROUND=$(awk -F= '$1=="ROUND"{print $2;exit}' $FILE)
 ROUNDS=$(awk -F= '$1=="ROUNDS"{print $2;exit}'  $FILE)
-PROGS=$(awk -F= '$1=="PROGS"{print $2;exit}' $FILE)
+PROG=$(awk -F= '$1=="PROGS"{print $2;exit}' $FILE)
+PROGS="${PROG}/src"
 SIMRNA=$(awk -F= '$1=="SIMRNA"{print $2;exit}'  $FILE)
 WHERE=$(awk -F= '$1=="WHERE"{print $2;exit}' $FILE)
 BUFFER=$(awk -F= '$1=="BUFFER"{print $2;exit}'  $FILE)
@@ -171,6 +172,13 @@ if ! [ ${RELAX} = "0" ]; then
 			#write and analyse from every simRNA run all paralell runs (SimRounds)
 			NAMESS=$START/$ROUND/"${NAME}_${ROUND}.ss"
 			NAMECC=$START/$ROUND/"${NAME}_${ROUND}.ss_cc"
+			NAMESTART=$START/"${NAME}_0.ss"
+
+			if [ "$TARGET" == true ] ; then
+				NAMEEND=$START/"${NAME}_target.ss"
+			elif [ "$TARGET" == false ] ; then
+				NAMEEND=$START/"${NAME}_${ROUNDS}.ss"
+			fi
 
 			mkdir ${START}/$ROUND/$step
 			mkdir "${START}/$ROUND/$step/analyse"
@@ -180,8 +188,8 @@ if ! [ ${RELAX} = "0" ]; then
 
 			SimRNA_trafl2pdbs $START/$ROUND/${step}/analyse/*.pdb $START/$ROUND/${step}/analyse/*.trafl :
 			wait
-			python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
-			echo python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL
+			python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL -s $NAMESTART -e $NAMEEND
+			echo python $PROGS/comparison.py -p $START/$ROUND/${step}/analyse/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/${step}/analyse/$TRAFL -s $NAMESTART -e $NAMEEND
 			wait
 			mv ${NAME}_${RELAX}* ${START}/$ROUND/$step
 
@@ -217,7 +225,14 @@ if ! [ ${RELAX} = "0" ]; then
 		elif [ "$TREESEARCH" == false ] ; then
 			NAMESS=$START/"${NAME}_${ROUND}.ss"
 			NAMECC=$START/"${NAME}_${ROUND}.ss_cc"
+			NAMESTART=$START/"${NAME}_0.ss"
 
+			if [ "$TARGET" == true ] ; then
+				NAMEEND=$START/"${NAME}_target.ss"
+			elif [ "$TARGET" == false ] ; then
+				NAMEEND=$START/"${NAME}_${ROUNDS}.ss"
+			fi
+			
 			mkdir $START/$ROUND/analyse
 
 			mkdir ${START}/$ROUND/analyse/${step}
@@ -228,9 +243,9 @@ if ! [ ${RELAX} = "0" ]; then
 			SimRNA_trafl2pdbs $START/$ROUND/analyse/${step}/*.pdb $START/$ROUND/analyse/${step}/*.trafl :
 
 			if [ $step = "1" ]; then
-				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'w' -t $START/$ROUND/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 			else #if no "treesearch" partI
-				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/$ROUND/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${RELAX}_0_${step}.csv -u ${NAME}_${RELAX}_0.csv -m 'a' -t $START/$ROUND/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 			fi
 
 		else
@@ -341,15 +356,23 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 						cp ${START}/${CURRENTROUND}/${simstep}/${PDB} ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/
 						SimRNA_trafl2pdbs ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/*.pdb ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/*.trafl :
 						wait
+
+						NAMESTART=$START/"${NAME}_0.ss"
+						if [ "$TARGET" == true ] ; then
+							NAMEEND=$START/"${NAME}_target.ss"
+						elif [ "$TARGET" == false ] ; then
+							NAMEEND=$START/"${NAME}_${ROUNDS}.ss"
+						fi
+
 						if [ $step = "1" ]; then
 							#first round + create outputfiles
-							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
-							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
+							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 							wait
 						else
 							#append the following output
-							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
-							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL
+							python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
+							echo python $PROGS/comparison.py -p ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/ -i ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss_cc -c ${START}/${CURRENTROUND}/${simstep}/${NAME}_${CURRENTROUND}.ss -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t ${START}/${CURRENTROUND}/${simstep}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 							wait
 						fi
 						wait
@@ -411,6 +434,14 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 		NAMESS=$START/${CURRENTROUND}/"${NAME}_${CURRENTROUND}.ss"
 		NAMESSOLD=$START/${ROLD}/"${NAME}_${ROLD}.ss"
 		NAMECC=${START}/${CURRENTROUND}/"${NAME}_${CURRENTROUND}.ss_cc"
+		NAMESTART=$START/"${NAME}_0.ss"
+
+		if [ "$TARGET" == true ] ; then
+	    	NAMEEND=$START/"${NAME}_target.ss"
+	    elif [ "$TARGET" == false ] ; then
+	        NAMEEND=$START/"${NAME}_${ROUNDS}.ss"
+	    fi
+
 		#+ checking algorithm - now both  before the SimRNA expantion
 
 		#start the SimRNA expansion job
@@ -429,10 +460,10 @@ for CURRENTROUND in `seq 0 1 ${ROUNDS}`; do
 
 			if [ $step = "1" ]; then
 				#first round + create outputfiles
-				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'w' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 			else
 				#append the following output
-				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL
+				python $PROGS/comparison.py -p $START/${CURRENTROUND}/analyse/${step}/ -i $NAMECC -c $NAMESS -o ${NAME}_${EXTEND}_${CURRENTROUND}_${step}.csv -u ${NAME}_${EXTEND}_${CURRENTROUND}.csv -m 'a' -t $START/${CURRENTROUND}/analyse/${step}/$TRAFL -s $NAMESTART -e $NAMEEND
 			fi
 		done
 

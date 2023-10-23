@@ -65,7 +65,7 @@ def trafl(traflfile):
                     line_count += 1
     return rawdat
 
-def difference(bigset,smalset):
+def find_difference(bigset,smalset):
     '''
     :param bigset: dictionary of eg all basepairs from the constraint, startpoint,
                   initial interaction, bp before...
@@ -239,7 +239,42 @@ def find_intra(bp,interaction_countbp,chainbreak):
         if bp[0] < chainbreak and bp[1] > chainbreak:
             otherinter.append(bp)
 
-    return len(intra_chainA), len(intra_chainB), otherinter
+    return intra_chainA, len(intra_chainA), intra_chainB, len(intra_chainB), otherinter, len(otherinter)
+
+
+def find_not_in_path(bp,set_constrained_se_bps):
+    '''
+    Return basepairs that are not listed in the start or the end/target    
+
+    param bp: bp list of the current structure
+    param set_constrained_se_bps: bp set with all bps from the initial start and the end/target structure
+    '''
+
+    bp = set(map(tuple, bp))
+    not_in_path = list(bp.difference(set_constrained_se_bps))
+
+    return not_in_path, len(not_in_path)
+
+def find_multiplets(bps):
+    '''
+    Return a list of multiplets
+
+    param bp: bp list of the current structure
+    '''
+    flat_list = [item for sublist in bps for item in sublist]
+    duplicates = list(set([x for x in flat_list if flat_list.count(x) > 1]))
+
+    multiplet = list()
+
+    for bp in bps:
+        for d in duplicates:
+            if bp[0] == d or bp[1] == d:
+                if bp not in  multiplet:
+                    multiplet.append(bp)
+            else:
+                continue
+
+    return multiplet
 
 
 def main():
@@ -254,6 +289,8 @@ def main():
                         help='Name of the unique outputfile/or the already existing one')
     parser.add_argument ('-t', '--trafl', help='Traflfile')
     parser.add_argument ('-v', '--verbose', action='store_true', help='Be verbose')
+    parser.add_argument ('-s', '--start', help='Path to the inital starting ss-file')
+    parser.add_argument ('-e', '--end', help='Path to the end/target ss-file')
 
     args = parser.parse_args()
 
@@ -284,6 +321,36 @@ def main():
     bp_dict_currentrun = {}
     bp_dict_unique = {}
 
+    #INITIAL START STRUCTURE
+    with open(args.start , 'r') as STARTFILE:
+        bp_initstart  = list()
+        content = STARTFILE.readlines()
+        content = [s.rstrip() for s in content]
+
+        for line in content:
+            bp_initstart.extend(db2bps(line))
+    #start_set = set(map(tuple, bp_start))
+
+    #END/TARGET STRUCTURE
+    with open(args.end , 'r') as ENDFILE:
+        bp_end  = list()
+        content = ENDFILE.readlines()
+        content = [s.rstrip() for s in content]
+
+        for line in content:
+            bp_end.extend(db2bps(line))
+
+
+    print(bp_initstart)
+    print(bp_end)
+    #prep. for not in path function
+    together = bp_initstart + bp_end
+    constrained_se_bps = [] 
+    [constrained_se_bps.append(x) for x in together if x not in constrained_se_bps] 
+    set_constrained_se_bps = set(map(tuple, constrained_se_bps))
+
+    print(set_constrained_se_bps)
+
     #CONSTRAINED SECONDARY STRUCTURE
     with open(constraint_ss , 'r') as CSSFile:
         bp_constraint  = list()
@@ -310,7 +377,9 @@ def main():
         interaction_cc, interaction_countbp_cc, len_interaction_cc= find_interaction(interim_interaction_db,chainbreak)
 
         #if args.intra: 
-        intra_chainA, intra_chainB, otherbp = find_intra(bp_constraint,interaction_cc,chainbreak)
+        intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count= find_intra(bp_constraint,interaction_cc,chainbreak)
+        not_in_path, not_in_path_count = find_not_in_path(bp_constraint, set_constrained_se_bps)
+        multiplet = find_multiplets(bp_constraint)
 
         #bp_constraint = sorted(bp_constraint, key=lambda bp_constraint: bp_constraint[0])
         bp_constraint = sorted(bp_constraint, key=itemgetter(0))
@@ -318,7 +387,7 @@ def main():
         bp_interaction_str = ''.join(str(s) for s in interaction_cc)
         constraint_ssf = str(os.path.basename(constraint_ss))
         log.debug('constrain {}'.format(constraint_ssf))
-        dic[constraint_ssf] = constraint_sequence,0,0,0,0,0,0,0,bp_constraint,0,0,0,0,interaction_cc,interaction_countbp_cc, len_interaction_cc,0,0,intra_chainA, intra_chainB, otherbp
+        dic[constraint_ssf] = constraint_sequence,0,0,0,0,0,0,0,bp_constraint,0,0,0,0,interaction_cc,interaction_countbp_cc, len_interaction_cc,0,0,intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count,not_in_path, not_in_path_count,multiplet
         # [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]      [8]
         # sequence,count_constraint,count_start,count_before,constancy,dif_constraint,dif_start,dif_before,bp
 
@@ -336,7 +405,9 @@ def main():
             interim_interaction_db.append(line)
 
         interaction, interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
-        intra_chainA, intra_chainB, otherbp = find_intra(bp_start,interaction,chainbreak)
+        intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count = find_intra(bp_start,interaction,chainbreak)
+        not_in_path, not_in_path_count = find_not_in_path(bp_start, set_constrained_se_bps)
+        multiplet = find_multiplets(bp_start)
 
         #bp_start = sorted(bp_start, key=lambda bp_start: bp_start[0])
         bp_start = sorted(bp_start, key=itemgetter(0))
@@ -345,11 +416,11 @@ def main():
         start_ssf = str(os.path.basename(start_ss))
         print('start {}'.format(start_ssf))
 
-        dif_constraint,count_constraint = difference(bp_constraint,bp_start)
+        dif_constraint,count_constraint = find_difference(bp_constraint,bp_start)
 
-        dif_interaction_cc,count_interaction_constraint = difference(interaction_cc,interaction)
+        dif_interaction_cc,count_interaction_constraint = find_difference(interaction_cc,interaction)
 
-        dic[start_ssf] = start_sequence, count_constraint,0,0,0,dif_constraint,0,0,bp_start,0,0,0,0,interaction, interaction_countbp, len_interaction, count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
+        dic[start_ssf] = start_sequence, count_constraint,0,0,0,dif_constraint,0,0,bp_start,0,0,0,0,interaction, interaction_countbp, len_interaction, count_interaction_constraint,dif_interaction_cc,intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count,not_in_path, not_in_path_count,multiplet
         # [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]      [8] [9]
         # sequence,count_constraint,count_start,count_before,constancy,dif_constraint,dif_start,dif_before,bp, time
 
@@ -359,9 +430,9 @@ def main():
         with open(args.uniqueoutput,'r') as Uniquefile:
             next(Uniquefile)
             for line in Uniquefile:
-                seq,count_how_often,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp = line.strip('\n').split('\t')
+                seq,count_how_often,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count,not_in_path, not_in_path_count,multiplet = line.strip('\n').split('\t')
                 count_unique[bpstr] = int(count_how_often)
-                dic_unique[seq] = count_how_often,count_constraint,count_start, dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
+                dic_unique[seq] = count_how_often,count_constraint,count_start, dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count, not_in_path, not_in_path_count,multiplet
                 #                       [0]                 [1]         [2]          [3]            [4]  [5] [6]   [7]              [8]              [9]                [10]                          [11]
 
         with open(unique_start_bp, 'r') as Bplist:
@@ -397,7 +468,9 @@ def main():
             filename = str(os.path.basename(File)) #exctract filename
             log.debug(filename)
             interaction,interaction_countbp, len_interaction = find_interaction(interim_interaction_db,chainbreak)
-            intra_chainA, intra_chainB, otherbp = find_intra(bp,interaction,chainbreak)
+            intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count= find_intra(bp,interaction,chainbreak)
+            not_in_path, not_in_path_count = find_not_in_path(bp, set_constrained_se_bps)
+            multiplet = find_multiplets(bp)
 
             #get the last entry from dict TODO: make it smarter
             last_key = str(list(dic.keys())[-1])
@@ -409,13 +482,13 @@ def main():
 
             log.debug('check 1 {} {}'.format(bp_constraint,bp))
 
-            dif_constraint,count_constraint = difference(bp_constraint,bp)
+            dif_constraint,count_constraint = find_difference(bp_constraint,bp)
 
             log.debug('check 2 {} {}'.format(interaction_cc,interaction))
 
-            dif_interaction_cc, count_interaction_constraint = difference(interaction_cc,interaction)
-            dif_before, count_before = difference(bp_before,bp)
-            dif_start, count_start = difference(bp_start,bp)
+            dif_interaction_cc, count_interaction_constraint = find_difference(interaction_cc,interaction)
+            dif_before, count_before = find_difference(bp_before,bp)
+            dif_start, count_start = find_difference(bp_start,bp)
 
 
             if bp_start_str == bpstr: #check if we ever reach the constraint
@@ -448,7 +521,7 @@ def main():
                     continue
 
             # create the new entry in the dictonary
-            dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
+            dic[filename]=sequence, count_constraint, count_start, count_before,constancy,dif_constraint,dif_start,dif_before,bp,timepoint_now,energy_values_plus_restraint_score,energy_value,current_temp,interaction,interaction_countbp, len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count,not_in_path, not_in_path_count,multiplet
             #                  [0]         [1]               [2]         [3]         [4]       [5]           [6]       [7]   [8]    [9]         [10]                                [11]           [12]     [13]            [14]                  [15]                       [16]
 
             bp = sorted(bp, key=itemgetter(0))
@@ -471,7 +544,7 @@ def main():
             #If the current sequence is an unique one safe it
             if bpstr not in count_unique.keys():
                 count_unique[bpstr] = 1
-                dic_unique[sequence] = 1,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA, intra_chainB, otherbp
+                dic_unique[sequence] = 1,count_constraint,count_start,dif_constraint,dif_start,bp,bpstr,interaction,interaction_countbp,len_interaction,count_interaction_constraint,dif_interaction_cc,intra_chainA,  intra_chainA_count, intra_chainB, intra_chainB_count, other_inter, other_inter_count,not_in_path, not_in_path_count,multiplet
                 #                       [0]                 [1]         [2]          [3]            [4]  [5] [6]   [7]              [8]              [9]                [10]                          [11]
             else: #increase the count for how often the structure appears
                 for k,v in count_unique.items():
@@ -482,7 +555,7 @@ def main():
     for k, v in dic_unique.items():
         for key, value in count_unique.items(): #[k]bpstr [v]count_how_often
             if key == v[6]:
-                unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11],v[12],v[13],v[14]
+                unique_universal[k] =value,v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11],v[12],v[13],v[14],v[15],v[16],v[17],v[18],v[19],v[20]
 
 
     columnnames_individual = ['number','sequence','count_constraint',
@@ -492,14 +565,22 @@ def main():
                               'energy_value','current_temp','interaction',
                               'interaction_countbp','len_interaction',
                               'count_interaction_constraint','dif_interaction_cc',
-                              'intra_chainA', 'intra_chainB', 'otherbp']
+                              'intra_chainA',  'intra_chainA_count', 
+                              'intra_chainB', 'intra_chainB_count',
+                              'other_inter', 'other_inter_count',
+                              'not_in_path', 'not_in_path_count',
+                              'multiplet']
 
     columnnames_unique = ['sequence','count_how_often','count_constraint',
                           'count_start','dif_constraint','dif_start',
                           'bp','bpstr','interaction',
                           'interaction_countbp','len_interaction',
                           'count_interaction_constraint','dif_interaction_cc',
-                          'intra_chainA', 'intra_chainB', 'otherbp']
+                          'intra_chainA',  'intra_chainA_count', 
+                          'intra_chainB', 'intra_chainB_count',
+                          'other_inter', 'other_inter_count',
+                          'not_in_path', 'not_in_path_count',
+                          'multiplet']
 
 
     df_individual = pd.DataFrame.from_dict(dic,orient='index').reset_index()
