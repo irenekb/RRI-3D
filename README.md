@@ -15,12 +15,70 @@
   <img src="pipeline_overview.png" alt="Overview">
 
 #### <strong>QUICKSTART WITH AN EXAMPLE</strong>
-To get a quick overview of the pipeline and to test if the pipeline and all dependencies are set up correctly some example interactions are provided (<code>/examples/</code>). The following <a href="#dependency">dependencies</a> are needed to start the pipeline. To start the pipeline, several parameters are needed, given in a file (<a href="#inputdat"><code>inputvalues.dat</code></a>, e.g. see in the respective example folder). Before starting, the paths to Ernwin, SimRNA and the pipeline itself must be updated in the <code>inputvalues.dat</code> file. 
+ <div>To get a quick overview of the pipeline and to test if the pipeline and all dependencies are set up correctly some example interactions are provided (<code>examples/</code>). The following <a href="#dependency">dependencies</a> are needed to start the pipeline. To start the pipeline, several parameters are needed, given in a file (<a href="#inputdat"><code>inputvalues.dat</code></a>, e.g. see in the respective example folder). Before starting, the paths to Ernwin, SimRNA and the pipeline itself must be updated in the <code>inputvalues.dat</code> file.  </div><br />
 
- Start the test interaction expansion with: <br />
+<div> Start the test interaction expansion with: <br />
 <code>./start.sh examples/from_2D/test/inputvalues_test.dat</code>
+</div>
+
 <br />
+ <div>The settings for the interaction examples published in the pipeline-paper (CopA--CopT, DsrA-<i>rpoS</i>, HIV-1 Dis), including different ways to present the 3D output (e.g., clusterwise), are available in the respective <code>example/</code> folders. </div>
 <br />
+
+## <strong>PIPELINE OUTPUT</strong>
+The raw pipeline result consists of numerous SimRNA trajectories containing each sampled 3D structure. To facilitate the analysis of this large collection of 3D structures we translate each structure back to 2D and generate a <code>csv</code> file for each <code>n<sub>cluster</sub> x n<sub>run</sub> x n<sub>sim</sub></code>. These <code>csv</code> files provide detailed information, particularly regarding the formation of base pairs:
+
+<style>.columns{column-count: 2;}</style>
+
+<div class="columns"> 
+ <ul>
+       <li><code>n<sub>step</sub></code></li>
+      <li>dotbracket representation</li>
+      <li>SimRNA based values:</li>
+       <ul>
+        <li>energy</li>
+        <li>energy plus constraint</li>
+        <li>temperature</li>
+      </ul>
+      <li>"constancy": <code>n<sub>step</sub></code> until bps change in the structure  </li>
+      <li>basepairlist of</li>
+      <ul>
+          <li>whole structure</li>
+          <li>the interaction site</li>
+          <li>intramolecular bps of chain-A</li>
+          <li>intramolecular bps of chain-B</li>
+          <li>difference to the start structure for this extension step</li>
+          <li>difference to the constrained structure</li>
+          <li>difference to the constrained interaction site</li>
+          <li>difference to the <code>n<sub>step</sub></code> structure before</li>
+          <li>intermoleculare bps that do not belong to the main interaction e.g separated by intramoleculare bps</li>
+          <li>multiplets</li>
+          <li>bps that occur neither in the start nor in the target structure </li>
+      </ul>
+      <li>basepairs count of</li>
+        <ul>
+          <li>chain-A</li>
+          <li>chain-B</li>
+          <li>interaction length (perfect helix)</li>
+          <li>interaction length with loops allowed</li>
+          <li>intermoleculare bp do not belong to the main interaction</li>
+          <li>bps that occure neither in the start nor in the target structure</li>
+      </ul>
+      <li>count of bps that differ to</li>
+        <ul>
+          <li>the start structur for this expansion step</li>
+          <li>the <code>n<sub>step</sub></code> structure before</li>
+          <li>the constrained structure</li>
+          <li>the constrained interaction </li>
+      </ul>
+    </ul>
+ </div><br />
+ <div>
+  
+  Additionally, for each <code>n<sub>cluster</sub> x n<sub>run</sub></code>, two summaries are provided. The first summary, stored in a <code>.csv_bp</code> file, includes all occurring base pairs and their frequencies. The second summary focuses on the frequency of dotbracket structures.
+  Furthermore, after each extension step, the <code>.interaction-csv</code> file contains all structures that are considered for further extension. The best structure, which is the first entry in the <code>.csv</code> file, is selected. This selected structure is then translated into a full-atom PDB format. For more details on the selection process, please see <td><a href="#selectnext"><code>selectnext.py</code></a></td>.
+
+</div><br />
 
 
 ## <strong>DOCUMENTATION</strong>
@@ -753,7 +811,7 @@ To get a quick overview of the pipeline and to test if the pipeline and all depe
 
   <br />
   <strong>Further Descriptions & Examples</strong><br />
-  <code> > python3 comparison.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
+  <code> > python comparison.py p /place/with/all/ss-sequences -i ss-constrain -c ssstart -o firstoutput.csv -u secondoutput.csv -m 'w' -t traflfile </code>
   <br /><br />
 
 
@@ -839,7 +897,7 @@ To get a quick overview of the pipeline and to test if the pipeline and all depe
   </table>
   <br />
   <strong>Further Descriptions & Examples</strong><br />
-  <code> >python3 selectnext.py -p 00/surface/analyse/ --print --first test0_00.ss --second test0_00.ss_cc -f </code>
+  <code> >python selectnext.py -p 00/surface/analyse/ --print --first test0_00.ss --second test0_00.ss_cc -f </code>
   <br /><br />
 
 
@@ -851,15 +909,21 @@ To get a quick overview of the pipeline and to test if the pipeline and all depe
     <ul>- numpy V.1.24.2 </ul>
     <ul>- pandas V.1.5.3 </ul>
     <ul>- scikit-learn V.1.2.1 </ul>
-  <dt>SimRNA V3.2 <a href="https://genesilico.pl/SimRNAweb">[link]</a><a id="SimRNA"></a></dt>
+  <dt><a href="https://genesilico.pl/SimRNAweb">SimRNA</a><a id="SimRNA"></a> V3.2</dt>
   <ul>Note: The files supplied with the RRI-3D package under <code>src/SimRNA_config/config*</code> are example SimRNA configurations for this pipeline. If you want to use these please copy them into the original SimRNA folder or adapt the <code>config.dat</code> file in the SimRNA folder individually and according to the pipeline, e.g. see section <a href="#configdat">config.dat</a> </ul>
-  <dt>Ernwin V1.2 <a href="https://github.com/ViennaRNA/ernwin">[link]</a><a id="ernwin"></a></dt>
-    <ul>- forgi V2.2.2 <a href="https://github.com/ViennaRNA/forgi">[link]</a> </ul>
+  <dt><a href="https://github.com/ViennaRNA/ernwin">Ernwin</a><a id="ernwin"></a> V1.2</dt>
+    <ul>- <a href="https://github.com/ViennaRNA/forgi">forgi</a> V2.2.2 </ul>
     <ul>- Note: incl. setup for all-atom reconstruction and fallbackstates </ul>
   <dt>for RNA design:</dt>
-    <ul>- ViennaRNA package <a href="https://www.tbi.univie.ac.at/RNA/">[link]</a> </ul>
-    <ul>- RNAblueprint <a href="https://github.com/ViennaRNA/RNAblueprint">[link]</a> </ul>
+    <ul>- <a href="https://www.tbi.univie.ac.at/RNA/"> ViennaRNA package</a> </ul>
+    <ul>- <a href="https://github.com/ViennaRNA/RNAblueprint">RNAblueprint</a> </ul>
+  <dt>To open the PyMOL sessions  (<code>.pse</code>) in the <code>/example</code> folder with selected 3D structures:</dt>
+    <ul>- <a href="https://pymol.org/2/#page-top">PyMol</a> </ul>
 </dl>
+
+## Runtime <a id="dependency"></a>
+Our pipeline's runtime is determined by both; the number of <code>n<sub>cluster</sub> x n<sub>run</sub> x n<sub>sim</sub> x n<sub>step</sub></code> and how many <code>n<sub>run</sub></code> are allowed to make a further extension step.
+As an example of runtime for our pipeline, we would like to highlight the CopA--CopT simualtion, which is mentioned in our publication. In this simulation, we utilized the following parameters: <code>n<sub>cluster</sub>=10, n<sub>run</sub>=5, n<sub>sim</sub>=5, n<sub>step</sub>=10000</code>. The simulation was executed over a duration of approximately 19 hours, utilizing up to 10 cores. 
 <br />
 
 ## References
