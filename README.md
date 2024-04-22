@@ -930,15 +930,14 @@ As an example of runtime for our pipeline, we would like to highlight the CopA--
 
 <dl>
   <dt>If you use this software package, please cite the follwing publication: </dt>
-    <ul>WILL BE ANNOUNCED </ul>
+        <ul><a href="https://doi.org/10.1261/rna.079756.123 ">Beckmann IK, Waldl M, Will S, Hofacker IL. 3D feasibility of 2D RNA–RNA interaction paths by stepwise folding simulations. RNA. 2023; 30:113–123.</a></ul>
 
   <dt>For the pipeline presented here, parts of the following already published software-features are used: </dt>
-    <ul><a href="https://doi.org/10.12688/f1000research.18458.2">B.C, Thiel et al. (2019) "3D based on 2D: Calculating helix angles and stacking patterns using forgi 2.0, an RNA Python library centered on secondary structure elements." F1000Research, 8:287</a></ul>
-    <ul><a href="https://doi.org/10.1261/rna.047522.114">P. Kerpedjiev P et al. (2015)"Predicting RNA 3D structure using a coarse-grain helix-centered model" RNA. 21(6): 1110–1121</a></ul>
-    <ul><a href="https://doi.org/10.1093/nar/gkv1479">M.J. Boniecki et al. (2016) “SimRNA: a coarse-grained method for RNA folding simulations and 3D structure prediction” Nucleic acids research vol. 44,7: e63</a> </ul>
-    <ul><a href="https://doi.org/10.1093/bioinformatics/btx263">S. Hammer et al. (2017) "RNAblueprint: flexible multiple target nucleic acid sequence design" Bioinformatics vol. 33, Issue 18, pp 2850–2858</a></ul>
-    <ul><a href="https://doi.org/10.1186/1748-7188-6-26">R. Lorenz et al. (2011), "ViennaRNA Package 2.0", Algorithms for Molecular Biology, 6:26</a></ul>
-    <ul><a href="https://doi.org/10.1007/BF00818163">I.L. Hofacker et al. (1994), "Fast folding and comparison of RNA secondary structures", Monatshefte fuer Chemie, vol. 125, Issue 2, pp 167-188</a></ul>
+    <ul><a href="https://doi.org/10.12688/f1000research.18458.2">Thiel BC, Beckmann IK, Kerpedjiev P, Hofacker IL. 3D based on 2D: Calculating helix angles and stacking patterns using forgi 2.0, an RNA Python library centered on secondary structure elements. F1000Res. 2019; 8:287.</a></ul>
+    <ul><a href="https://doi.org/10.1261/rna.047522.114">Kerpedjiev P, Höner zu Siederdissen C, Hofacker IL. Predicting RNA 3D structure using a coarse-grain helix-centered model. RNA. 2015; 21:1110–1121.</a></ul>
+    <ul><a href="https://doi.org/10.1093/nar/gkv1479">Boniecki MJ, Lach G, Dawson WK, Tomala K, Lukasz P, Soltysinski T, et al. SimRNA: a coarse-grained method for RNA folding simulations and 3D structure prediction. Nucleic Acids Res. 2015; 44:e63–e63.</a> </ul>
+    <ul><a href="https://doi.org/10.1093/bioinformatics/btx263">Hammer S, Tschiatschek B, Flamm C, Hofacker IL, Findeiß S. RNAblueprint: flexible multiple target nucleic acid sequence design. Bioinformatics.</a></ul>
+    <ul><a href="https://doi.org/10.1186/1748-7188-6-26">Lorenz R, Bernhart SH, Höner zu Siederdissen C, Tafer H, Flamm C, Stadler PF, et al. ViennaRNA Package 2.0. Algorithms Mol Biol. 2011; 6.</a></ul>
   </dl>
 
 
